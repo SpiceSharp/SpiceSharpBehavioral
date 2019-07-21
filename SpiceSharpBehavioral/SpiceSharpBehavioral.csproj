@@ -1,0 +1,51 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard1.5;net45</TargetFrameworks>
+    <Version>1.0.0</Version>
+    <Authors>Sven Boulanger</Authors>
+    <Description>Spice# is a circuit simulator based on and improved from Spice 3f5 by Berkeley. The framework allows custom components and simulations to be added.</Description>
+    <PackageProjectUrl>https://github.com/SpiceSharp/SpiceSharp</PackageProjectUrl>
+    <PackageLicenseUrl></PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/SpiceSharp/SpiceSharp</RepositoryUrl>
+    <PackageTags>circuit electronics netlist parser spice simulator simulation ode solver design behavioral modeling</PackageTags>
+    <PackageIconUrl>https://raw.githubusercontent.com/SpiceSharp/SpiceSharp/master/api/images/logo_full.svg?sanitize=true</PackageIconUrl>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <PackageReleaseNotes>Refer to the GitHub release for release notes</PackageReleaseNotes>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Company />
+    <NeutralLanguage>en-001</NeutralLanguage>
+    <FileVersion>1.0.0.0</FileVersion>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Derivative\**" />
+    <EmbeddedResource Remove="Derivative\**" />
+    <None Remove="Derivative\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Parsers\DefaultMath.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SpiceSharp" Version="2.7.4" />
+    <PackageReference Include="System.Linq.Expressions" Version="4.3.0" />
+  </ItemGroup>
+
+</Project>
