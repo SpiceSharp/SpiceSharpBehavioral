@@ -191,6 +191,10 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
             // Fill Y-matrix
             foreach (var item in Function.Derivatives)
             {
+                // Ignore 0-contributions
+                if (item.Value == null)
+                    continue;
+
                 // We want to first calculate the derivative
                 // derivative = df/dv(i)
                 block.Add(Expression.Assign(derivative, item.Value));

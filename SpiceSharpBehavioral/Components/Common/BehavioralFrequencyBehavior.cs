@@ -98,6 +98,10 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
             _contributions = new Complex[BiasingBehavior.Function.DerivativeCount];
             foreach (var item in BiasingBehavior.Function.Derivatives)
             {
+                // Ignore 0-contributions
+                if (item.Value == null)
+                    continue;
+
                 var contribution = Expression.ArrayAccess(Expression.Constant(_contributions), Expression.Constant(index, typeof(int)));
                 if (PosIndex > 0)
                 {
