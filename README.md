@@ -99,4 +99,6 @@ namespace Example2
 }
 ```
 
+A list of differentiable functions have been implemented for convenience through the use of extension methods. Include the namespace `SpiceSharpBehavioral.Parsers.Helper` to enable the method `RegisterDefaultFunctions()` on a parser.
+
 Defining a mathematical function will inevitably require you to also think about how its derivative should behave. If the derivative is chosen well, then the simulator will more likely converge quickly to the right value. The example also shows that you require access to LINQ expressions.
