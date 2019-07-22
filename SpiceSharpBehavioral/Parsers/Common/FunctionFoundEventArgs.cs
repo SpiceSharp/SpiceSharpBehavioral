@@ -40,7 +40,21 @@ namespace SpiceSharpBehavioral.Parsers
         /// <summary>
         /// Gets or sets the result.
         /// </summary>
-        public T Result { get; set; }
+        public T Result
+        {
+            get => _result;
+            set
+            {
+                _result = value;
+                Found = true;
+            }
+        }
+        private T _result;
+
+        /// <summary>
+        /// Gets or sets whether the result has been assigned or not.
+        /// </summary>
+        public bool Found { get; private set; }
 
         /// <summary>
         /// Constructor
@@ -52,7 +66,8 @@ namespace SpiceSharpBehavioral.Parsers
         {
             Name = name.ThrowIfNull(nameof(name));
             _arguments = arguments.ThrowIfNull(nameof(arguments));
-            Result = defaultValue;
+            _result = defaultValue;
+            Found = false;
         }
 
         /// <summary>

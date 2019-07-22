@@ -73,7 +73,7 @@ namespace SpiceSharpBehavioral.Parsers
                     
                     // Ask around for the result of this method
                     FunctionFound?.Invoke(this, args);
-                    if (double.IsNaN(args.Result))
+                    if (!args.Found)
                         throw new ParserException("Unrecognized method '{0}()'".FormatString(fo.Name), Input, Index);
                     _stack.Push(args.Result);
                     break;
@@ -174,7 +174,7 @@ namespace SpiceSharpBehavioral.Parsers
             var args = new SpicePropertyFoundEventArgs<double>(property, double.NaN);
             SpicePropertyFound?.Invoke(this, args);
 
-            if (double.IsNaN(args.Result))
+            if (!args.Found)
                 throw new ParserException("Unrecognized Spice property '{0}'".FormatString(property), Input, Index);
             _stack.Push(args.Result);
         }
@@ -188,7 +188,7 @@ namespace SpiceSharpBehavioral.Parsers
             var args = new VariableFoundEventArgs<double>(name, double.NaN);
             VariableFound?.Invoke(this, args);
 
-            if (double.IsNaN(args.Result))
+            if (!args.Found)
                 throw new ParserException("Unrecognized variable '{0}'".FormatString(name), Input, Index);
             _stack.Push(args.Result);
         }

@@ -2,6 +2,7 @@
 using System.Linq.Expressions;
 using NUnit.Framework;
 using SpiceSharpBehavioral.Parsers;
+using SpiceSharpBehavioral.Parsers.Helper;
 
 namespace SpiceSharpBehavioralTests.Parsers
 {
@@ -34,6 +35,34 @@ namespace SpiceSharpBehavioralTests.Parsers
             // Test brackets
             Check(1 - (5.8 - 12) - 3, parser.Parse("1 - (5.8 - 12) - 3"));
             Check(2 * (2 + 3) * 4, parser.Parse("2 * ((2 + 3)) * 4"));
+        }
+
+        [Test]
+        public void When_Functions_Expect_Reference()
+        {
+            var parser = new ExpressionTreeParser();
+            parser.RegisterDefaultFunctions();
+
+            // Test basic functions
+            Check(Math.Exp(10), parser.Parse("Exp(10)"));
+            Check(Math.Exp(-10), parser.Parse("Exp(-10)"));
+            Check(Math.Log(5), parser.Parse("Log(5)"));
+            Check(Math.Log(-5), parser.Parse("Log(-5)")); // Should give NaN
+            Check(Math.Log10(5), parser.Parse("Log10(5)"));
+            Check(Math.Pow(2, 3), parser.Parse("Pow(2, 3)"));
+            Check(Math.Pow(-2, -0.5), parser.Parse("Pow(-2, -0.5)")); // Should give NaN)
+            Check(Math.Sqrt(5), parser.Parse("Sqrt(5)"));
+            Check(Math.Sqrt(-5), parser.Parse("Sqrt(-5)")); // Should give NaN
+            Check(Math.Sin(2), parser.Parse("Sin(2)"));
+            Check(Math.Sin(-0.5), parser.Parse("Sin(-0.5)"));
+            Check(Math.Cos(2), parser.Parse("Cos(2)"));
+            Check(Math.Cos(-0.5), parser.Parse("Cos(-0.5)"));
+            Check(Math.Tan(2), parser.Parse("Tan(2)"));
+            Check(Math.Tan(-0.5), parser.Parse("Tan(-0.5)"));
+            Check(Math.Asin(0.25), parser.Parse("Asin(0.25)"));
+            Check(Math.Asin(-0.4), parser.Parse("Asin(-0.4)"));
+            Check(Math.Acos(0.25), parser.Parse("Acos(0.25)"));
+            Check(Math.Acos(-0.4), parser.Parse("Acos(-0.4)"));
         }
     }
 }

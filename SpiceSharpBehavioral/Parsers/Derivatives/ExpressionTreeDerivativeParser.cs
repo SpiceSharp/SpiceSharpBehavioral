@@ -77,7 +77,7 @@ namespace SpiceSharpBehavioral.Parsers
 
                     // Ask around for the result of this method
                     FunctionFound?.Invoke(this, args);
-                    if (ReferenceEquals(args.Result, null))
+                    if (!args.Found || args.Result == null)
                         throw new ParserException("Unrecognized method '{0}()'".FormatString(fo.Name), Input, Index);
                     _stack.Push(args.Result);
                     break;
@@ -180,7 +180,7 @@ namespace SpiceSharpBehavioral.Parsers
             var args = new SpicePropertyFoundEventArgs<ExpressionTreeDerivatives>(property, null);
             SpicePropertyFound?.Invoke(this, args);
 
-            if (args.Result == null)
+            if (!args.Found || args.Result == null)
                 throw new ParserException("Unrecognized Spice property '{0}'".FormatString(property), Input, Index);
             _stack.Push(args.Result);
         }
@@ -194,7 +194,7 @@ namespace SpiceSharpBehavioral.Parsers
             var args = new VariableFoundEventArgs<ExpressionTreeDerivatives>(name, null);
             VariableFound?.Invoke(this, args);
 
-            if (args.Result == null)
+            if (!args.Found || args.Result == null)
                 throw new ParserException("Unrecognized variable '{0}'".FormatString(name), Input, Index);
             _stack.Push(args.Result);
         }

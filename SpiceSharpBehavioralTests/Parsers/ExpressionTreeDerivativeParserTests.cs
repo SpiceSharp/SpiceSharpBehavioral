@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using NUnit.Framework;
 using SpiceSharpBehavioral.Parsers;
+using SpiceSharpBehavioral.Parsers.Helper;
 
 namespace SpiceSharpBehavioralTests.Parsers
 {
@@ -115,6 +116,48 @@ namespace SpiceSharpBehavioralTests.Parsers
                     for (var i = 0; i < list.Count; i++)
                         Check(list[i].Item2(), list[i].Item1());
                 }
+            }
+        }
+
+        [Test]
+        public void When_FunctionDerivatives_Expect_Reference()
+        {
+            var parser = new ExpressionTreeDerivativeParser();
+            parser.RegisterDefaultFunctions();
+
+            // Define our variable x
+            double x = 0;
+            parser.VariableFound += (sender, e) =>
+            {
+                if (e.Name == "x")
+                {
+                    e.Result = new ExpressionTreeDerivatives();
+                    Func<double> getx = () => x;
+                    e.Result[0] = Expression.Call(Expression.Constant(getx.Target), getx.Method);
+                    e.Result[1] = Expression.Constant(1.0);
+                }
+            };
+
+            // Compile all these methods
+            var list = new List<Tuple<Func<double>, Func<double>>>();
+            Compare(list, parser.Parse("Exp(x)"), () => Math.Exp(x), () => Math.Exp(x));
+            Compare(list, parser.Parse("Log(x^2)"), () => Math.Log(x * x), () => 2 * x / x / x);
+            Compare(list, parser.Parse("Log10(x)"), () => Math.Log10(x), () => 1 / Math.Log(10.0) / x);
+            Compare(list, parser.Parse("Pow(x, 5)"), () => Math.Pow(x, 5), () => Math.Pow(x, 4) * 5);
+            Compare(list, parser.Parse("Sqrt(x)"), () => Math.Sqrt(x), () => -0.5 / Math.Sqrt(x));
+            Compare(list, parser.Parse("Sin(x)"), () => Math.Sin(x), () => Math.Cos(x));
+            Compare(list, parser.Parse("Cos(x)"), () => Math.Cos(x), () => -Math.Sin(x));
+            Compare(list, parser.Parse("Tan(x)"), () => Math.Tan(x), () => 1 / Math.Cos(x) / Math.Cos(x));
+            Compare(list, parser.Parse("Asin(x)"), () => Math.Asin(x), () => 1 / Math.Sqrt(1 - x * x));
+            Compare(list, parser.Parse("Acos(x)"), () => Math.Acos(x), () => -1 / Math.Sqrt(1 - x * x));
+            Compare(list, parser.Parse("Atan(x)"), () => Math.Atan(x), () => 1 / (1 + x * x));
+
+
+            // Perform some tests
+            for (x = -2; x <= 2; x += 0.5)
+            {
+                for (var i = 0; i < list.Count; i++)
+                    Check(list[i].Item2(), list[i].Item1());
             }
         }
     }

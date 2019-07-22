@@ -33,6 +33,11 @@ namespace SpiceSharpBehavioral.Parsers
             return base.GetHashCode();
         }
 
+        /// <summary>
+        /// Calculate the power.
+        /// </summary>
+        /// <param name="exponent">The exponent.</param>
+        /// <returns></returns>
         public DoubleDerivatives Pow(DoubleDerivatives exponent)
         {
             var size = Math.Max(Count, exponent.Count);

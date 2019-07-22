@@ -17,7 +17,21 @@ namespace SpiceSharpBehavioral.Parsers
         /// <summary>
         /// Gets or sets the resulting value.
         /// </summary>
-        public T Result { get; set; }
+        public T Result
+        {
+            get => _result;
+            set
+            {
+                _result = value;
+                Found = true;
+            }
+        }
+        private T _result;
+
+        /// <summary>
+        /// Gets whether or not the property has been found.
+        /// </summary>
+        public bool Found { get; private set; }
 
         /// <summary>
         /// Constructor
@@ -27,7 +41,8 @@ namespace SpiceSharpBehavioral.Parsers
         public SpicePropertyFoundEventArgs(SpiceProperty property, T defaultValue)
         {
             Property = property.ThrowIfNull(nameof(property));
-            Result = defaultValue;
+            _result = defaultValue;
+            Found = false;
         }
     }
 }
