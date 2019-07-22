@@ -38,7 +38,7 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         /// </summary>
         private Complex[] _contributions;
         private Action _behavioralMethod;
-        private Action<Vector<double>> _initializeMethod;
+        private Action<SpiceSharp.Algebra.Vector<double>> _initializeMethod;
 
         /// <summary>
         /// Creates a new instance of the <see cref="BehavioralFrequencyBehavior"/> class.
@@ -121,7 +121,7 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
 
             // Compile the methods
             _behavioralMethod = Expression.Lambda<Action>(Expression.Block(block)).Compile();
-            _initializeMethod = Expression.Lambda<Action<Vector<double>>>(Expression.Block(init_block), BiasingBehavior.Function.Solution).Compile();
+            _initializeMethod = Expression.Lambda<Action<SpiceSharp.Algebra.Vector<double>>>(Expression.Block(init_block), BiasingBehavior.Function.Solution).Compile();
         }
 
         /// <summary>
