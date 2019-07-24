@@ -159,6 +159,9 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             return Expression.Call(AtanMethod, arguments[0]);
         }
 
+        /// <summary>
+        /// Miscellaneous
+        /// </summary>
         private static readonly MethodInfo AbsMethod = typeof(Math).GetTypeInfo().GetMethod("Abs", new[] { typeof(double) });
         private static readonly MethodInfo RoundMethod = typeof(Math).GetTypeInfo().GetMethod("Round", new[] { typeof(double) });
         private static readonly MethodInfo Round2Method = typeof(Math).GetTypeInfo().GetMethod("Round", new[] { typeof(double), typeof(int) });

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
 using NUnit.Framework;
 using SpiceSharpBehavioral.Parsers;
 using SpiceSharpBehavioral.Parsers.Helper;
@@ -10,23 +11,92 @@ namespace SpiceSharpBehavioralTests.Parsers
     [TestFixture]
     public class ExpressionTreeDerivativeTests
     {
+        private static readonly MethodInfo InvokeMethod = typeof(Func<double>).GetTypeInfo().GetMethod("Invoke");
+        private static readonly MethodInfo Invoke2Method = typeof(Func<int, double>).GetTypeInfo().GetMethod("Invoke");
         protected double RelativeTolerance = 1e-9;
         protected double AbsoluteTolerance = 1e-12;
 
-        protected void Check(double expected, double actual)
+        protected void Check(double expected, ExpressionTreeDerivatives parsed)
         {
-            var tol = Math.Max(Math.Abs(expected), Math.Abs(actual)) * RelativeTolerance + AbsoluteTolerance;
-            Assert.AreEqual(expected, actual, tol);
+            // Compile
+            var actual = parsed.Compile<Func<double>>(0);
+            var tol = Math.Max(Math.Abs(expected), Math.Abs(actual())) * RelativeTolerance + AbsoluteTolerance;
+            Assert.AreEqual(expected, actual(), tol);
         }
 
-        protected void Check(double[] expected, Derivatives<Expression> actual)
+        protected void Check(Func<double, double> reference, ExpressionTreeDerivativeParser parser, string expression)
         {
-            for (var i = 0; i < expected.Length; i++)
+            double x = 0.0;
+            Func<double> var = () => x;
+            void VariableFound(object sender, VariableFoundEventArgs<ExpressionTreeDerivatives> e)
             {
-                var method = Expression.Lambda<Func<double>>(actual[i]).Compile();
-                var result = method();
-                var tol = Math.Max(Math.Abs(expected[i]), Math.Abs(result)) * RelativeTolerance + AbsoluteTolerance;
-                Assert.AreEqual(expected[i], result, tol);
+                if (e.Name == "x")
+                {
+                    e.Result = new ExpressionTreeDerivatives();
+                    e.Result[0] = Expression.Call(Expression.Constant(var), InvokeMethod);
+                }
+            }
+            parser.VariableFound += VariableFound;
+            var parsed = parser.Parse(expression).Compile<Func<double>>(0);
+            parser.VariableFound -= VariableFound;
+
+            for (x = -2; x <= 2; x += 0.5)
+            {
+                var expected = reference(x);
+                var actual = parsed();
+                var tol = Math.Max(Math.Abs(expected), Math.Abs(actual)) * RelativeTolerance + AbsoluteTolerance;
+                Assert.AreEqual(expected, actual, tol);
+            }
+        }
+
+        protected void Check(Func<double[], double>[] reference, ExpressionTreeDerivativeParser parser, string expression)
+        {
+            double[] x = new double[reference.Length];
+            Func<int, double> var = i => x[i];
+            void VariableFound(object sender, VariableFoundEventArgs<ExpressionTreeDerivatives> e)
+            {
+                if (e.Name.Length == 1)
+                {
+                    var c = e.Name[0] - 'a';
+                    if (c >= 0 && c < reference.Length - 1)
+                    {
+                        e.Result = new ExpressionTreeDerivatives();
+                        e.Result[0] = Expression.Call(Expression.Constant(var), Invoke2Method, Expression.Constant(c, typeof(int)));
+                        e.Result[c + 1] = Expression.Constant(1.0);
+                    }
+                }
+            }
+            parser.VariableFound += VariableFound;
+            var result = parser.Parse(expression);
+            parser.VariableFound -= VariableFound;
+
+            var parsed = new Func<double>[reference.Length];
+            for (var i = 0; i < reference.Length; i++)
+                parsed[i] = result.Compile<Func<double>>(i);
+
+            // Iterate through a number of values
+            for (var i = 0; i < x.Length; i++)
+                x[i] = -2.0;
+            while (true)
+            {
+                
+                for (var i = 0; i < reference.Length; i++)
+                {
+                    var expected = reference[i](x);
+                    var actual = parsed[i]();
+                    var tol = Math.Max(Math.Abs(expected), Math.Abs(actual)) * RelativeTolerance + AbsoluteTolerance;
+                    Assert.AreEqual(expected, actual, tol);
+                }
+
+                // Find the last index that reached the maximum
+                var index = x.Length - 1;
+                while (index >= 0 && x[index] >= 2.0)
+                    index--;
+                if (index < 0)
+                    break;
+                x[index] += 0.5;
+                for (var i = index + 1; i < x.Length; i++)
+                    x[i] = 0.0;
             }
         }
 
@@ -39,126 +109,170 @@ namespace SpiceSharpBehavioralTests.Parsers
             Assert.AreEqual(expected, result, tol);
         }
 
-        protected void Compare(List<Tuple<Func<double>, Func<double>>> list, ExpressionTreeDerivatives derivatives, params Func<double>[] expected)
+        [Test]
+        public void When_Addition_Expect_Reference()
         {
-            Assert.IsTrue(expected.Length >= derivatives.Count);
-            for (var i = 0; i < expected.Length; i++)
-            {
-                var actual = derivatives.Compile<Func<double>>(i);
-                list.Add(new Tuple<Func<double>, Func<double>>(
-                    actual, expected[i]));
-            }
+            var parser = new ExpressionTreeDerivativeParser();
+            Check(1 + 2.5 + 10.8, parser.Parse("1 + 2.5 + 10.8"));
         }
 
         [Test]
-        public void When_SimpleArithmetic_Expect_Reference()
+        public void When_Subtraction_Expect_Reference()
         {
             var parser = new ExpressionTreeDerivativeParser();
+            Check(2 - 5.8 - 12, parser.Parse("2 - 5.8 - 12"));
+        }
 
-            // Test associativity
-            Check(1 + 2.5 + 10.8, parser.Parse("1 + 2.5 + 10.8")); // Addition associativity
-            Check(2 - 5.8 - 12, parser.Parse("2 - 5.8 - 12")); // Subtraction associativity
-            Check(3 * 1.8 * 0.9, parser.Parse("3 * 1.8 * 0.9")); // Multiplication associativity
-            Check(4 / 0.4 / 2.8, parser.Parse("4 / 0.4 / 2.8")); // Division associativity
-            Check(Math.Pow(2, Math.Pow(0.5, 3)), parser.Parse("2^0.5^3")); // Power associativity
+        [Test]
+        public void When_Multiplication_Expect_Reference()
+        {
+            var parser = new ExpressionTreeDerivativeParser();
+            Check(3 * 1.8 * 0.9, parser.Parse("3 * 1.8 * 0.9"));
+        }
 
-            // Test brackets
+        [Test]
+        public void When_Division_Expect_Reference()
+        {
+            var parser = new ExpressionTreeDerivativeParser();
+            Check(4 / 0.4 / 2.8, parser.Parse("4 / 0.4 / 2.8"));
+        }
+
+        [Test]
+        public void When_Power_Expect_Reference()
+        {
+            var parser = new ExpressionTreeDerivativeParser();
+            Check(Math.Pow(2, Math.Pow(0.5, 3)), parser.Parse("2^0.5^3"));
+        }
+
+        [Test]
+        public void When_Brackets_Expect_Reference()
+        {
+            var parser = new ExpressionTreeDerivativeParser();
             Check(1 - (5.8 - 12) - 3, parser.Parse("1 - (5.8 - 12) - 3"));
             Check(2 * (2 + 3) * 4, parser.Parse("2 * ((2 + 3)) * 4"));
+        }
+
+        private ExpressionTreeDerivativeParser Parser
+        {
+            get
+            {
+                var parser = new ExpressionTreeDerivativeParser();
+                parser.RegisterDefaultFunctions();
+                return parser;
+            }
         }
 
         [Test]
         public void When_SimpleDerivatives_Expect_Reference()
         {
-
-            var parser = new ExpressionTreeDerivativeParser();
-
-            // Define our variable x
-            double x = 0, y = 0;
-            parser.VariableFound += (sender, e) =>
-            {
-                if (e.Name == "x")
-                {
-                    e.Result = new ExpressionTreeDerivatives();
-                    Func<double> getx = () => x;
-                    e.Result[0] = Expression.Call(Expression.Constant(getx.Target), getx.Method);
-                    e.Result[1] = Expression.Constant(1.0);
-                }
-            };
-
-            // Define our variable y
-            parser.VariableFound += (sender, e) =>
-            {
-                if (e.Name == "y")
-                {
-                    e.Result = new ExpressionTreeDerivatives();
-                    Func<double> gety = () => y;
-                    e.Result[0] = Expression.Call(Expression.Constant(gety.Target), gety.Method);
-                    e.Result[2] = Expression.Constant(1.0);
-                }
-            };
-
-            // Compile all these methods
-            var list = new List<Tuple<Func<double>, Func<double>>>();
-            Compare(list, parser.Parse("6*x"), () => 6 * x, () => 6);
-            Compare(list, parser.Parse("x^2"), () => x * x, () => 2 * x);
-            Compare(list, parser.Parse("x * (x - 3)"), () => x * (x - 3), () => 2 * x - 3);
-            Compare(list, parser.Parse("1 / x^3"), () => 1 / Math.Pow(x, 3), () => -3 * Math.Pow(x, 2) / Math.Pow(x, 6));
-            Compare(list, parser.Parse("2 * x + 3 * y"), () => 2 * x + 3 * y, () => 2, () => 3);
-            Compare(list, parser.Parse("x * y"), () => x * y, () => y, () => x);
-            Compare(list, parser.Parse("x ^ y"), () => Math.Pow(x, y), () => y * Math.Pow(x, y - 1), () => Math.Log(x) * Math.Pow(x, y));
-
-            // Perform some tests
-            for (x = -2; x <= 2; x += 0.5)
-            {
-                for (y = -2; y <= 2; y += 0.5)
-                {
-                    for (var i = 0; i < list.Count; i++)
-                        Check(list[i].Item2(), list[i].Item1());
-                }
-            }
+            var parser = Parser;
+            Check(new Func<double[], double>[] { x => 6 * x[0], x => 6 }, parser, "6*a");
+            Check(new Func<double[], double>[] { x => x[0] * x[0], x => 2 * x[0] }, parser, "a^2");
+            Check(new Func<double[], double>[] { x => x[0] * (x[0] - 3), x => 2 * x[0] - 3 }, parser, "a * (a - 3)");
+            Check(new Func<double[], double>[] { x => 1 / Math.Pow(x[0], 3), x => -3 * Math.Pow(x[0], 2) / Math.Pow(x[0], 6) }, parser, "1 / a^3");
+            Check(new Func<double[], double>[] { x => 2 * x[0] + 3 * x[1], x => 2, x => 3 }, parser, "2 * a + 3 * b");
+            Check(new Func<double[], double>[] { x => x[0] * x[1], x => x[1], x => x[0] }, parser, "a * b");
+            Check(new Func<double[], double>[] { x => Math.Pow(x[0], x[1]), x => x[1] * Math.Pow(x[0], x[1] - 1), x => Math.Log(x[0]) * Math.Pow(x[0], x[1]) }, parser, "a^b");
         }
 
         [Test]
-        public void When_FunctionDerivatives_Expect_Reference()
+        public void When_Exp_Expect_Reference()
         {
-            var parser = new ExpressionTreeDerivativeParser();
-            parser.RegisterDefaultFunctions();
+            var parser = Parser;
+            Check(new Func<double[], double>[] { x => Math.Exp(x[0]), x => Math.Exp(x[0]) }, parser, "Exp(a)");
+        }
 
-            // Define our variable x
-            double x = 0;
-            parser.VariableFound += (sender, e) =>
-            {
-                if (e.Name == "x")
-                {
-                    e.Result = new ExpressionTreeDerivatives();
-                    Func<double> getx = () => x;
-                    e.Result[0] = Expression.Call(Expression.Constant(getx.Target), getx.Method);
-                    e.Result[1] = Expression.Constant(1.0);
-                }
-            };
+        [Test]
+        public void When_Log_Expect_Reference()
+        {
+            var parser = Parser;
+            Check(new Func<double[], double>[] { x => Math.Log(x[0]), x => 1 / x[0] }, parser, "Log(a)");
+            Check(new Func<double[], double>[] { x => Math.Log10(x[0]), x => 1 / Math.Log(10.0) / x[0] }, parser, "Log10(a)");
+        }
 
-            // Compile all these methods
-            var list = new List<Tuple<Func<double>, Func<double>>>();
-            Compare(list, parser.Parse("Exp(x)"), () => Math.Exp(x), () => Math.Exp(x));
-            Compare(list, parser.Parse("Log(x^2)"), () => Math.Log(x * x), () => 2 * x / x / x);
-            Compare(list, parser.Parse("Log10(x)"), () => Math.Log10(x), () => 1 / Math.Log(10.0) / x);
-            Compare(list, parser.Parse("Pow(x, 5)"), () => Math.Pow(x, 5), () => Math.Pow(x, 4) * 5);
-            Compare(list, parser.Parse("Sqrt(x)"), () => Math.Sqrt(x), () => -0.5 / Math.Sqrt(x));
-            Compare(list, parser.Parse("Sin(x)"), () => Math.Sin(x), () => Math.Cos(x));
-            Compare(list, parser.Parse("Cos(x)"), () => Math.Cos(x), () => -Math.Sin(x));
-            Compare(list, parser.Parse("Tan(x)"), () => Math.Tan(x), () => 1 / Math.Cos(x) / Math.Cos(x));
-            Compare(list, parser.Parse("Asin(x)"), () => Math.Asin(x), () => 1 / Math.Sqrt(1 - x * x));
-            Compare(list, parser.Parse("Acos(x)"), () => Math.Acos(x), () => -1 / Math.Sqrt(1 - x * x));
-            Compare(list, parser.Parse("Atan(x)"), () => Math.Atan(x), () => 1 / (1 + x * x));
+        [Test]
+        public void When_Pow_Expect_Reference()
+        {
+            var parser = Parser;
+            Check(new Func<double[], double>[] { x => Math.Pow(x[0], x[1]), x => x[1] * Math.Pow(x[0], x[1] - 1), x => Math.Log(x[0]) * Math.Pow(x[0], x[1]) }, parser, "Pow(a, b)");
+        }
 
+        [Test]
+        public void When_Sqrt_Expect_Reference()
+        {
+            var parser = Parser;
+            Check(new Func<double[], double>[] { x => Math.Sqrt(x[0]), x => -0.5 / Math.Sqrt(x[0]) }, parser, "Sqrt(a)");
+        }
 
-            // Perform some tests
-            for (x = -2; x <= 2; x += 0.5)
-            {
-                for (var i = 0; i < list.Count; i++)
-                    Check(list[i].Item2(), list[i].Item1());
-            }
+        [Test]
+        public void When_Sin_Expect_Reference()
+        {
+            var parser = Parser;
+            Check(new Func<double[], double>[] { x => Math.Sin(x[0]), x => Math.Cos(x[0]) }, parser, "Sin(a)");
+        }
+
+        [Test]
+        public void When_Cos_Expect_Reference()
+        {
+            var parser = Parser;
+            Check(new Func<double[], double>[] { x => Math.Cos(x[0]), x => -Math.Sin(x[0]) }, parser, "Cos(a)");
+        }
+
+        [Test]
+        public void When_Tan_Expect_Reference()
+        {
+            var parser = Parser;
+            Check(new Func<double[], double>[] { x => Math.Tan(x[0]), x => 1.0 / Math.Cos(x[0]) / Math.Cos(x[0]) }, parser, "Tan(a)");
+        }
+
+        [Test]
+        public void When_Asin_Expect_Reference()
+        {
+            var parser = Parser;
+            Check(new Func<double[], double>[] { x => Math.Asin(x[0]), x => 1.0 / Math.Sqrt(1 - x[0] * x[0]) }, parser, "Asin(a)");
+        }
+
+        [Test]
+        public void When_Acos_Expect_Reference()
+        {
+            var parser = Parser;
+            Check(new Func<double[], double>[] { x => Math.Acos(x[0]), x => -1.0 / Math.Sqrt(1 - x[0] * x[0]) }, parser, "Acos(a)");
+        }
+
+        [Test]
+        public void When_Atan_Expect_Reference()
+        {
+            var parser = Parser;
+            Check(new Func<double[], double>[] { x => Math.Atan(x[0]), x => 1.0 / (1 + x[0] * x[0]) }, parser, "Atan(a)");
+        }
+
+        [Test]
+        public void When_Abs_Expect_Reference()
+        {
+            var parser = Parser;
+            Check(new Func<double[], double>[] { x => Math.Abs(x[0]), x => x[0] > 0 ? 1 : x[0] < 0 ? -1 : 0 }, parser, "Abs(a)");
+        }
+
+        [Test]
+        public void When_Round_Expect_Reference()
+        {
+            var parser = Parser;
+            Check(x => Math.Round(x), parser, "Round(x)");
+            Check(x => Math.Round(x, 2), parser, "Round(x, 2)");
+        }
+
+        [Test]
+        public void When_Min_Expect_Reference()
+        {
+            var parser = Parser;
+            Check(x => Math.Min(x, 1), parser, "Min(x, 1)");
+        }
+
+        [Test]
+        public void When_Max_Expect_Reference()
+        {
+            var parser = Parser;
+            Check(x => Math.Max(x, 1), parser, "Max(x, 1)");
         }
     }
 }

@@ -277,6 +277,9 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             return result;
         }
 
+        /// <summary>
+        /// Miscellaneous
+        /// </summary>
         public static DoubleDerivatives ApplyAbs(DoubleDerivatives[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 1);

@@ -26,7 +26,11 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             { "Tan", ApplyTan },
             { "Asin", ApplyAsin },
             { "Acos", ApplyAcos },
-            { "Atan", ApplyAtan }
+            { "Atan", ApplyAtan },
+            { "Abs", ApplyAbs },
+            { "Round", ApplyRound },
+            { "Min", ApplyMin },
+            { "Max", ApplyMax }
         };
 
         /// <summary>
@@ -311,6 +315,96 @@ namespace SpiceSharpBehavioral.Parsers.Helper
                     result[i] = Expression.Divide(arg[i], Expression.Add(Expression.Constant(1.0),
                         Expression.Call(SquareMethod, arg[0])));
             }
+            return result;
+        }
+
+        /// <summary>
+        /// Miscellaneous
+        /// </summary>
+        private static readonly MethodInfo AbsMethod = typeof(Math).GetTypeInfo().GetMethod("Abs", new[] { typeof(double) });
+        private static readonly MethodInfo RoundMethod = typeof(Math).GetTypeInfo().GetMethod("Round", new[] { typeof(double) });
+        private static readonly MethodInfo Round2Method = typeof(Math).GetTypeInfo().GetMethod("Round", new[] { typeof(double), typeof(int) });
+        private static readonly MethodInfo MinMethod = typeof(Math).GetTypeInfo().GetMethod("Min", new[] { typeof(double), typeof(double) });
+        private static readonly MethodInfo MaxMethod = typeof(Math).GetTypeInfo().GetMethod("Max", new[] { typeof(double), typeof(double) });
+        public static ExpressionTreeDerivatives ApplyAbs(ExpressionTreeDerivatives[] arguments)
+        {
+            arguments.ThrowIfNot(nameof(arguments), 1);
+            var arg = arguments[0];
+            var result = new ExpressionTreeDerivatives(arg.Count);
+            result[0] = Expression.Call(AbsMethod, arg[0]);
+
+            // Apply chain rule
+            for (var i = 1; i < arg.Count; i++)
+            {
+                if (!arg[i].Equals(0.0))
+                    result[i] = Expression.Multiply(arg[i], 
+                        Expression.Condition(
+                            Expression.GreaterThan(arg[0], Expression.Constant(0.0)),
+                            Expression.Constant(1.0),
+                            Expression.Condition(
+                                Expression.LessThan(arg[0], Expression.Constant(0.0)),
+                                Expression.Constant(-1.0),
+                                Expression.Constant(0.0))));
+            }
+            return result;
+        }
+        public static ExpressionTreeDerivatives ApplyRound(ExpressionTreeDerivatives[] arguments)
+        {
+            arguments.ThrowIfEmpty(nameof(arguments));
+            var arg = arguments[0];
+            if (arguments.Length == 1)
+            {
+                var result = new ExpressionTreeDerivatives();
+                result[0] = Expression.Call(RoundMethod, arg[0]);
+
+                for (var i = 1; i < arg.Count; i++)
+                    if (arg[i] != null)
+                        throw new CircuitException("Cannot differentiate Round()");
+                return result;
+            }
+            if (arguments.Length == 2)
+            {
+                var result = new ExpressionTreeDerivatives();
+                result[0] = Expression.Call(Round2Method, arg[0], Expression.Convert(Expression.Call(RoundMethod, arguments[1][0]), typeof(int)));
+
+                for (var i = 1; i < arg.Count; i++)
+                    if (arg[i] != null)
+                        throw new CircuitException("Cannot differentiate Round()");
+                for (var i = 1; i < arguments[1].Count; i++)
+                    if (arguments[1][i] != null)
+                        throw new CircuitException("Cannot differentiate Round()");
+                return result;
+            }
+            throw new CircuitException("Invalid number of arguments for Round()");
+        }
+        public static ExpressionTreeDerivatives ApplyMin(ExpressionTreeDerivatives[] arguments)
+        {
+            arguments.ThrowIfEmpty(nameof(arguments));
+            var result = new ExpressionTreeDerivatives();
+            var min = arguments[0][0];
+            for (var i = 1; i < arguments.Length; i++)
+            {
+                min = Expression.Call(MinMethod, min, arguments[i][0]);
+                for (var k = 1; k < arguments[i].Count; k++)
+                    if (arguments[i][k] != null)
+                        throw new CircuitException("Cannot differentiate Min()");
+            }
+            result[0] = min;
+            return result;
+        }
+        public static ExpressionTreeDerivatives ApplyMax(ExpressionTreeDerivatives[] arguments)
+        {
+            arguments.ThrowIfEmpty(nameof(arguments));
+            var result = new ExpressionTreeDerivatives();
+            var min = arguments[0][0];
+            for (var i = 1; i < arguments.Length; i++)
+            {
+                min = Expression.Call(MaxMethod, min, arguments[i][0]);
+                for (var k = 1; k < arguments[i].Count; k++)
+                    if (arguments[i][k] != null)
+                        throw new CircuitException("Cannot differentiate Min()");
+            }
+            result[0] = min;
             return result;
         }
 
