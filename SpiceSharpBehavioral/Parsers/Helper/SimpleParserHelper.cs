@@ -18,7 +18,11 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             { "Tan", ApplyTan },
             { "Asin", ApplyAsin },
             { "Acos", ApplyAcos },
-            { "Atan", ApplyAtan }
+            { "Atan", ApplyAtan },
+            { "Abs", ApplyAbs },
+            { "Round", ApplyRound },
+            { "Min", ApplyMin },
+            { "Max", ApplyMax }
         };
 
         /// <summary>
@@ -101,6 +105,36 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         public static double ApplyAsin(double[] arguments) => Math.Asin(arguments.ThrowIfNot(nameof(arguments), 1)[0]);
         public static double ApplyAcos(double[] arguments) => Math.Acos(arguments.ThrowIfNot(nameof(arguments), 1)[0]);
         public static double ApplyAtan(double[] arguments) => Math.Atan(arguments.ThrowIfNot(nameof(arguments), 1)[0]);
+
+        /// <summary>
+        /// Miscellaneous
+        /// </summary>
+        public static double ApplyAbs(double[] arguments) => Math.Abs(arguments.ThrowIfNot(nameof(arguments), 1)[0]);
+        public static double ApplyRound(double[] arguments)
+        {
+            arguments.ThrowIfEmpty(nameof(arguments));
+            if (arguments.Length == 1)
+                return Math.Round(arguments[0]);
+            if (arguments.Length == 2)
+                return Math.Round(arguments[0], (int)Math.Round(arguments[1]));
+            throw new CircuitException("Invalid number of arguments for Round()");
+        }
+        public static double ApplyMin(double[] arguments)
+        {
+            arguments.ThrowIfEmpty(nameof(arguments));
+            var min = arguments[0];
+            for (var i = 1; i < arguments.Length; i++)
+                min = Math.Min(min, arguments[i]);
+            return min;
+        }
+        public static double ApplyMax(double[] arguments)
+        {
+            arguments.ThrowIfEmpty(nameof(arguments));
+            var max = arguments[0];
+            for (var i = 1; i < arguments.Length; i++)
+                max = Math.Max(max, arguments[i]);
+            return max;
+        }
 
         public delegate double SimpleFunction(double[] arguments);
     }

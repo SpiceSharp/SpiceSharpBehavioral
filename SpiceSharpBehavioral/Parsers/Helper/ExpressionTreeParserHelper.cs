@@ -23,7 +23,11 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             { "Tan", ApplyTan },
             { "Asin", ApplyAsin },
             { "Acos", ApplyAcos },
-            { "Atan", ApplyAtan }
+            { "Atan", ApplyAtan },
+            { "Abs", ApplyAbs },
+            { "Round", ApplyRound },
+            { "Min", ApplyMin },
+            { "Max", ApplyMax }
         };
 
         /// <summary>
@@ -153,6 +157,42 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         {
             arguments.ThrowIfNot(nameof(arguments), 1);
             return Expression.Call(AtanMethod, arguments[0]);
+        }
+
+        private static readonly MethodInfo AbsMethod = typeof(Math).GetTypeInfo().GetMethod("Abs", new[] { typeof(double) });
+        private static readonly MethodInfo RoundMethod = typeof(Math).GetTypeInfo().GetMethod("Round", new[] { typeof(double) });
+        private static readonly MethodInfo Round2Method = typeof(Math).GetTypeInfo().GetMethod("Round", new[] { typeof(double), typeof(int) });
+        private static readonly MethodInfo MinMethod = typeof(Math).GetTypeInfo().GetMethod("Min", new[] { typeof(double), typeof(double) });
+        private static readonly MethodInfo MaxMethod = typeof(Math).GetTypeInfo().GetMethod("Max", new[] { typeof(double), typeof(double) });
+        public static Expression ApplyAbs(Expression[] arguments)
+        {
+            arguments.ThrowIfNot(nameof(arguments), 1);
+            return Expression.Call(AbsMethod, arguments[0]);
+        }
+        public static Expression ApplyRound(Expression[] arguments)
+        {
+            arguments.ThrowIfEmpty(nameof(arguments));
+            if (arguments.Length == 1)
+                return Expression.Call(RoundMethod, arguments[0]);
+            if (arguments.Length == 2)
+                return Expression.Call(Round2Method, arguments[0], Expression.Convert(Expression.Call(RoundMethod, arguments[1]), typeof(int)));
+            throw new CircuitException("Invalid number of arguments for Abs()");
+        }
+        public static Expression ApplyMin(Expression[] arguments)
+        {
+            arguments.ThrowIfEmpty(nameof(arguments));
+            var result = arguments[0];
+            for (var i = 1; i < arguments.Length; i++)
+                result = Expression.Call(MinMethod, result, arguments[i]);
+            return result;
+        }
+        public static Expression ApplyMax(Expression[] arguments)
+        {
+            arguments.ThrowIfEmpty(nameof(arguments));
+            var result = arguments[0];
+            for (var i = 1; i < arguments.Length; i++)
+                result = Expression.Call(MaxMethod, result, arguments[i]);
+            return result;
         }
 
         /// <summary>
