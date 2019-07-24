@@ -24,7 +24,11 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             { "Tan", ApplyTan },
             { "Asin", ApplyAsin },
             { "Acos", ApplyAcos },
-            { "Atan", ApplyAtan }
+            { "Atan", ApplyAtan },
+            { "Abs", ApplyAbs },
+            { "Round", ApplyRound },
+            { "Min", ApplyMin },
+            { "Max", ApplyMax }
         };
 
         /// <summary>
@@ -270,6 +274,81 @@ namespace SpiceSharpBehavioral.Parsers.Helper
                 if (!arg[i].Equals(0.0))
                     result[i] = arg[i] / (1 + Square(arg[0]));
             }
+            return result;
+        }
+
+        public static DoubleDerivatives ApplyAbs(DoubleDerivatives[] arguments)
+        {
+            arguments.ThrowIfNot(nameof(arguments), 1);
+            var arg = arguments[0];
+            var result = new DoubleDerivatives(arg.Count);
+            result[0] = Math.Abs(arg[0]);
+
+            // Apply chain rule
+            for (var i = 1; i < arg.Count; i++)
+            {
+                if (!arg[i].Equals(0.0))
+                    result[i] = arg[i] * (arg[0] > 0 ? 1 : arg[0] < 0 ? -1 : 0);
+            }
+            return result;
+        }
+        public static DoubleDerivatives ApplyRound(DoubleDerivatives[] arguments)
+        {
+            arguments.ThrowIfEmpty(nameof(arguments));
+            var arg = arguments[0];
+            if (arguments.Length == 1)
+            {
+                var result = new DoubleDerivatives();
+                result[0] = Math.Round(arg[0]);
+                
+                for (var i = 1; i < arg.Count; i++)
+                    if (!arg[i].Equals(0.0))
+                        throw new CircuitException("Cannot differentiate Round()");
+                return result;
+            }
+            if (arguments.Length == 2)
+            {
+                var result = new DoubleDerivatives();
+                result[0] = Math.Round(arg[0], (int)Math.Round(arguments[1][0]));
+
+                for (var i = 1; i < arg.Count; i++)
+                    if (!arg[i].Equals(0.0))
+                        throw new CircuitException("Cannot differentiate Round()");
+                for (var i = 1; i < arguments[1].Count; i++)
+                    if (!arguments[1][i].Equals(0.0))
+                        throw new CircuitException("Cannot differentiate Round()");
+                return result;
+            }
+            throw new CircuitException("Invalid number of arguments for Round()");
+        }
+        public static DoubleDerivatives ApplyMin(DoubleDerivatives[] arguments)
+        {
+            arguments.ThrowIfEmpty(nameof(arguments));
+            var result = new DoubleDerivatives();
+            var min = arguments[0][0];
+            for (var i = 1; i < arguments.Length; i++)
+            {
+                min = Math.Min(min, arguments[i][0]);
+                for (var k = 1; k < arguments[i].Count; k++)
+                    if (!arguments[i][k].Equals(0.0))
+                        throw new CircuitException("Cannot differentiate Min()");
+            }
+            result[0] = min;
+            return result;
+        }
+        public static DoubleDerivatives ApplyMax(DoubleDerivatives[] arguments)
+        {
+            arguments.ThrowIfEmpty(nameof(arguments));
+            var result = new DoubleDerivatives();
+            var min = arguments[0][0];
+            for (var i = 1; i < arguments.Length; i++)
+            {
+                min = Math.Max(min, arguments[i][0]);
+                for (var k = 1; k < arguments[i].Count; k++)
+                    if (!arguments[i][k].Equals(0.0))
+                        throw new CircuitException("Cannot differentiate Min()");
+            }
+            result[0] = min;
             return result;
         }
 
