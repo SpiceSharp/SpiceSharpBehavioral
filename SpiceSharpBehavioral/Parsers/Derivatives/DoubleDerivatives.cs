@@ -7,9 +7,16 @@ namespace SpiceSharpBehavioral.Parsers
     /// </summary>
     public class DoubleDerivatives : Derivatives<double>
     {
+        /// <summary>
+        /// Creates a new instance of the <see cref="DoubleDerivatives"/> class.
+        /// </summary>
         public DoubleDerivatives()
         { }
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="DoubleDerivatives"/> class.
+        /// </summary>
+        /// <param name="capacity"></param>
         public DoubleDerivatives(int capacity)
             : base(capacity)
         { }

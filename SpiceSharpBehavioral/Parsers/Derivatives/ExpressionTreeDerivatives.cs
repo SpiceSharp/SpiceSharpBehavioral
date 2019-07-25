@@ -9,11 +9,11 @@ namespace SpiceSharpBehavioral.Parsers
     /// </summary>
     public class ExpressionTreeDerivatives : Derivatives<Expression>
     {
-        public static Expression Zero = Expression.Constant(0.0);
-        public static Expression One = Expression.Constant(1.0);
-        public static MethodInfo LogInfo = typeof(Math).GetTypeInfo().GetMethod("Log", new[] { typeof(double) });
-        public static MethodInfo PowInfo = typeof(Math).GetTypeInfo().GetMethod("Pow", new[] { typeof(double), typeof(double) });
-        public static MethodInfo SquareInfo = typeof(ExpressionTreeDerivatives).GetTypeInfo().GetMethod("Square", new[] { typeof(double) });
+        public static readonly Expression Zero = Expression.Constant(0.0);
+        public static readonly Expression One = Expression.Constant(1.0);
+        public static readonly MethodInfo LogInfo = typeof(Math).GetTypeInfo().GetMethod("Log", new[] { typeof(double) });
+        public static readonly MethodInfo PowInfo = typeof(Math).GetTypeInfo().GetMethod("Pow", new[] { typeof(double), typeof(double) });
+        public static readonly MethodInfo SquareInfo = typeof(ExpressionTreeDerivatives).GetTypeInfo().GetMethod("Square", new[] { typeof(double) });
 
         public ExpressionTreeDerivatives()
         { }
