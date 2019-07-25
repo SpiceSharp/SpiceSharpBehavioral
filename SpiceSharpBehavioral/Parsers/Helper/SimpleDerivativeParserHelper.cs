@@ -73,13 +73,17 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             arguments.ThrowIfNot(nameof(arguments), 1);
             var arg = arguments[0];
             var result = new DoubleDerivatives(arg.Count);
-            result[0] = Math.Exp(arg[0]);
+            var a0 = arg[0];
+            result[0] = () => Math.Exp(a0());
 
             // Chain rule for derivatives
             for (var i = 1; i < arg.Count; i++)
             {
-                if (!arg[i].Equals(0.0))
-                    result[i] = result[0] * arg[i];
+                if (arg[i] != null)
+                {
+                    var ai = arg[i];
+                    result[i] = () => Math.Exp(a0()) * ai();
+                }
             }
             return result;
         }
@@ -95,13 +99,17 @@ namespace SpiceSharpBehavioral.Parsers.Helper
                 // Ln(f(x))' = 1/f(x)*f'(x)
                 var arg = arguments[0];
                 var result = new DoubleDerivatives(arg.Count);
-                result[0] = Math.Log(arg[0]);
+                var a0 = arg[0];
+                result[0] = () => Math.Log(a0());
 
                 // Chain rule
                 for (var i = 1; i < arg.Count; i++)
                 {
-                    if (!arg[i].Equals(0.0))
-                        result[i] = arg[i] / arg[0];
+                    if (arg[i] != null)
+                    {
+                        var ai = arg[i];
+                        result[i] = () => ai() / a0();
+                    }
                 }
                 return result;
             }
@@ -113,15 +121,38 @@ namespace SpiceSharpBehavioral.Parsers.Helper
                 var f = arguments[1];
                 var size = Math.Max(f.Count, g.Count);
                 var result = new DoubleDerivatives(size);
-                result[0] = Math.Log(g[0], f[0]);
+                var g0 = g[0];
+                var f0 = f[0];
+                result[0] = () => Math.Log(g0(), f0());
 
                 // Chain rule
                 for (var i = 1; i < size; i++)
                 {
-                    if (!g[i].Equals(0.0))
-                        result[i] = g[i] / g[0] / Math.Log(f[0]);
-                    if (!f[i].Equals(0.0))
-                        result[i] -= f[i] / f[0] * result[0];
+                    if (g[i] != null && f[i] != null)
+                    {
+                        var gi = g[i];
+                        var fi = f[i];
+                        result[i] = () =>
+                        {
+                            var tmpf0 = f0();
+                            var tmpg0 = g0();
+                            return gi() / tmpg0 / Math.Log(tmpf0) - fi() / tmpf0 * Math.Log(tmpg0, tmpf0);
+                        };
+                    }
+                    else if (g[i] != null)
+                    {
+                        var gi = g[i];
+                        result[i] = () => gi() / g0() / Math.Log(f0());
+                    }
+                    else if (f[i] != null)
+                    {
+                        var fi = f[i];
+                        result[i] = () =>
+                        {
+                            var tmpf0 = f0();
+                            return -fi() / f0() * Math.Log(g0(), tmpf0);
+                        };
+                    }
                 }
                 return result;
             }
@@ -131,9 +162,11 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         public static DoubleDerivatives ApplyLog10(DoubleDerivatives[] arguments)
         {
             var result = ApplyLog(arguments);
-            var a = Math.Log(10.0);
             for (var i = 0; i < arguments[0].Count; i++)
-                result[i] = result[i] / a;
+            {
+                var arg = result[i];
+                result[i] = () => arg() / Math.Log(10.0);
+            }
             return result;
         }
 
@@ -145,19 +178,7 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             arguments.ThrowIfNot(nameof(arguments), 2);
             var f = arguments[0];
             var g = arguments[1];
-            var size = Math.Max(f.Count, g.Count);
-            var result = new DoubleDerivatives(size);
-            result[0] = Math.Pow(f[0], g[0]);
-
-            // Apply chain rule
-            for (var i = 1; i < size; i++)
-            {
-                if (!f[i].Equals(0.0))
-                    result[i] = g[0] * f[i] * Math.Pow(f[0], g[0] - 1);
-                if (!g[i].Equals(0.0))
-                    result[i] += g[i] * result[0] * Math.Log(f[0]);
-            }
-            return result;
+            return f.Pow(g);
         }
 
         /// <summary>
@@ -166,15 +187,19 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         public static DoubleDerivatives ApplySqrt(DoubleDerivatives[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 1);
-            var arg = arguments[0];
-            var result = new DoubleDerivatives(arg.Count);
-            result[0] = Math.Sqrt(arg[0]);
+            var a = arguments[0];
+            var result = new DoubleDerivatives(a.Count);
+            var a0 = a[0];
+            result[0] = () => Math.Sqrt(a0());
 
             // Apply the chain rule
-            for (var i = 1; i < arg.Count; i++)
+            for (var i = 1; i < a.Count; i++)
             {
-                if (!arg[i].Equals(0.0))
-                    result[i] = -0.5 * arg[i] / result[0];
+                if (a[i] != null)
+                {
+                    var ai = a[i];
+                    result[i] = () => -0.5 * ai() / Math.Sqrt(a0());
+                }
             }
             return result;
         }
@@ -187,13 +212,17 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             arguments.ThrowIfNot(nameof(arguments), 1);
             var arg = arguments[0];
             var result = new DoubleDerivatives(arg.Count);
-            result[0] = Math.Sin(arg[0]);
+            var a0 = arg[0];
+            result[0] = () => Math.Sin(a0());
 
             // Apply the chain rule
             for (var i = 1; i < arg.Count; i++)
             {
-                if (!arg[i].Equals(0.0))
-                    result[i] = Math.Cos(arg[0]) * arg[i];
+                if (arg[i] != null)
+                {
+                    var ai = arg[i];
+                    result[i] = () => Math.Cos(a0()) * ai();
+                }
             }
             return result;
         }
@@ -202,13 +231,17 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             arguments.ThrowIfNot(nameof(arguments), 1);
             var arg = arguments[0];
             var result = new DoubleDerivatives(arg.Count);
-            result[0] = Math.Cos(arg[0]);
+            var a0 = arg[0];
+            result[0] = () => Math.Cos(a0());
 
             // Apply the chain rule
             for (var i = 1; i < arg.Count; i++)
             {
-                if (!arg[i].Equals(0.0))
-                    result[i] = -Math.Sin(arg[0]) * arg[i];
+                if (arg[i] != null)
+                {
+                    var ai = arg[i];
+                    result[i] = () => -Math.Sin(a0()) * ai();
+                }
             }
             return result;
         }
@@ -217,13 +250,21 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             arguments.ThrowIfNot(nameof(arguments), 1);
             var arg = arguments[0];
             var result = new DoubleDerivatives(arg.Count);
-            result[0] = Math.Tan(arg[0]);
+            var a0 = arg[0];
+            result[0] = () => Math.Tan(a0());
 
-            // Apply chain rule
+            // Apply the chain rule
             for (var i = 1; i < arg.Count; i++)
             {
-                if (!arg[i].Equals(0.0))
-                    result[i] = arg[i] / Square(Math.Cos(arg[0]));
+                if (arg[i] != null)
+                {
+                    var ai = arg[i];
+                    result[i] = () =>
+                    {
+                        var tmp = Math.Cos(a0());
+                        return ai() / tmp / tmp;
+                    };
+                }
             }
             return result;
         }
@@ -236,13 +277,21 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             arguments.ThrowIfNot(nameof(arguments), 1);
             var arg = arguments[0];
             var result = new DoubleDerivatives(arg.Count);
-            result[0] = Math.Asin(arg[0]);
+            var a0 = arg[0];
+            result[0] = () => Math.Asin(a0());
 
-            // Apply chain rule
+            // Apply the chain rule
             for (var i = 1; i < arg.Count; i++)
             {
-                if (!arg[i].Equals(0.0))
-                    result[i] = arg[i] / Math.Sqrt(1 - Square(arg[0]));
+                if (arg[i] != null)
+                {
+                    var ai = arg[i];
+                    result[i] = () =>
+                    {
+                        var x = a0();
+                        return ai() / Math.Sqrt(1 - x * x);
+                    };
+                }
             }
             return result;
         }
@@ -251,13 +300,21 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             arguments.ThrowIfNot(nameof(arguments), 1);
             var arg = arguments[0];
             var result = new DoubleDerivatives(arg.Count);
-            result[0] = Math.Acos(arg[0]);
+            var a0 = arg[0];
+            result[0] = () => Math.Acos(a0());
 
-            // Apply chain rule
+            // Apply the chain rule
             for (var i = 1; i < arg.Count; i++)
             {
-                if (!arg[i].Equals(0.0))
-                    result[i] = -arg[i] / Math.Sqrt(1 - Square(arg[0]));
+                if (arg[i] != null)
+                {
+                    var ai = arg[i];
+                    result[i] = () =>
+                    {
+                        var x = a0();
+                        return -ai() / Math.Sqrt(1 - x * x);
+                    };
+                }
             }
             return result;
         }
@@ -266,13 +323,21 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             arguments.ThrowIfNot(nameof(arguments), 1);
             var arg = arguments[0];
             var result = new DoubleDerivatives(arg.Count);
-            result[0] = Math.Atan(arg[0]);
+            var a0 = arg[0];
+            result[0] = () => Math.Atan(a0());
 
-            // Apply chain rule
+            // Apply the chain rule
             for (var i = 1; i < arg.Count; i++)
             {
-                if (!arg[i].Equals(0.0))
-                    result[i] = arg[i] / (1 + Square(arg[0]));
+                if (arg[i] != null)
+                {
+                    var ai = arg[i];
+                    result[i] = () =>
+                    {
+                        var x = a0();
+                        return ai() / (1 + x * x);
+                    };
+                }
             }
             return result;
         }
@@ -285,13 +350,21 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             arguments.ThrowIfNot(nameof(arguments), 1);
             var arg = arguments[0];
             var result = new DoubleDerivatives(arg.Count);
-            result[0] = Math.Abs(arg[0]);
+            var a0 = arg[0];
+            result[0] = () => Math.Abs(a0());
 
             // Apply chain rule
             for (var i = 1; i < arg.Count; i++)
             {
-                if (!arg[i].Equals(0.0))
-                    result[i] = arg[i] * (arg[0] > 0 ? 1 : arg[0] < 0 ? -1 : 0);
+                if (arg[i] != null)
+                {
+                    var ai = arg[i];
+                    result[i] = () =>
+                    {
+                        var tmp = a0();
+                        return tmp > 0 ? 1 : tmp < 0 ? -1 : 0;
+                    };
+                }
             }
             return result;
         }
@@ -302,7 +375,8 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             if (arguments.Length == 1)
             {
                 var result = new DoubleDerivatives();
-                result[0] = Math.Round(arg[0]);
+                var a0 = arg[0];
+                result[0] = () => Math.Round(a0());
                 
                 for (var i = 1; i < arg.Count; i++)
                     if (!arg[i].Equals(0.0))
@@ -312,7 +386,9 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             if (arguments.Length == 2)
             {
                 var result = new DoubleDerivatives();
-                result[0] = Math.Round(arg[0], (int)Math.Round(arguments[1][0]));
+                var a0 = arg[0];
+                var b0 = arguments[1][0];
+                result[0] = () => Math.Round(a0(), (int)Math.Round(b0()));
 
                 for (var i = 1; i < arg.Count; i++)
                     if (!arg[i].Equals(0.0))
@@ -328,39 +404,52 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         {
             arguments.ThrowIfEmpty(nameof(arguments));
             var result = new DoubleDerivatives();
-            var min = arguments[0][0];
-            for (var i = 1; i < arguments.Length; i++)
+            if (arguments.Length == 1)
             {
-                min = Math.Min(min, arguments[i][0]);
+                result[0] = arguments[0][0];
+                return result;
+            }
+
+            var a = arguments[0][0];
+            var b = arguments[1][0];
+            Func<double> c = () => Math.Min(a(), b());
+            for (var i = 2; i < arguments.Length; i++)
+            {
+                a = c;
+                b = arguments[i][0];
+                c = () => Math.Min(a(), b());
                 for (var k = 1; k < arguments[i].Count; k++)
                     if (!arguments[i][k].Equals(0.0))
                         throw new CircuitException("Cannot differentiate Min()");
             }
-            result[0] = min;
+            result[0] = c;
             return result;
         }
         public static DoubleDerivatives ApplyMax(DoubleDerivatives[] arguments)
         {
             arguments.ThrowIfEmpty(nameof(arguments));
             var result = new DoubleDerivatives();
-            var min = arguments[0][0];
-            for (var i = 1; i < arguments.Length; i++)
+            if (arguments.Length == 1)
             {
-                min = Math.Max(min, arguments[i][0]);
+                result[0] = arguments[0][0];
+                return result;
+            }
+
+            var a = arguments[0][0];
+            var b = arguments[1][0];
+            Func<double> c = () => Math.Max(a(), b());
+            for (var i = 2; i < arguments.Length; i++)
+            {
+                a = c;
+                b = arguments[i][0];
+                c = () => Math.Max(a(), b());
                 for (var k = 1; k < arguments[i].Count; k++)
                     if (!arguments[i][k].Equals(0.0))
                         throw new CircuitException("Cannot differentiate Min()");
             }
-            result[0] = min;
+            result[0] = c;
             return result;
         }
-
-        /// <summary>
-        /// Square a number
-        /// </summary>
-        /// <param name="x">The argument.</param>
-        /// <returns></returns>
-        public static double Square(double x) => x * x;
 
         /// <summary>
         /// Delegate for applying a function.

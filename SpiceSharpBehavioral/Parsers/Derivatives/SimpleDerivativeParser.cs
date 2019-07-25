@@ -163,7 +163,7 @@ namespace SpiceSharpBehavioral.Parsers
         protected override void PushValue(double value)
         {
             var d = new DoubleDerivatives();
-            d[0] = value;
+            d[0] = () => value;
             _stack.Push(d);
         }
 

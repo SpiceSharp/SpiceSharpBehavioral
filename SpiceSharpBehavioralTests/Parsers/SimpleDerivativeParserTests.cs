@@ -22,8 +22,8 @@ namespace SpiceSharpBehavioralTests.Parsers
                     if (c >= 0 && c < reference.Length - 1)
                     {
                         e.Result = new DoubleDerivatives();
-                        e.Result[0] = x[c];
-                        e.Result[c + 1] = 1.0;
+                        e.Result[0] = () => x[c];
+                        e.Result[c + 1] = () => 1.0;
                     }
                 }
             }
@@ -38,7 +38,7 @@ namespace SpiceSharpBehavioralTests.Parsers
                 for (var i = 0; i < reference.Length; i++)
                 {
                     var expected = reference[i](x);
-                    var actual = parsed[i];
+                    var actual = parsed.GetDerivative(i).Invoke();
                     var tol = Math.Max(Math.Abs(expected), Math.Abs(actual)) * RelativeTolerance + AbsoluteTolerance;
                     Assert.AreEqual(expected, actual, tol);
                 }
@@ -64,7 +64,7 @@ namespace SpiceSharpBehavioralTests.Parsers
                 if (e.Name == "x")
                 {
                     e.Result = new DoubleDerivatives();
-                    e.Result[0] = x;
+                    e.Result[0] = () => x;
                 }
             };
             parser.VariableFound += VariableFound;
@@ -75,18 +75,19 @@ namespace SpiceSharpBehavioralTests.Parsers
                 var expected = reference(x);
                 var parsed = parser.Parse(expression);
 
-                var actual = parsed[0];
+                var actual = parsed.GetDerivative(0).Invoke();
                 var tol = Math.Max(Math.Abs(expected), Math.Abs(actual)) * RelativeTolerance + AbsoluteTolerance;
                 Assert.AreEqual(expected, actual, tol);
             }
             parser.VariableFound -= VariableFound;
         }
 
-        protected void Check(double expected, Derivatives<double> actual)
+        protected void Check(double expected, DoubleDerivatives parsed)
         {
-            Assert.AreEqual(actual.Count, 1);
-            var tol = Math.Max(Math.Abs(expected), Math.Abs(actual[0])) * RelativeTolerance + AbsoluteTolerance;
-            Assert.AreEqual(expected, actual[0], tol);
+            Assert.AreEqual(parsed.Count, 1);
+            var actual = parsed.GetDerivative(0).Invoke();
+            var tol = Math.Max(Math.Abs(expected), Math.Abs(actual)) * RelativeTolerance + AbsoluteTolerance;
+            Assert.AreEqual(expected, actual, tol);
         }
 
         [Test]
@@ -174,7 +175,10 @@ namespace SpiceSharpBehavioralTests.Parsers
         public void When_Pow_Expect_Reference()
         {
             var parser = Parser;
-            Check(new Func<double[], double>[] { x => Math.Pow(x[0], x[1]), x => x[1] * Math.Pow(x[0], x[1] - 1), x => Math.Log(x[0]) * Math.Pow(x[0], x[1]) }, parser, "Pow(a, b)");
+            Check(new Func<double[], double>[] {
+                x => Math.Pow(x[0], x[1]),
+                x => x[1] * Math.Pow(x[0], x[1] - 1),
+                x => Math.Pow(x[0], x[1]) * Math.Log(x[0]) }, parser, "Pow(a, b)");
         }
 
         [Test]
