@@ -19,7 +19,7 @@ namespace SpiceSharpBehavioralTests.Parsers
         protected void Check(double expected, ExpressionTreeDerivatives parsed)
         {
             // Compile
-            var actual = parsed.Compile<Func<double>>(0);
+            var actual = Expression.Lambda<Func<double>>(parsed[0]).Compile();
             var tol = Math.Max(Math.Abs(expected), Math.Abs(actual())) * RelativeTolerance + AbsoluteTolerance;
             Assert.AreEqual(expected, actual(), tol);
         }
@@ -28,7 +28,7 @@ namespace SpiceSharpBehavioralTests.Parsers
         {
             double x = 0.0;
             Func<double> var = () => x;
-            void VariableFound(object sender, VariableFoundEventArgs<ExpressionTreeDerivatives> e)
+            void VariableFound(object sender, VariableFoundEventArgs<Derivatives<Expression>> e)
             {
                 if (e.Name == "x")
                 {
@@ -37,7 +37,7 @@ namespace SpiceSharpBehavioralTests.Parsers
                 }
             }
             parser.VariableFound += VariableFound;
-            var parsed = parser.Parse(expression).Compile<Func<double>>(0);
+            var parsed = ((ISpiceDerivativeParser<double>)parser).Parse(expression)[0];
             parser.VariableFound -= VariableFound;
 
             for (x = -2; x <= 2; x += 0.5)
@@ -53,7 +53,7 @@ namespace SpiceSharpBehavioralTests.Parsers
         {
             double[] x = new double[reference.Length];
             Func<int, double> var = i => x[i];
-            void VariableFound(object sender, VariableFoundEventArgs<ExpressionTreeDerivatives> e)
+            void VariableFound(object sender, VariableFoundEventArgs<Derivatives<Expression>> e)
             {
                 if (e.Name.Length == 1)
                 {
@@ -67,12 +67,12 @@ namespace SpiceSharpBehavioralTests.Parsers
                 }
             }
             parser.VariableFound += VariableFound;
-            var result = parser.Parse(expression);
+            var result = ((ISpiceDerivativeParser<double>)parser).Parse(expression);
             parser.VariableFound -= VariableFound;
 
             var parsed = new Func<double>[reference.Length];
             for (var i = 0; i < reference.Length; i++)
-                parsed[i] = result.Compile<Func<double>>(i);
+                parsed[i] = result[i];
 
             // Iterate through a number of values
             for (var i = 0; i < x.Length; i++)

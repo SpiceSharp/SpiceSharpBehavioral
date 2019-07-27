@@ -32,8 +32,8 @@ namespace SpiceSharpBehavioral.Components.BehavioralCurrentSourceBehaviors
         public void Connect(params int[] pins)
         {
             pins.ThrowIfNot(nameof(pins), 2);
-            NegIndex = pins[0];
-            PosIndex = pins[1];
+            PosIndex = pins[0];
+            NegIndex = pins[1];
         }
     }
 }

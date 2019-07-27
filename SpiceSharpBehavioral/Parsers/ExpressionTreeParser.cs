@@ -11,7 +11,7 @@ namespace SpiceSharpBehavioral.Parsers
     /// Allows parsing expressions into a method. The method signature should
     /// match the expression.
     /// </summary>
-    public class ExpressionTreeParser : SpiceParser
+    public class ExpressionTreeParser : SpiceParser, IParser<Expression>
     {
         private static readonly MethodInfo PowInfo = typeof(Math).GetTypeInfo().GetMethod("Pow", new Type[] { typeof(double), typeof(double) });
         private static readonly Expression Zero = Expression.Constant(0.0);
@@ -30,7 +30,7 @@ namespace SpiceSharpBehavioral.Parsers
         /// <summary>
         /// this event is called when a Spice property has been encountered.
         /// </summary>
-        public event EventHandler<SpicePropertyFoundEventArgs<Expression>> SpicePropertyFound;
+        public event EventHandler<SpicePropertyFoundEventArgs<double>> SpicePropertyFound;
 
         /// <summary>
         /// The value stack.
@@ -177,7 +177,7 @@ namespace SpiceSharpBehavioral.Parsers
 
         protected override void PushSpiceProperty(SpiceProperty property)
         {
-            var args = new SpicePropertyFoundEventArgs<Expression>(property, null);
+            var args = new ExpressionTreeSpicePropertyEventArgs(property);
             SpicePropertyFound?.Invoke(this, args);
 
             if (args.Result == null)

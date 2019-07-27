@@ -3,43 +3,41 @@ using SpiceSharpBehavioral.Parsers.Operators;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Reflection;
 
 namespace SpiceSharpBehavioral.Parsers
 {
-    public class ExpressionTreeDerivativeParser : SpiceParser
+    /// <summary>
+    /// This class can parse expressions into methods. It uses linq expressions to build the methods.
+    /// This class will not work for platforms that do not support dynamic code generation.
+    /// </summary>
+    public class ExpressionTreeDerivativeParser : SpiceParser, ISpiceDerivativeParser<double>
     {
-        private static readonly MethodInfo PowInfo = typeof(Math).GetTypeInfo().GetMethod("Pow", new Type[] { typeof(double), typeof(double) });
-        private static readonly MethodInfo LogInfo = typeof(Math).GetTypeInfo().GetMethod("Log", new Type[] { typeof(double) });
-        private static readonly Expression Zero = Expression.Constant(0.0);
-        private static readonly Expression One = Expression.Constant(1.0);
-
         /// <summary>
         /// This event is called when a variable is found.
         /// </summary>
-        public event EventHandler<VariableFoundEventArgs<ExpressionTreeDerivatives>> VariableFound;
+        public event EventHandler<VariableFoundEventArgs<Derivatives<Expression>>> VariableFound;
 
         /// <summary>
         /// This event is called when a method call is found.
         /// </summary>
-        public event EventHandler<FunctionFoundEventArgs<ExpressionTreeDerivatives>> FunctionFound;
+        public event EventHandler<FunctionFoundEventArgs<Derivatives<Expression>>> FunctionFound;
 
         /// <summary>
         /// This event is called when a Spice property is found.
         /// </summary>
-        public event EventHandler<SpicePropertyFoundEventArgs<ExpressionTreeDerivatives>> SpicePropertyFound;
+        public event EventHandler<SpicePropertyFoundEventArgs<double>> SpicePropertyFound;
 
         /// <summary>
         /// The value stack
         /// </summary>
-        private Stack<ExpressionTreeDerivatives> _stack = new Stack<ExpressionTreeDerivatives>();
+        private Stack<Derivatives<Expression>> _stack = new Stack<Derivatives<Expression>>();
 
         /// <summary>
         /// Parse an expression.
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <returns></returns>
-        public ExpressionTreeDerivatives Parse(string expression)
+        public Derivatives<Expression> Parse(string expression)
         {
             _stack.Clear();
             ParseExpression(expression);
@@ -50,18 +48,42 @@ namespace SpiceSharpBehavioral.Parsers
         }
 
         /// <summary>
+        /// Parse an expression.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <returns></returns>
+        Derivatives<Func<double>> IParser<Derivatives<Func<double>>>.Parse(string expression)
+        {
+            _stack.Clear();
+            ParseExpression(expression);
+
+            if (_stack.Count != 1)
+                throw new ParserException("Invalid expression", Input, Index);
+            var result = _stack.Pop();
+
+            // Compile all these expressions to funcs
+            var funcResult = new DoubleDerivatives(result.Count);
+            for (var i = 0; i < result.Count; i++)
+            {
+                if (result[i] != null)
+                    funcResult[i] = Expression.Lambda<Func<double>>(result[i]).Compile();
+            }
+            return funcResult;
+        }
+
+        /// <summary>
         /// Execute an operator.
         /// </summary>
         /// <param name="op">The operator.</param>
         protected override void ExecuteOperator(Operator op)
         {
-            ExpressionTreeDerivatives a, b;
+            Derivatives<Expression> a, b;
             switch (op)
             {
                 case TernaryOperator to:
                     b = _stack.Pop();
                     a = _stack.Pop();
-                    _stack.Push(_stack.Pop().IfThen(a, b));
+                    _stack.Push(_stack.Pop().IfThenElse(a, b));
                     break;
 
                 case ClosingTernaryOperator _:
@@ -70,10 +92,10 @@ namespace SpiceSharpBehavioral.Parsers
                 case FunctionOperator fo:
 
                     // Extract all arguments for the method
-                    var arguments = new ExpressionTreeDerivatives[fo.Arguments];
+                    var arguments = new Derivatives<Expression>[fo.Arguments];
                     for (var i = fo.Arguments - 1; i >= 0; i--)
                         arguments[i] = _stack.Pop();
-                    var args = new FunctionFoundEventArgs<ExpressionTreeDerivatives>(fo.Name, null, arguments);
+                    var args = new FunctionFoundEventArgs<Derivatives<Expression>>(fo.Name, null, arguments);
 
                     // Ask around for the result of this method
                     FunctionFound?.Invoke(this, args);
@@ -93,26 +115,26 @@ namespace SpiceSharpBehavioral.Parsers
                         case OperatorType.Positive:
                             break;
                         case OperatorType.Negative:
-                            _stack.Push(-_stack.Pop());
+                            _stack.Push(_stack.Pop().Negate());
                             break;
                         case OperatorType.Not:
-                            _stack.Push(!_stack.Pop());
+                            _stack.Push(_stack.Pop().Not());
                             break;
                         case OperatorType.Add:
                             b = _stack.Pop();
-                            _stack.Push(_stack.Pop() + b);
+                            _stack.Push(_stack.Pop().Add(b));
                             break;
                         case OperatorType.Subtract:
                             b = _stack.Pop();
-                            _stack.Push(_stack.Pop() - b);
+                            _stack.Push(_stack.Pop().Subtract(b));
                             break;
                         case OperatorType.Multiply:
                             b = _stack.Pop();
-                            _stack.Push(_stack.Pop() * b);
+                            _stack.Push(_stack.Pop().Multiply(b));
                             break;
                         case OperatorType.Divide:
                             b = _stack.Pop();
-                            _stack.Push(_stack.Pop() / b);
+                            _stack.Push(_stack.Pop().Divide(b));
                             break;
                         case OperatorType.Power:
                             b = _stack.Pop();
@@ -128,19 +150,19 @@ namespace SpiceSharpBehavioral.Parsers
                             break;
                         case OperatorType.GreaterThan:
                             b = _stack.Pop();
-                            _stack.Push(_stack.Pop() > b);
+                            _stack.Push(_stack.Pop().GreaterThan(b));
                             break;
                         case OperatorType.LessThan:
                             b = _stack.Pop();
-                            _stack.Push(_stack.Pop() < b);
+                            _stack.Push(_stack.Pop().LessThan(b));
                             break;
                         case OperatorType.GreaterThanOrEqual:
                             b = _stack.Pop();
-                            _stack.Push(_stack.Pop() >= b);
+                            _stack.Push(_stack.Pop().GreaterOrEqual(b));
                             break;
                         case OperatorType.LessThanOrEqual:
                             b = _stack.Pop();
-                            _stack.Push(_stack.Pop() <= b);
+                            _stack.Push(_stack.Pop().LessOrEqual(b));
                             break;
                         case OperatorType.IsEqual:
                             b = _stack.Pop();
@@ -177,10 +199,10 @@ namespace SpiceSharpBehavioral.Parsers
         /// <param name="property">The property.</param>
         protected override void PushSpiceProperty(SpiceProperty property)
         {
-            var args = new SpicePropertyFoundEventArgs<ExpressionTreeDerivatives>(property, null);
+            var args = new ExpressionTreeDerivativePropertyEventArgs(property);
             SpicePropertyFound?.Invoke(this, args);
 
-            if (!args.Found || args.Result == null)
+            if (args.Result == null)
                 throw new ParserException("Unrecognized Spice property '{0}'".FormatString(property), Input, Index);
             _stack.Push(args.Result);
         }
@@ -191,7 +213,7 @@ namespace SpiceSharpBehavioral.Parsers
         /// <param name="name">The name of the variable.</param>
         protected override void PushVariable(string name)
         {
-            var args = new VariableFoundEventArgs<ExpressionTreeDerivatives>(name, null);
+            var args = new VariableFoundEventArgs<Derivatives<Expression>>(name, null);
             VariableFound?.Invoke(this, args);
 
             if (!args.Found || args.Result == null)

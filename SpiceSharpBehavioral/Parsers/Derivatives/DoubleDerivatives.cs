@@ -5,7 +5,7 @@ namespace SpiceSharpBehavioral.Parsers
     /// <summary>
     /// A specific implementation of derivatives for doubles.
     /// </summary>
-    public class DoubleDerivatives : Derivatives<Func<double>>, IDerivatives<double>
+    public class DoubleDerivatives : Derivatives<Func<double>>
     {
         /// <summary>
         /// Creates a new instance of the <see cref="DoubleDerivatives"/> class.
@@ -20,13 +20,6 @@ namespace SpiceSharpBehavioral.Parsers
         public DoubleDerivatives(int capacity)
             : base(capacity)
         { }
-
-        /// <summary>
-        /// Gets the derivative.
-        /// </summary>
-        /// <param name="index">The index of the derivative. 0 for the value itself.</param>
-        /// <returns></returns>
-        public Func<double> GetDerivative(int index) => this[index];
 
         /// <summary>
         /// Check equality.
@@ -52,7 +45,7 @@ namespace SpiceSharpBehavioral.Parsers
         /// </summary>
         /// <param name="exponent">The exponent.</param>
         /// <returns></returns>
-        public DoubleDerivatives Pow(DoubleDerivatives exponent)
+        public override Derivatives<Func<double>> Pow(Derivatives<Func<double>> exponent)
         {
             var size = Math.Max(Count, exponent.Count);
             var result = new DoubleDerivatives(size);
@@ -99,7 +92,7 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
-        public DoubleDerivatives Or(DoubleDerivatives b)
+        public override Derivatives<Func<double>> Or(Derivatives<Func<double>> b)
         {
             var result = new DoubleDerivatives();
             var arg1 = this[0];
@@ -108,7 +101,7 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
-        public DoubleDerivatives And(DoubleDerivatives b)
+        public override Derivatives<Func<double>> And(Derivatives<Func<double>> b)
         {
             var result = new DoubleDerivatives();
             var arg1 = this[0];
@@ -117,7 +110,7 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
-        public DoubleDerivatives IfThen(DoubleDerivatives iftrue, DoubleDerivatives iffalse)
+        public override Derivatives<Func<double>> IfThenElse(Derivatives<Func<double>> iftrue, Derivatives<Func<double>> iffalse)
         {
             var size = Math.Max(iftrue.Count, iffalse.Count);
             var result = new DoubleDerivatives(size);
@@ -131,7 +124,7 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
-        public DoubleDerivatives Equal(DoubleDerivatives other)
+        public override Derivatives<Func<double>> Equal(Derivatives<Func<double>> other)
         {
             var result = new DoubleDerivatives();
             var arg1 = this[0];
@@ -140,7 +133,7 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
-        public DoubleDerivatives NotEqual(DoubleDerivatives other)
+        public override Derivatives<Func<double>> NotEqual(Derivatives<Func<double>> other)
         {
             var result = new DoubleDerivatives();
             var arg1 = this[0];
@@ -149,51 +142,51 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
-        public static DoubleDerivatives operator -(DoubleDerivatives a)
+        public override Derivatives<Func<double>> Negate()
         {
-            var result = new DoubleDerivatives(a.Count);
-            for (var i = 0; i < a.Count; i++)
+            var result = new DoubleDerivatives(Count);
+            for (var i = 0; i < Count; i++)
             {
-                var arg = a[i];
-                if (arg != null)
-                    result[i] = () => -arg();
+                var ai = this[i];
+                if (ai != null)
+                    result[i] = () => -ai();
             }
             return result;
         }
 
-        public static DoubleDerivatives operator !(DoubleDerivatives a)
+        public override Derivatives<Func<double>> Not()
         {
             var result = new DoubleDerivatives();
-            var arg = a[0];
-            result[0] = () => arg().Equals(0.0) ? 1.0 : 0.0;
+            var ai = this[0];
+            result[0] = () => ai().Equals(0.0) ? 1.0 : 0.0;
             return result;
         }
 
-        public static DoubleDerivatives operator +(DoubleDerivatives a, DoubleDerivatives b)
+        public override Derivatives<Func<double>> Add(Derivatives<Func<double>> b)
         {
-            var size = Math.Max(a.Count, b.Count);
+            var size = Math.Max(Count, b.Count);
             var result = new DoubleDerivatives(size);
             for (var i = 0; i < size; i++)
             {
-                var arg1 = a[i];
-                var arg2 = b[i];
-                if (arg1 != null && arg2 != null)
-                    result[i] = () => arg1() + arg2();
-                else if (arg1 != null)
-                    result[i] = arg1;
-                else if (arg2 != null)
-                    result[i] = arg2;
+                var ai = this[i];
+                var bi = b[i];
+                if (ai != null && bi != null)
+                    result[i] = () => ai() + bi();
+                else if (ai != null)
+                    result[i] = ai;
+                else if (bi != null)
+                    result[i] = bi;
             }
             return result;
         }
 
-        public static DoubleDerivatives operator -(DoubleDerivatives a, DoubleDerivatives b)
+        public override Derivatives<Func<double>> Subtract(Derivatives<Func<double>> b)
         {
-            var size = Math.Max(a.Count, b.Count);
+            var size = Math.Max(Count, b.Count);
             var result = new DoubleDerivatives(size);
             for (var i = 0; i < size; i++)
             {
-                var arg1 = a[i];
+                var arg1 = this[i];
                 var arg2 = b[i];
                 if (arg1 != null && arg2 != null)
                     result[i] = () => arg1() - arg2();
@@ -205,16 +198,16 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
-        public static DoubleDerivatives operator *(DoubleDerivatives a, DoubleDerivatives b)
+        public override Derivatives<Func<double>> Multiply(Derivatives<Func<double>> b)
         {
-            var size = Math.Max(a.Count, b.Count);
+            var size = Math.Max(Count, b.Count);
             var result = new DoubleDerivatives(size);
-            var a0 = a[0];
+            var a0 = this[0];
             var b0 = b[0];
             result[0] = () => a0() * b0();
             for (var i = 1; i < size; i++)
             {
-                var arg1 = a[i];
+                var arg1 = this[i];
                 var arg2 = b[i];
                 if (arg1 != null && arg2 != null)
                     result[i] = () => a0() * arg1() + arg2() * b0();
@@ -226,16 +219,16 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
-        public static DoubleDerivatives operator /(DoubleDerivatives a, DoubleDerivatives b)
+        public override Derivatives<Func<double>> Divide(Derivatives<Func<double>> b)
         {
-            var size = Math.Max(a.Count, b.Count);
+            var size = Math.Max(Count, b.Count);
             var result = new DoubleDerivatives(size);
-            var a0 = a[0];
+            var a0 = this[0];
             var b0 = b[0];
             result[0] = () => a0() / b0();
             for (var i = 1; i < size; i++)
             {
-                var ai = a[i];
+                var ai = this[i];
                 var bi = b[i];
                 if (ai != null && bi != null)
                     result[i] = () =>
@@ -255,48 +248,48 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
-        public static DoubleDerivatives operator %(DoubleDerivatives a, DoubleDerivatives b)
+        public override Derivatives<Func<double>> Modulo(Derivatives<Func<double>> b)
         {
             var result = new DoubleDerivatives();
-            var arg1 = a[0];
-            var arg2 = b[0];
-            result[0] = () => arg1() % arg2();
+            var a0 = this[0];
+            var b0 = b[0];
+            result[0] = () => a0() % b0();
             return result;
         }
 
-        public static DoubleDerivatives operator >(DoubleDerivatives a, DoubleDerivatives b)
+        public override Derivatives<Func<double>> GreaterThan(Derivatives<Func<double>> b)
         {
             var result = new DoubleDerivatives();
-            var arg1 = a[0];
-            var arg2 = b[0];
-            result[0] = () => arg1() > arg2() ? 1 : 0;
+            var a0 = this[0];
+            var b0 = b[0];
+            result[0] = () => a0() > b0() ? 1 : 0;
             return result;
         }
 
-        public static DoubleDerivatives operator <(DoubleDerivatives a, DoubleDerivatives b)
+        public override Derivatives<Func<double>> LessThan(Derivatives<Func<double>> b)
         {
             var result = new DoubleDerivatives();
-            var arg1 = a[0];
-            var arg2 = b[0];
-            result[0] = () => arg1() < arg2() ? 1 : 0;
+            var a0 = this[0];
+            var b0 = b[0];
+            result[0] = () => a0() < b0() ? 1 : 0;
             return result;
         }
 
-        public static DoubleDerivatives operator >=(DoubleDerivatives a, DoubleDerivatives b)
+        public override Derivatives<Func<double>> GreaterOrEqual(Derivatives<Func<double>> b)
         {
             var result = new DoubleDerivatives();
-            var arg1 = a[0];
-            var arg2 = b[0];
-            result[0] = () => arg1() >= arg2() ? 1 : 0;
+            var a0 = this[0];
+            var b0 = b[0];
+            result[0] = () => a0() >= b0() ? 1 : 0;
             return result;
         }
 
-        public static DoubleDerivatives operator <=(DoubleDerivatives a, DoubleDerivatives b)
+        public override Derivatives<Func<double>> LessOrEqual(Derivatives<Func<double>> b)
         {
             var result = new DoubleDerivatives();
-            var arg1 = a[0];
-            var arg2 = b[0];
-            result[0] = () => arg1() <= arg2() ? 1 : 0;
+            var a0 = this[0];
+            var b0 = b[0];
+            result[0] = () => a0() <= b0() ? 1 : 0;
             return result;
         }
     }

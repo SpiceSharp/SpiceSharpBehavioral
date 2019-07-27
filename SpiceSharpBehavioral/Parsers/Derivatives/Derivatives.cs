@@ -6,7 +6,7 @@ namespace SpiceSharpBehavioral.Parsers
     /// <summary>
     /// Keeps track of derivatives
     /// </summary>
-    public class Derivatives<T> : IEquatable<Derivatives<T>>
+    public abstract class Derivatives<T> : IEquatable<Derivatives<T>>
     {
         // The derivatives
         private T[] _derivatives;
@@ -139,5 +139,39 @@ namespace SpiceSharpBehavioral.Parsers
                 result += _derivatives[i].ToString() + "; ";
             return result;
         }
+
+        public abstract Derivatives<T> Negate();
+
+        public abstract Derivatives<T> Not();
+
+        public abstract Derivatives<T> Pow(Derivatives<T> b);
+
+        public abstract Derivatives<T> Or(Derivatives<T> b);
+
+        public abstract Derivatives<T> And(Derivatives<T> b);
+
+        public abstract Derivatives<T> IfThenElse(Derivatives<T> iftrue, Derivatives<T> iffalse);
+
+        public abstract Derivatives<T> Equal(Derivatives<T> b);
+
+        public abstract Derivatives<T> NotEqual(Derivatives<T> b);
+
+        public abstract Derivatives<T> Add(Derivatives<T> b);
+
+        public abstract Derivatives<T> Subtract(Derivatives<T> b);
+
+        public abstract Derivatives<T> Multiply(Derivatives<T> b);
+
+        public abstract Derivatives<T> Divide(Derivatives<T> b);
+
+        public abstract Derivatives<T> Modulo(Derivatives<T> b);
+
+        public abstract Derivatives<T> LessThan(Derivatives<T> b);
+
+        public abstract Derivatives<T> GreaterThan(Derivatives<T> b);
+
+        public abstract Derivatives<T> LessOrEqual(Derivatives<T> b);
+
+        public abstract Derivatives<T> GreaterOrEqual(Derivatives<T> b);
     }
 }

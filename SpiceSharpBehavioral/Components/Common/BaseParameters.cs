@@ -2,6 +2,7 @@
 using SpiceSharp.Attributes;
 using SpiceSharpBehavioral.Parsers;
 using System.Collections.Generic;
+using SpiceSharpBehavioral.Parsers.Helper;
 
 namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
 {
@@ -20,7 +21,7 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         /// Gets or sets the parser used to parse the expression.
         /// </summary>
         [ParameterName("parser"), ParameterInfo("The parser that is used to parse the expression")]
-        public ExpressionTreeDerivativeParser Parser { get; set; }
+        public ISpiceDerivativeParser<double> Parser { get; set; }
 
         /// <summary>
         /// Gets or sets the comparer for Spice properties.
@@ -31,5 +32,18 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
             set => _spicePropertyComparer = value ?? EqualityComparer<string>.Default;
         }
         private EqualityComparer<string> _spicePropertyComparer = EqualityComparer<string>.Default;
+
+        /// <summary>
+        /// Calculate the defaults
+        /// </summary>
+        public override void CalculateDefaults()
+        {
+            if (Parser == null)
+            {
+                var parser = new SimpleDerivativeParser();
+                parser.RegisterDefaultFunctions();
+                Parser = parser;
+            }
+        }
     }
 }

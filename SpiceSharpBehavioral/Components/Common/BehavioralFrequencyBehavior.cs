@@ -37,8 +37,8 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         /// All contributions to the Y-matrix.
         /// </summary>
         private Complex[] _contributions;
-        private Action _behavioralMethod;
-        private Action<SpiceSharp.Algebra.Vector<double>> _initializeMethod;
+        private Action _fillMatrix;
+        private Action _initializeMethod;
 
         /// <summary>
         /// Creates a new instance of the <see cref="BehavioralFrequencyBehavior"/> class.
@@ -69,7 +69,7 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         public override void Unsetup(Simulation simulation)
         {
             BiasingBehavior = null;
-            _behavioralMethod = null;
+            _fillMatrix = null;
             _contributions = null;
             _initializeMethod = null;
         }
@@ -80,48 +80,84 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         /// <param name="solver">Gets the equation pointers.</param>
         public virtual void GetEquationPointers(Solver<Complex> solver)
         {
-            var block = new List<Expression>();
-            var init_block = new List<Expression>();
+            var block = new List<Action>();
+            var init_block = new List<Action>();
 
             // If the contributions cancel each other, don't bother compiling
             if (PosIndex == NegIndex)
             {
                 _initializeMethod = null;
-                _behavioralMethod = null;
+                _fillMatrix = null;
                 return;
             }
 
             // The biasing behavior has a nice series of derivatives that need to be
             // calculated here. Since it is a small-signal analysis, we don't need
             // the actual value, only the derivatives.
-            int index = 0;
+            int count = 0;
             _contributions = new Complex[BiasingBehavior.Function.DerivativeCount];
             foreach (var item in BiasingBehavior.Function.Derivatives)
             {
                 // Ignore 0-contributions
-                if (item.Value == null)
+                var index = item.Key;
+                var func = item.Value;
+                if (func == null)
                     continue;
 
-                var contribution = Expression.ArrayAccess(Expression.Constant(_contributions), Expression.Constant(index, typeof(int)));
+                MatrixElement<Complex> posElt = null, negElt = null;
                 if (PosIndex > 0)
-                {
-                    var melt = solver.GetMatrixElement(PosIndex, item.Key);
-                    block.Add(Expression.AddAssign(Expression.Property(Expression.Constant(melt), MatrixValueProperty), contribution));
-                }
+                    posElt = solver.GetMatrixElement(PosIndex, index);
                 if (NegIndex > 0)
+                    negElt = solver.GetMatrixElement(NegIndex, index);
+                if (posElt != null && negElt != null)
                 {
-                    var melt = solver.GetMatrixElement(NegIndex, item.Key);
-                    block.Add(Expression.SubtractAssign(Expression.Property(Expression.Constant(melt), MatrixValueProperty), contribution));
+                    var i = count; // Avoid referencing the original count variable
+                    block.Add(() =>
+                    {
+                        posElt.Value += _contributions[i];
+                        negElt.Value -= _contributions[i];
+                    });
+                }
+                else if (posElt != null)
+                {
+                    var i = count;
+                    block.Add(() =>
+                    {
+                        posElt.Value += _contributions[i];
+                    });
+                }
+                else if (negElt != null)
+                {
+                    var i = count;
+                    block.Add(() =>
+                    {
+                        negElt.Value -= _contributions[i];
+                    });
                 }
 
-                // Create an initialization method
-                init_block.Add(Expression.Assign(contribution, Expression.Convert(item.Value, typeof(Complex))));
-                index++;
+                // Let's also initialize it
+                var i2 = count;
+                init_block.Add(() => _contributions[i2] = func());
+                count++;
             }
 
             // Compile the methods
-            _behavioralMethod = Expression.Lambda<Action>(Expression.Block(block)).Compile();
-            _initializeMethod = Expression.Lambda<Action<SpiceSharp.Algebra.Vector<double>>>(Expression.Block(init_block), BiasingBehavior.Function.Solution).Compile();
+            {
+                var actions = init_block.ToArray();
+                _initializeMethod = () =>
+                {
+                    for (var i = 0; i < actions.Length; i++)
+                        actions[i]();
+                };
+            }
+            {
+                var actions = block.ToArray();
+                _fillMatrix = () =>
+                {
+                    for (var i = 0; i < actions.Length; i++)
+                        actions[i]();
+                };
+            }
         }
 
         /// <summary>
@@ -130,8 +166,7 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         /// <param name="simulation">The simulation.</param>
         public void InitializeParameters(FrequencySimulation simulation)
         {
-            var solution = simulation.RealState.Solution;
-            _initializeMethod?.Invoke(solution);
+            _initializeMethod?.Invoke();
         }
 
         /// <summary>
@@ -140,7 +175,7 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         /// <param name="simulation">The simulation.</param>
         public virtual void Load(FrequencySimulation simulation)
         {
-            _behavioralMethod?.Invoke();
+            _fillMatrix?.Invoke();
         }
     }
 }

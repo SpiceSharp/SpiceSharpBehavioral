@@ -23,12 +23,16 @@ namespace SpiceSharpBehavioral.Parsers
         { }
 
         /// <summary>
-        /// Compile an expression tree.
+        /// Get a method that computes the derivative.
         /// </summary>
-        /// <typeparam name="T">The base type.</typeparam>
-        /// <param name="index">The index.</param>
+        /// <param name="index">The derivative index, 0 for the function value.</param>
         /// <returns></returns>
-        public T Compile<T>(int index) => Expression.Lambda<T>(this[index] ?? Zero).Compile();
+        public Func<double> GetDerivative(int index)
+        {
+            if (this[index] == null)
+                return null;
+            return Expression.Lambda<Func<double>>(this[index]).Compile();
+        }
 
         public override bool Equals(object obj)
         {
@@ -47,7 +51,7 @@ namespace SpiceSharpBehavioral.Parsers
         /// <returns></returns>
         public static double Square(double x) => x * x;
 
-        public ExpressionTreeDerivatives Or(ExpressionTreeDerivatives b)
+        public override Derivatives<Expression> Or(Derivatives<Expression> b)
         {
             var result = new ExpressionTreeDerivatives();
             result[0] = Expression.Condition(
@@ -57,7 +61,7 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
-        public ExpressionTreeDerivatives And(ExpressionTreeDerivatives b)
+        public override Derivatives<Expression> And(Derivatives<Expression> b)
         {
             var result = new ExpressionTreeDerivatives();
             result[0] = Expression.Condition(
@@ -67,7 +71,7 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
-        public ExpressionTreeDerivatives IfThen(ExpressionTreeDerivatives iftrue, ExpressionTreeDerivatives iffalse)
+        public override Derivatives<Expression> IfThenElse(Derivatives<Expression> iftrue, Derivatives<Expression> iffalse)
         {
             if (this[0] == null)
                 return iffalse;
@@ -85,7 +89,7 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
-        public ExpressionTreeDerivatives Pow(ExpressionTreeDerivatives exponent)
+        public override Derivatives<Expression> Pow(Derivatives<Expression> exponent)
         {
             var size = Math.Max(Count, exponent.Count);
             var result = new ExpressionTreeDerivatives(size);
@@ -127,67 +131,67 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
-        public ExpressionTreeDerivatives Equal(ExpressionTreeDerivatives other)
+        public override Derivatives<Expression> Equal(Derivatives<Expression> other)
         {
             var result = new ExpressionTreeDerivatives();
             result[0] = Expression.Condition(Expression.Equal(this[0], other[0]), One, Zero);
             return result;
         }
 
-        public ExpressionTreeDerivatives NotEqual(ExpressionTreeDerivatives other)
+        public override Derivatives<Expression> NotEqual(Derivatives<Expression> other)
         {
             var result = new ExpressionTreeDerivatives();
             result[0] = Expression.Condition(Expression.NotEqual(this[0], other[0]), One, Zero);
             return result;
         }
 
-        public static ExpressionTreeDerivatives operator -(ExpressionTreeDerivatives a)
+        public override Derivatives<Expression> Negate()
         {
-            var result = new ExpressionTreeDerivatives(a.Count);
-            for (var i = 0; i < a.Count; i++)
+            var result = new ExpressionTreeDerivatives(Count);
+            for (var i = 0; i < Count; i++)
             {
-                if (a[i] != null)
-                    result[i] = Expression.Negate(a[i]);
+                if (this[i] != null)
+                    result[i] = Expression.Negate(this[i]);
             }
             return result;
         }
 
-        public static ExpressionTreeDerivatives operator !(ExpressionTreeDerivatives a)
+        public override Derivatives<Expression> Not()
         {
-            var result = new ExpressionTreeDerivatives(a.Count);
-            if (a[0] != null)
-                result[0] = Expression.Condition(Expression.Equal(a[0], Zero), One, Zero);
+            var result = new ExpressionTreeDerivatives(Count);
+            if (this[0] != null)
+                result[0] = Expression.Condition(Expression.Equal(this[0], Zero), One, Zero);
             else
                 result[0] = One;
             return result;
         }
 
-        public static ExpressionTreeDerivatives operator +(ExpressionTreeDerivatives a, ExpressionTreeDerivatives b)
+        public override Derivatives<Expression> Add(Derivatives<Expression> b)
         {
-            var size = Math.Max(a.Count, b.Count);
+            var size = Math.Max(Count, b.Count);
             var result = new ExpressionTreeDerivatives(size);
             for (var i = 0; i < size; i++)
             {
-                if (a[i] == null)
+                if (this[i] == null)
                     result[i] = b[i];
                 else
                 {
                     if (b[i] == null)
-                        result[i] = a[i];
+                        result[i] = this[i];
                     else
-                        result[i] = Expression.Add(a[i], b[i]);
+                        result[i] = Expression.Add(this[i], b[i]);
                 }
             }
             return result;
         }
 
-        public static ExpressionTreeDerivatives operator -(ExpressionTreeDerivatives a, ExpressionTreeDerivatives b)
+        public override Derivatives<Expression> Subtract(Derivatives<Expression> b)
         {
-            var size = Math.Max(a.Count, b.Count);
+            var size = Math.Max(Count, b.Count);
             var result = new ExpressionTreeDerivatives(size);
             for (var i = 0; i < size; i++)
             {
-                if (a[i] == null)
+                if (this[i] == null)
                 {
                     if (b[i] == null)
                         result[i] = null;
@@ -197,19 +201,19 @@ namespace SpiceSharpBehavioral.Parsers
                 else
                 {
                     if (b[i] == null)
-                        result[i] = a[i];
+                        result[i] = this[i];
                     else
-                        result[i] = Expression.Subtract(a[i], b[i]);
+                        result[i] = Expression.Subtract(this[i], b[i]);
                 }
             }
             return result;
         }
 
-        public static ExpressionTreeDerivatives operator *(ExpressionTreeDerivatives a, ExpressionTreeDerivatives b)
+        public override Derivatives<Expression> Multiply(Derivatives<Expression> b)
         {
-            var size = Math.Max(a.Count, b.Count);
+            var size = Math.Max(Count, b.Count);
             var result = new ExpressionTreeDerivatives(size);
-            Expression a0 = a[0], b0 = b[0];
+            Expression a0 = this[0], b0 = b[0];
 
             if (a0 == null || b0 == null)
                 return result; // x*0 = 0 and so is all its derivatives
@@ -218,7 +222,7 @@ namespace SpiceSharpBehavioral.Parsers
 
             for (var i = 1; i < size; i++)
             {
-                if (a[i] == null)
+                if (this[i] == null)
                 {
                     if (b[i] == null)
                         result[i] = null;
@@ -230,23 +234,23 @@ namespace SpiceSharpBehavioral.Parsers
                 {
                     if (b[i] == null)
                         // (fx*b)' = f'x*b
-                        result[i] = Expression.Multiply(a[i], b0);
+                        result[i] = Expression.Multiply(this[i], b0);
                     else
                         // (fx*gx)' = fx*g'x + f'x*gx
                         result[i] = Expression.Add(
                             Expression.Multiply(a0, b[i]),
-                            Expression.Multiply(a[i], b0));
+                            Expression.Multiply(this[i], b0));
                 }
             }
             return result;
         }
 
-        public static ExpressionTreeDerivatives operator /(ExpressionTreeDerivatives a, ExpressionTreeDerivatives b)
+        public override Derivatives<Expression> Divide(Derivatives<Expression> b)
         {
-            var size = Math.Max(a.Count, b.Count);
+            var size = Math.Max(Count, b.Count);
             var result = new ExpressionTreeDerivatives(size);
 
-            Expression a0 = a[0], b0 = b[0];
+            Expression a0 = this[0], b0 = b[0];
             if (a0 == null)
                 return null;
             if (b0 == null)
@@ -254,7 +258,7 @@ namespace SpiceSharpBehavioral.Parsers
             result[0] = Expression.Divide(a0, b0);
             for (var i = 1; i < size; i++)
             {
-                if (a[i] == null)
+                if (this[i] == null)
                 {
                     if (b[i] == null)
                         result[i] = null;
@@ -268,12 +272,12 @@ namespace SpiceSharpBehavioral.Parsers
                 {
                     if (b[i] == null)
                         // (fx/b)' = f'x/b
-                        result[i] = Expression.Divide(a[i], b0);
+                        result[i] = Expression.Divide(this[i], b0);
                     else
                         // (fx/gx)' = (f'x*gx-fx*g'x)/gx^2
                         result[i] = Expression.Divide(
                             Expression.Subtract(
-                                Expression.Multiply(a[i], b0),
+                                Expression.Multiply(this[i], b0),
                                 Expression.Multiply(a0, b[i])),
                             Expression.Call(SquareInfo, b0));
                 }
@@ -281,21 +285,21 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
-        public static ExpressionTreeDerivatives operator %(ExpressionTreeDerivatives a, ExpressionTreeDerivatives b)
+        public override Derivatives<Expression> Modulo(Derivatives<Expression> b)
         {
             var result = new ExpressionTreeDerivatives();
-            if (a[0] == null)
+            if (this[0] == null)
                 return result;
             if (b[0] == null)
                 throw new Exception("Modulo by 0");
-            result[0] = Expression.Modulo(a[0], b[0]);
+            result[0] = Expression.Modulo(this[0], b[0]);
             return result;
         }
 
-        public static ExpressionTreeDerivatives operator >(ExpressionTreeDerivatives a, ExpressionTreeDerivatives b)
+        public override Derivatives<Expression> GreaterThan(Derivatives<Expression> b)
         {
             var result = new ExpressionTreeDerivatives();
-            Expression a0 = a[0], b0 = b[0];
+            Expression a0 = this[0], b0 = b[0];
             if (a0 == null && b0 == null)
                 return result;
             a0 = a0 ?? Zero;
@@ -304,10 +308,10 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
-        public static ExpressionTreeDerivatives operator <(ExpressionTreeDerivatives a, ExpressionTreeDerivatives b)
+        public override Derivatives<Expression> LessThan(Derivatives<Expression> b)
         {
             var result = new ExpressionTreeDerivatives();
-            Expression a0 = a[0], b0 = b[0];
+            Expression a0 = this[0], b0 = b[0];
             if (a0 == null && b0 == null)
                 return result;
             a0 = a0 ?? Zero;
@@ -315,10 +319,10 @@ namespace SpiceSharpBehavioral.Parsers
             result[0] = Expression.Condition(Expression.LessThan(a0, b0), One, Zero); return result;
         }
 
-        public static ExpressionTreeDerivatives operator >=(ExpressionTreeDerivatives a, ExpressionTreeDerivatives b)
+        public override Derivatives<Expression> GreaterOrEqual(Derivatives<Expression> b)
         {
             var result = new ExpressionTreeDerivatives();
-            Expression a0 = a[0], b0 = b[0];
+            Expression a0 = this[0], b0 = b[0];
             if (a0 == null && b0 == null)
                 return result;
             a0 = a0 ?? Zero;
@@ -326,10 +330,10 @@ namespace SpiceSharpBehavioral.Parsers
             result[0] = Expression.Condition(Expression.GreaterThanOrEqual(a0, b0), One, Zero); return result;
         }
 
-        public static ExpressionTreeDerivatives operator <=(ExpressionTreeDerivatives a, ExpressionTreeDerivatives b)
+        public override Derivatives<Expression> LessOrEqual(Derivatives<Expression> b)
         {
             var result = new ExpressionTreeDerivatives();
-            Expression a0 = a[0], b0 = b[0];
+            Expression a0 = this[0], b0 = b[0];
             if (a0 == null && b0 == null)
                 return result;
             a0 = a0 ?? Zero;

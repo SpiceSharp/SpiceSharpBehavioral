@@ -56,11 +56,11 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private static void DefaultFunctionFound(object sender, FunctionFoundEventArgs<ExpressionTreeDerivatives> e)
+        private static void DefaultFunctionFound(object sender, FunctionFoundEventArgs<Derivatives<Expression>> e)
         {
             if (DefaultFunctions.TryGetValue(e.Name, out var function))
             {
-                var arguments = new ExpressionTreeDerivatives[e.ArgumentCount];
+                var arguments = new Derivatives<Expression>[e.ArgumentCount];
                 for (var i = 0; i < e.ArgumentCount; i++)
                     arguments[i] = e[i];
                 e.Result = function?.Invoke(arguments);
@@ -71,7 +71,7 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         /// Exponentials
         /// </summary>
         private static readonly MethodInfo ExpMethod = typeof(Math).GetTypeInfo().GetMethod("Exp", new[] { typeof(double) });
-        public static ExpressionTreeDerivatives ApplyExp(ExpressionTreeDerivatives[] arguments)
+        public static Derivatives<Expression> ApplyExp(Derivatives<Expression>[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 1);
             var arg = arguments[0];
@@ -92,7 +92,7 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         /// </summary>
         private static readonly MethodInfo LogMethod = typeof(Math).GetTypeInfo().GetMethod("Log", new[] { typeof(double) });
         private static readonly MethodInfo Log2Method = typeof(Math).GetTypeInfo().GetMethod("Log", new[] { typeof(double), typeof(double) });
-        public static ExpressionTreeDerivatives ApplyLog(ExpressionTreeDerivatives[] arguments)
+        public static Derivatives<Expression> ApplyLog(Derivatives<Expression>[] arguments)
         {
             arguments.ThrowIfEmpty(nameof(arguments));
             if (arguments.Length == 1)
@@ -144,7 +144,7 @@ namespace SpiceSharpBehavioral.Parsers.Helper
 
             throw new CircuitException("Invalid number of arguments, {0} given but 2 expected".FormatString(arguments.Length));
         }
-        public static ExpressionTreeDerivatives ApplyLog10(ExpressionTreeDerivatives[] arguments)
+        public static Derivatives<Expression> ApplyLog10(Derivatives<Expression>[] arguments)
         {
             var result = ApplyLog(arguments);
             double a = Math.Log(10.0);
@@ -157,7 +157,7 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         /// Power method.
         /// </summary>
         private static readonly MethodInfo PowMethod = typeof(Math).GetTypeInfo().GetMethod("Pow", new[] { typeof(double), typeof(double) });
-        public static ExpressionTreeDerivatives ApplyPow(ExpressionTreeDerivatives[] arguments)
+        public static Derivatives<Expression> ApplyPow(Derivatives<Expression>[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 2);
             var f = arguments[0];
@@ -190,7 +190,7 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         /// Square root method.
         /// </summary>
         private static readonly MethodInfo SqrtMethod = typeof(Math).GetTypeInfo().GetMethod("Sqrt", new[] { typeof(double) });
-        public static ExpressionTreeDerivatives ApplySqrt(ExpressionTreeDerivatives[] arguments)
+        public static Derivatives<Expression> ApplySqrt(Derivatives<Expression>[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 1);
             var arg = arguments[0];
@@ -214,7 +214,7 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         private static readonly MethodInfo CosMethod = typeof(Math).GetTypeInfo().GetMethod("Cos", new[] { typeof(double) });
         private static readonly MethodInfo TanMethod = typeof(Math).GetTypeInfo().GetMethod("Tan", new[] { typeof(double) });
         private static readonly MethodInfo SquareMethod = typeof(ExpressionTreeDerivativesParserHelper).GetTypeInfo().GetMethod("Square", new[] { typeof(double) });
-        public static ExpressionTreeDerivatives ApplySin(ExpressionTreeDerivatives[] arguments)
+        public static Derivatives<Expression> ApplySin(Derivatives<Expression>[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 1);
             var arg = arguments[0];
@@ -229,7 +229,7 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             }
             return result;
         }
-        private static ExpressionTreeDerivatives ApplyCos(ExpressionTreeDerivatives[] arguments)
+        private static Derivatives<Expression> ApplyCos(Derivatives<Expression>[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 1);
             var arg = arguments[0];
@@ -244,7 +244,7 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             }
             return result;
         }
-        private static ExpressionTreeDerivatives ApplyTan(ExpressionTreeDerivatives[] arguments)
+        private static Derivatives<Expression> ApplyTan(Derivatives<Expression>[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 1);
             var arg = arguments[0];
@@ -267,7 +267,7 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         private static readonly MethodInfo AsinMethod = typeof(Math).GetTypeInfo().GetMethod("Asin", new[] { typeof(double) });
         private static readonly MethodInfo AcosMethod = typeof(Math).GetTypeInfo().GetMethod("Acos", new[] { typeof(double) });
         private static readonly MethodInfo AtanMethod = typeof(Math).GetTypeInfo().GetMethod("Atan", new[] { typeof(double) });
-        public static ExpressionTreeDerivatives ApplyAsin(ExpressionTreeDerivatives[] arguments)
+        public static Derivatives<Expression> ApplyAsin(Derivatives<Expression>[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 1);
             var arg = arguments[0];
@@ -284,7 +284,7 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             }
             return result;
         }
-        public static ExpressionTreeDerivatives ApplyAcos(ExpressionTreeDerivatives[] arguments)
+        public static Derivatives<Expression> ApplyAcos(Derivatives<Expression>[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 1);
             var arg = arguments[0];
@@ -301,7 +301,7 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             }
             return result;
         }
-        public static ExpressionTreeDerivatives ApplyAtan(ExpressionTreeDerivatives[] arguments)
+        public static Derivatives<Expression> ApplyAtan(Derivatives<Expression>[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 1);
             var arg = arguments[0];
@@ -326,7 +326,7 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         private static readonly MethodInfo Round2Method = typeof(Math).GetTypeInfo().GetMethod("Round", new[] { typeof(double), typeof(int) });
         private static readonly MethodInfo MinMethod = typeof(Math).GetTypeInfo().GetMethod("Min", new[] { typeof(double), typeof(double) });
         private static readonly MethodInfo MaxMethod = typeof(Math).GetTypeInfo().GetMethod("Max", new[] { typeof(double), typeof(double) });
-        public static ExpressionTreeDerivatives ApplyAbs(ExpressionTreeDerivatives[] arguments)
+        public static Derivatives<Expression> ApplyAbs(Derivatives<Expression>[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 1);
             var arg = arguments[0];
@@ -348,7 +348,7 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             }
             return result;
         }
-        public static ExpressionTreeDerivatives ApplyRound(ExpressionTreeDerivatives[] arguments)
+        public static Derivatives<Expression> ApplyRound(Derivatives<Expression>[] arguments)
         {
             arguments.ThrowIfEmpty(nameof(arguments));
             var arg = arguments[0];
@@ -377,7 +377,7 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             }
             throw new CircuitException("Invalid number of arguments for Round()");
         }
-        public static ExpressionTreeDerivatives ApplyMin(ExpressionTreeDerivatives[] arguments)
+        public static Derivatives<Expression> ApplyMin(Derivatives<Expression>[] arguments)
         {
             arguments.ThrowIfEmpty(nameof(arguments));
             var result = new ExpressionTreeDerivatives();
@@ -392,7 +392,7 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             result[0] = min;
             return result;
         }
-        public static ExpressionTreeDerivatives ApplyMax(ExpressionTreeDerivatives[] arguments)
+        public static Derivatives<Expression> ApplyMax(Derivatives<Expression>[] arguments)
         {
             arguments.ThrowIfEmpty(nameof(arguments));
             var result = new ExpressionTreeDerivatives();
@@ -420,6 +420,6 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         /// </summary>
         /// <param name="arguments">The arguments.</param>
         /// <returns></returns>
-        public delegate ExpressionTreeDerivatives ExpressionTreeDerivativesFunction(ExpressionTreeDerivatives[] arguments);
+        public delegate Derivatives<Expression> ExpressionTreeDerivativesFunction(Derivatives<Expression>[] arguments);
     }
 }

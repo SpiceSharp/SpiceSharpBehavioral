@@ -45,7 +45,7 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
                     var source = e.Property[0];
                     entities[source].CreateBehaviors(types, simulation, entities);
                 }
-                e.Result = 0.0;
+                e.Apply(() => 0.0);
             };
             parser.Parse(expression);
 

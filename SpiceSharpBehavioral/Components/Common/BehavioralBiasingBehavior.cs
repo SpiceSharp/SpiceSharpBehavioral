@@ -45,7 +45,9 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         /// </summary>
         private Dictionary<string, SpiceSharp.Components.VoltageSourceBehaviors.BiasingBehavior> _voltageSourceBehaviors = 
             new Dictionary<string, SpiceSharp.Components.VoltageSourceBehaviors.BiasingBehavior>();
-        private Action<Vector<double>> _behavioralMethod;
+        private Vector<double> _currentSolution;
+        private double _cumulated;
+        private Action _fillMatrix;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BehavioralBiasingBehavior"/> class.
@@ -77,7 +79,7 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
                     var source = e.Property[0];
                     _voltageSourceBehaviors.Add(source, simulation.EntityBehaviors[source].Get<SpiceSharp.Components.VoltageSourceBehaviors.BiasingBehavior>());
                 }
-                e.Result = 0.0;
+                e.Apply(() => 0.0, 0, 0.0);
             };
             parser.Parse(BaseParameters.Expression);
         }
@@ -89,7 +91,6 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         public override void Unsetup(Simulation simulation)
         {
             Function = null;
-            _behavioralMethod = null;
         }
 
         /// <summary>
@@ -99,11 +100,10 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         /// <param name="solver">The solver.</param>
         public virtual void GetEquationPointers(VariableSet variables, Solver<double> solver)
         {
-            var parser = BaseParameters.Parser ?? new ExpressionTreeDerivativeParser();
+            var parser = BaseParameters.Parser ?? throw new CircuitException("No parser specified for {0}".FormatString(Name));
             var map = new Dictionary<int, int>();
 
             // We want to keep track of derivatives, and which column they map to
-            var solArg = Expression.Parameter(typeof(Vector<double>));
             int Derivative(int index)
             {
                 if (index <= 0)
@@ -114,10 +114,8 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
             };
 
             // Catch the derivatives for Y-matrix loading
-            void SpicePropertyFound(object sender, SpicePropertyFoundEventArgs<ExpressionTreeDerivatives> e)
+            void SpicePropertyFound(object sender, SpicePropertyFoundEventArgs<double> e)
             {
-                var result = new ExpressionTreeDerivatives();
-
                 var property = e.Property;
                 if (BaseParameters.SpicePropertyComparer.Equals(property.Identifier, "V"))
                 {
@@ -126,22 +124,17 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
                     var index = variables.MapNode(property[0]).Index;
                     var refindex = property.ArgumentCount > 1 ? variables.MapNode(property[1]).Index : 0;
                     if (index != refindex)
-                    { 
-                        if (index > 0)
+                    {
+                        if (index > 0 && refindex > 0)
                         {
-                            result[0] = Solution(solArg, index);
-                            result[Derivative(index)] = Expression.Constant(1.0);
+                            e.Apply(null, Derivative(index), 1.0);
+                            e.Apply(() => _currentSolution[index] - _currentSolution[refindex], Derivative(refindex), -1.0);
                         }
-                        if (refindex > 0)
-                        {
-                            if (result[0] == null)
-                                result[0] = Expression.Negate(Solution(solArg, index));
-                            else
-                                result[0] = Expression.Subtract(result[0], Solution(solArg, index));
-                            result[Derivative(index)] = Expression.Constant(-1.0);
-                        }
+                        else if (index > 0)
+                            e.Apply(() => _currentSolution[index], Derivative(index), 1.0);
+                        else if (refindex > 0)
+                            e.Apply(() => -_currentSolution[refindex], Derivative(refindex), -1.0);
                     }
-                    e.Result = result;
                 }
                 else if (BaseParameters.SpicePropertyComparer.Equals(property.Identifier, "I"))
                 {
@@ -150,15 +143,13 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
 
                     // Get the voltage behavior to find the branch equation
                     var index = _voltageSourceBehaviors[property[0]].BranchEq;
-                    result[0] = Solution(solArg, index);
-                    result[Derivative(index)] = Expression.Constant(1.0);
-                    e.Result = result;
+                    e.Apply(() => _currentSolution[index], Derivative(index), 1.0);
                 }
             };
             parser.SpicePropertyFound += SpicePropertyFound;
             var parsedResult = parser.Parse(BaseParameters.Expression);
             parser.SpicePropertyFound -= SpicePropertyFound;
-            Function = new BehavioralFunction(map, parsedResult, solArg);
+            Function = new BehavioralFunction(map, parsedResult);
 
             // Build the total method
             BuildFunctionMethod(solver);
@@ -174,65 +165,90 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
 
             // If the contributions cancel each other out anyway, don't bother compiling
             if (PosIndex == NegIndex)
-            {
-                _behavioralMethod = null;
                 return;
-            }
 
-            // Let us now build a method that will fill matrix elements
-            var cumulated = Expression.Variable(typeof(double), "cumulated");
-            var derivative = Expression.Variable(typeof(double), "derivative");
-            List<Expression> block = new List<Expression>
+            // Initialize contributions
+            List<Action> _contributions = new List<Action>();
             {
-                // cumulated = f(v1, v2, ..., vn)
-                Expression.Assign(cumulated, Function.Value)
-            };
+                var func = Function.Value;
+                _contributions.Add(() => _cumulated = func());
+            }
 
             // Fill Y-matrix
             foreach (var item in Function.Derivatives)
             {
+                var index = item.Key;
+                var func = item.Value;
+
                 // Ignore 0-contributions
-                if (item.Value == null)
+                if (func == null)
                     continue;
 
-                // We want to first calculate the derivative
-                // derivative = df/dv(i)
-                block.Add(Expression.Assign(derivative, item.Value));
-
-                // Get the positive contribution matrix element
+                MatrixElement<double> posElt = null, negElt = null;
                 if (PosIndex > 0)
-                {
-                    var melt = solver.GetMatrixElement(PosIndex, item.Key);
-                    block.Add(Expression.AddAssign(Expression.Property(Expression.Constant(melt), MatrixValueProperty), derivative));
-                }
+                    posElt = solver.GetMatrixElement(PosIndex, index);
                 if (NegIndex > 0)
-                {
-                    var melt = solver.GetMatrixElement(NegIndex, item.Key);
-                    block.Add(Expression.SubtractAssign(Expression.Property(Expression.Constant(melt), MatrixValueProperty), derivative));
-                }
+                    negElt = solver.GetMatrixElement(NegIndex, index);
 
-                // Track the cumulated value
-                if (PosIndex > 0 || NegIndex > 0)
-                    block.Add(Expression.SubtractAssign(cumulated, Expression.Multiply(derivative, Solution(Function.Solution, item.Key))));
+                if (posElt != null && negElt != null)
+                {
+                    _contributions.Add(() =>
+                    {
+                        var derivative = func();
+                        posElt.Value += derivative;
+                        negElt.Value -= derivative;
+                        _cumulated -= _currentSolution[index] * derivative;
+                    });
+                }
+                else if (posElt != null)
+                {
+                    _contributions.Add(() =>
+                    {
+                        var derivative = func();
+                        posElt.Value += derivative;
+                        _cumulated -= _currentSolution[index] * derivative;
+                    });
+                }
+                else if (negElt != null)
+                {
+                    _contributions.Add(() =>
+                    {
+                        var derivative = func();
+                        negElt.Value -= derivative;
+                        _cumulated -= _currentSolution[index] * derivative;
+                    });
+                }
             }
 
             // Fill Rhs-vectors
+            VectorElement<double> posRhs = null, negRhs = null;
             if (PosIndex > 0)
-            {
-                var rhselt = solver.GetRhsElement(PosIndex);
-                block.Add(Expression.SubtractAssign(Expression.Property(Expression.Constant(rhselt), VectorValueProperty), cumulated));
-            }
+                posRhs = solver.GetRhsElement(PosIndex);
             if (NegIndex > 0)
-            {
-                var rhselt = solver.GetRhsElement(NegIndex);
-                block.Add(Expression.AddAssign(Expression.Property(Expression.Constant(rhselt), VectorValueProperty), cumulated));
-            }
+                negRhs = solver.GetRhsElement(NegIndex);
+            if (posRhs != null && negRhs != null)
+                _contributions.Add(() =>
+                {
+                    posRhs.Value -= _cumulated;
+                    negRhs.Value += _cumulated;
+                });
+            else if (posRhs != null)
+                _contributions.Add(() => posRhs.Value -= _cumulated);
+            else if (negRhs != null)
+                _contributions.Add(() => negRhs.Value += _cumulated);
 
             // Build the total behavioral method, ignore if nothing has been done
-            if (block.Count == 0)
-                _behavioralMethod = null;
+            if (_contributions.Count == 0)
+                _fillMatrix = null;
             else
-                _behavioralMethod = Expression.Lambda<Action<Vector<double>>>(Expression.Block(new[] { cumulated, derivative }, block), Function.Solution).Compile();
+            {
+                var actions = _contributions.ToArray();
+                _fillMatrix = () =>
+                {
+                    for (var i = 0; i < actions.Length; i++)
+                        actions[i]();
+                };
+            }
         }
 
         /// <summary>
@@ -250,8 +266,8 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         public virtual void Load(BaseSimulation simulation)
         {
             // We compiled all instructions into one big function, so we can make this simple!
-            var solution = simulation.RealState.Solution;
-            _behavioralMethod?.Invoke(solution);
+            _currentSolution = simulation.RealState.Solution;
+            _fillMatrix?.Invoke();
         }
 
         /// <summary>

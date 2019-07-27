@@ -1,7 +1,7 @@
-﻿using SpiceSharp;
+﻿using System;
+using SpiceSharp;
 using SpiceSharpBehavioral.Parsers;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 
 namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
 {
@@ -11,7 +11,7 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
     public class BehavioralFunction
     {
         private Dictionary<int, int> _map;
-        private ExpressionTreeDerivatives _derivatives;
+        private Derivatives<Func<double>> _derivatives;
 
         /// <summary>
         /// Gets the number of derivatives.
@@ -19,26 +19,21 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         public int DerivativeCount => _derivatives.Count;
 
         /// <summary>
-        /// Gets the parameter that represents the current iteration solution.
-        /// </summary>
-        public ParameterExpression Solution { get; }
-
-        /// <summary>
         /// Gets the expression that returns the value of the function
         /// </summary>
-        public Expression Value => _derivatives[0];
+        public Func<double> Value => _derivatives[0];
 
         /// <summary>
         /// Enumerates all derivatives of the behavioral function. The key is the index of the variable to which
         /// is derived.
         /// </summary>
-        public IEnumerable<KeyValuePair<int, Expression>> Derivatives
+        public IEnumerable<KeyValuePair<int, Func<double>>> Derivatives
         {
             get
             {
                 foreach (var item in _map)
                 {
-                    var result = new KeyValuePair<int, Expression>(
+                    var result = new KeyValuePair<int, Func<double>>(
                         item.Key,
                         _derivatives[item.Value]
                         );
@@ -52,11 +47,10 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         /// </summary>
         /// <param name="map">Maps each derivative to an unknown</param>
         /// <param name="derivatives">The derivatives.</param>
-        public BehavioralFunction(Dictionary<int, int> map, ExpressionTreeDerivatives derivatives, ParameterExpression solution)
+        public BehavioralFunction(Dictionary<int, int> map, Derivatives<Func<double>> derivatives)
         {
             _map = map.ThrowIfNull(nameof(map));
             _derivatives = derivatives.ThrowIfNull(nameof(map));
-            Solution = solution.ThrowIfNull(nameof(solution));
         }
     }
 }

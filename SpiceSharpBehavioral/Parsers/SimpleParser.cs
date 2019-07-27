@@ -8,7 +8,7 @@ namespace SpiceSharpBehavioral.Parsers
     /// <summary>
     /// Allows parsing an expression using only doubles.
     /// </summary>
-    public class SimpleParser : SpiceParser
+    public class SimpleParser : SpiceParser, IParser<double>
     {
         /// <summary>
         /// This event is called when a variable is found.
@@ -171,7 +171,7 @@ namespace SpiceSharpBehavioral.Parsers
         /// <param name="property">The property.</param>
         protected override void PushSpiceProperty(SpiceProperty property)
         {
-            var args = new SpicePropertyFoundEventArgs<double>(property, double.NaN);
+            var args = new SimpleSpicePropertyEventArgs(property);
             SpicePropertyFound?.Invoke(this, args);
 
             if (!args.Found)

@@ -14,7 +14,7 @@ namespace SpiceSharpBehavioralTests.Parsers
         protected void Check(Func<double[], double>[] reference, SimpleDerivativeParser parser, string expression)
         {
             double[] x = new double[reference.Length];
-            void VariableFound(object sender, VariableFoundEventArgs<DoubleDerivatives> e)
+            void VariableFound(object sender, VariableFoundEventArgs<Derivatives<Func<double>>> e)
             {
                 if (e.Name.Length == 1)
                 {
@@ -38,7 +38,7 @@ namespace SpiceSharpBehavioralTests.Parsers
                 for (var i = 0; i < reference.Length; i++)
                 {
                     var expected = reference[i](x);
-                    var actual = parsed.GetDerivative(i).Invoke();
+                    var actual = parsed[i].Invoke();
                     var tol = Math.Max(Math.Abs(expected), Math.Abs(actual)) * RelativeTolerance + AbsoluteTolerance;
                     Assert.AreEqual(expected, actual, tol);
                 }
@@ -59,7 +59,7 @@ namespace SpiceSharpBehavioralTests.Parsers
         protected void Check(Func<double, double> reference, SimpleDerivativeParser parser, string expression)
         {
             double x = 0;
-            void VariableFound(object sender, VariableFoundEventArgs<DoubleDerivatives> e)
+            void VariableFound(object sender, VariableFoundEventArgs<Derivatives<Func<double>>> e)
             {
                 if (e.Name == "x")
                 {
@@ -75,17 +75,17 @@ namespace SpiceSharpBehavioralTests.Parsers
                 var expected = reference(x);
                 var parsed = parser.Parse(expression);
 
-                var actual = parsed.GetDerivative(0).Invoke();
+                var actual = parsed[0].Invoke();
                 var tol = Math.Max(Math.Abs(expected), Math.Abs(actual)) * RelativeTolerance + AbsoluteTolerance;
                 Assert.AreEqual(expected, actual, tol);
             }
             parser.VariableFound -= VariableFound;
         }
 
-        protected void Check(double expected, DoubleDerivatives parsed)
+        protected void Check(double expected, Derivatives<Func<double>> parsed)
         {
             Assert.AreEqual(parsed.Count, 1);
-            var actual = parsed.GetDerivative(0).Invoke();
+            var actual = parsed[0].Invoke();
             var tol = Math.Max(Math.Abs(expected), Math.Abs(actual)) * RelativeTolerance + AbsoluteTolerance;
             Assert.AreEqual(expected, actual, tol);
         }
