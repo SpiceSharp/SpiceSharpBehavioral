@@ -1,11 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Text;
 using System.Reflection;
 
 namespace SpiceSharpBehavioral.Parsers
 {
+    /// <summary>
+    /// Event arguments for finding spice properties for the <see cref="ExpressionTreeDerivativeParser"/>.
+    /// </summary>
     public class ExpressionTreeSpicePropertyEventArgs : SpicePropertyFoundEventArgs<double>
     {
         private static readonly MethodInfo InvokeMethod = typeof(Func<double>).GetTypeInfo().GetMethod("Invoke");

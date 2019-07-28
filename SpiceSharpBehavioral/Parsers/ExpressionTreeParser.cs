@@ -64,7 +64,7 @@ namespace SpiceSharpBehavioral.Parsers
                 case TernaryOperator to:
                     b = _stack.Pop();
                     a = _stack.Pop();
-                    _stack.Push(_stack.Pop().Equals(0.0) ? b : a);
+                    _stack.Push(Expression.Condition(_stack.Pop(), a, b));
                     break;
 
                 case ClosingTernaryOperator _:

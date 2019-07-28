@@ -379,7 +379,7 @@ namespace SpiceSharpBehavioral.Parsers.Helper
                 result[0] = () => Math.Round(a0());
                 
                 for (var i = 1; i < arg.Count; i++)
-                    if (!arg[i].Equals(0.0))
+                    if (arg[i] != null)
                         throw new CircuitException("Cannot differentiate Round()");
                 return result;
             }
@@ -391,10 +391,10 @@ namespace SpiceSharpBehavioral.Parsers.Helper
                 result[0] = () => Math.Round(a0(), (int)Math.Round(b0()));
 
                 for (var i = 1; i < arg.Count; i++)
-                    if (!arg[i].Equals(0.0))
+                    if (arg[i] != null)
                         throw new CircuitException("Cannot differentiate Round()");
                 for (var i = 1; i < arguments[1].Count; i++)
-                    if (!arguments[1][i].Equals(0.0))
+                    if (arguments[1][i] != null)
                         throw new CircuitException("Cannot differentiate Round()");
                 return result;
             }
@@ -419,7 +419,7 @@ namespace SpiceSharpBehavioral.Parsers.Helper
                 b = arguments[i][0];
                 c = () => Math.Min(a(), b());
                 for (var k = 1; k < arguments[i].Count; k++)
-                    if (!arguments[i][k].Equals(0.0))
+                    if (arguments[i][k] != null)
                         throw new CircuitException("Cannot differentiate Min()");
             }
             result[0] = c;
@@ -444,7 +444,7 @@ namespace SpiceSharpBehavioral.Parsers.Helper
                 b = arguments[i][0];
                 c = () => Math.Max(a(), b());
                 for (var k = 1; k < arguments[i].Count; k++)
-                    if (!arguments[i][k].Equals(0.0))
+                    if (arguments[i][k] != null)
                         throw new CircuitException("Cannot differentiate Min()");
             }
             result[0] = c;
