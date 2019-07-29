@@ -377,10 +377,11 @@ namespace SpiceSharpBehavioral.Parsers.Helper
                 var result = new DoubleDerivatives();
                 var a0 = arg[0];
                 result[0] = () => Math.Round(a0());
-                
+
+                // The derivative of Round() is always 0 (horizontal), but doesn't exist depending on where it is rounded
                 for (var i = 1; i < arg.Count; i++)
                     if (arg[i] != null)
-                        throw new CircuitException("Cannot differentiate Round()");
+                        CircuitWarning.Warning(null, "Trying to derive Round() for which the derivative may not exist in some points");
                 return result;
             }
             if (arguments.Length == 2)
@@ -390,12 +391,13 @@ namespace SpiceSharpBehavioral.Parsers.Helper
                 var b0 = arguments[1][0];
                 result[0] = () => Math.Round(a0(), (int)Math.Round(b0()));
 
+                // The derivative of Round() is always 0 (horizontal), but doesn't exist depending on where it is rounded
                 for (var i = 1; i < arg.Count; i++)
                     if (arg[i] != null)
-                        throw new CircuitException("Cannot differentiate Round()");
+                        CircuitWarning.Warning(null, "Trying to derive Round() to the first argument for which the derivative may not exist in some points");
                 for (var i = 1; i < arguments[1].Count; i++)
                     if (arguments[1][i] != null)
-                        throw new CircuitException("Cannot differentiate Round()");
+                        CircuitWarning.Warning(null, "Trying to derive Round() to the second argument for which the derivative may not exist in some points");
                 return result;
             }
             throw new CircuitException("Invalid number of arguments for Round()");
@@ -403,51 +405,127 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         public static Derivatives<Func<double>> ApplyMin(Derivatives<Func<double>>[] arguments)
         {
             arguments.ThrowIfEmpty(nameof(arguments));
-            var result = new DoubleDerivatives();
+            var size = 1;
+            for (var i = 0; i < arguments.Length; i++)
+                size = Math.Max(size, arguments[i].Count);
+            var result = new DoubleDerivatives(size);
             if (arguments.Length == 1)
             {
                 result[0] = arguments[0][0];
                 return result;
             }
 
-            var a = arguments[0][0];
-            var b = arguments[1][0];
-            Func<double> c = () => Math.Min(a(), b());
+            {
+                // First two arguments
+                var a = arguments[0][0];
+                var b = arguments[1][0];
+                result[0] = () => Math.Min(a(), b());
+                for (var k = 1; k < size; k++)
+                {
+                    if (arguments[0][k] != null || arguments[1][k] != null)
+                    {
+                        CircuitWarning.Warning(null, "Trying to derive Min() for which the derivative may not exist in some points");
+                        var tmpda = arguments[0][k];
+                        var tmpdb = arguments[1][k];
+                        var funca = arguments[0][0];
+                        var funcb = arguments[1][0];
+                        if (tmpda != null && tmpdb != null)
+                            result[k] = () => funca() < funcb() ? tmpda() : tmpdb(); // Use the derivative of the function that is currently the smallest
+                        else if (tmpda != null)
+                            result[k] = () => funca() < funcb() ? tmpda() : 0;
+                        else if (tmpdb != null)
+                            result[k] = () => funca() < funcb() ? 0 : tmpdb();
+                    }
+                }
+            }
+
             for (var i = 2; i < arguments.Length; i++)
             {
-                a = c;
-                b = arguments[i][0];
-                c = () => Math.Min(a(), b());
-                for (var k = 1; k < arguments[i].Count; k++)
-                    if (arguments[i][k] != null)
-                        throw new CircuitException("Cannot differentiate Min()");
+                // First two arguments
+                var a = result[0];
+                var b = arguments[i][0];
+                result[0] = () => Math.Min(a(), b());
+                for (var k = 1; k < size; k++)
+                {
+                    if (arguments[0][k] != null || arguments[1][k] != null)
+                    {
+                        CircuitWarning.Warning(null, "Trying to derive Min() for which the derivative may not exist in some points");
+                        var tmpda = result[k];
+                        var tmpdb = arguments[i][k];
+                        var funca = a;
+                        var funcb = arguments[i][0];
+                        if (tmpda != null && tmpdb != null)
+                            result[k] = () => funca() < funcb() ? tmpda() : tmpdb(); // Use the derivative of the function that is currently the smallest
+                        else if (tmpda != null)
+                            result[k] = () => funca() < funcb() ? tmpda() : 0;
+                        else if (tmpdb != null)
+                            result[k] = () => funca() < funcb() ? 0 : tmpdb();
+                    }
+                }
             }
-            result[0] = c;
             return result;
         }
         public static Derivatives<Func<double>> ApplyMax(Derivatives<Func<double>>[] arguments)
         {
             arguments.ThrowIfEmpty(nameof(arguments));
-            var result = new DoubleDerivatives();
+            var size = 1;
+            for (var i = 0; i < arguments.Length; i++)
+                size = Math.Max(size, arguments[i].Count);
+            var result = new DoubleDerivatives(size);
             if (arguments.Length == 1)
             {
                 result[0] = arguments[0][0];
                 return result;
             }
 
-            var a = arguments[0][0];
-            var b = arguments[1][0];
-            Func<double> c = () => Math.Max(a(), b());
+            {
+                // First two arguments
+                var a = arguments[0][0];
+                var b = arguments[1][0];
+                result[0] = () => Math.Max(a(), b());
+                for (var k = 1; k < size; k++)
+                {
+                    if (arguments[0][k] != null || arguments[1][k] != null)
+                    {
+                        CircuitWarning.Warning(null, "Trying to derive Min() for which the derivative may not exist in some points");
+                        var tmpda = arguments[0][k];
+                        var tmpdb = arguments[1][k];
+                        var funca = arguments[0][0];
+                        var funcb = arguments[1][0];
+                        if (tmpda != null && tmpdb != null)
+                            result[k] = () => funca() > funcb() ? tmpda() : tmpdb(); // Use the derivative of the function that is currently the smallest
+                        else if (tmpda != null)
+                            result[k] = () => funca() > funcb() ? tmpda() : 0;
+                        else if (tmpdb != null)
+                            result[k] = () => funca() > funcb() ? 0 : tmpdb();
+                    }
+                }
+            }
+
             for (var i = 2; i < arguments.Length; i++)
             {
-                a = c;
-                b = arguments[i][0];
-                c = () => Math.Max(a(), b());
-                for (var k = 1; k < arguments[i].Count; k++)
-                    if (arguments[i][k] != null)
-                        throw new CircuitException("Cannot differentiate Min()");
+                // First two arguments
+                var a = result[0];
+                var b = arguments[i][0];
+                result[0] = () => Math.Max(a(), b());
+                for (var k = 1; k < size; k++)
+                {
+                    if (arguments[0][k] != null || arguments[1][k] != null)
+                    {
+                        CircuitWarning.Warning(null, "Trying to derive Min() for which the derivative may not exist in some points");
+                        var tmpda = result[k];
+                        var tmpdb = arguments[i][k];
+                        var funca = a;
+                        var funcb = arguments[i][0];
+                        if (tmpda != null && tmpdb != null)
+                            result[k] = () => funca() > funcb() ? tmpda() : tmpdb(); // Use the derivative of the function that is currently the smallest
+                        else if (tmpda != null)
+                            result[k] = () => funca() > funcb() ? tmpda() : 0;
+                        else if (tmpdb != null)
+                            result[k] = () => funca() > funcb() ? 0 : tmpdb();
+                    }
+                }
             }
-            result[0] = c;
             return result;
         }
 

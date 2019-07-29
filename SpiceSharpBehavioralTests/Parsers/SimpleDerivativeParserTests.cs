@@ -250,6 +250,16 @@ namespace SpiceSharpBehavioralTests.Parsers
         {
             var parser = Parser;
             Check(x => Math.Min(x, 1), parser, "Min(x, 1)");
+            Check(new Func<double[], double>[] {
+                x => Math.Min((x[0] + 0.5) * (x[0] + 0.5), Math.Min(x[0] * x[0], (x[0] - 0.5) * (x[0] - 0.5))),
+                x =>
+                {
+                    if (x[0] < -0.25)
+                        return 2 * (x[0] + 0.5);
+                    if (x[0] < 0.25)
+                        return 2 * x[0];
+                    return 2 * (x[0] - 0.5);
+                }}, parser, "Min((a+0.5)^2, a^2, (a-0.5)^2)");
         }
 
         [Test]
@@ -257,6 +267,16 @@ namespace SpiceSharpBehavioralTests.Parsers
         {
             var parser = Parser;
             Check(x => Math.Max(x, 1), parser, "Max(x, 1)");
+            Check(new Func<double[], double>[] {
+                x => Math.Max(-(x[0] + 0.5) * (x[0] + 0.5), Math.Max(-x[0] * x[0], -(x[0] - 0.5) * (x[0] - 0.5))),
+                x =>
+                {
+                    if (x[0] < -0.25)
+                        return -2 * (x[0] + 0.5);
+                    if (x[0] < 0.25)
+                        return -2 * x[0];
+                    return -2 * (x[0] - 0.5);
+                }}, parser, "Max(-(a+0.5)^2, -a^2, -(a-0.5)^2)");
         }
     }
 }

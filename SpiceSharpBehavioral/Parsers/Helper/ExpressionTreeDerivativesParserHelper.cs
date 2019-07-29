@@ -380,31 +380,127 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         public static Derivatives<Expression> ApplyMin(Derivatives<Expression>[] arguments)
         {
             arguments.ThrowIfEmpty(nameof(arguments));
-            var result = new ExpressionTreeDerivatives();
-            var min = arguments[0][0];
-            for (var i = 1; i < arguments.Length; i++)
+            var size = 1;
+            for (var i = 0; i < arguments.Length; i++)
+                size = Math.Max(size, arguments[i].Count);
+            var result = new ExpressionTreeDerivatives(size);
+            if (arguments.Length == 1)
             {
-                min = Expression.Call(MinMethod, min, arguments[i][0]);
-                for (var k = 1; k < arguments[i].Count; k++)
-                    if (arguments[i][k] != null)
-                        throw new CircuitException("Cannot differentiate Min()");
+                result[0] = arguments[0][0];
+                return result;
             }
-            result[0] = min;
+
+            {
+                // First two arguments
+                var a = arguments[0][0];
+                var b = arguments[1][0];
+                result[0] = Expression.Call(MinMethod, a, b);
+                for (var k = 1; k < size; k++)
+                {
+                    if (arguments[0][k] != null || arguments[1][k] != null)
+                    {
+                        CircuitWarning.Warning(null, "Trying to derive Min() for which the derivative may not exist in some points");
+                        var tmpda = arguments[0][k];
+                        var tmpdb = arguments[1][k];
+                        var funca = arguments[0][0];
+                        var funcb = arguments[1][0];
+                        if (tmpda != null && tmpdb != null)
+                            result[k] = Expression.Condition(Expression.LessThan(funca, funcb), tmpda, tmpdb); // Use the derivative of the function that is currently the smallest
+                        else if (tmpda != null)
+                            result[k] = Expression.Condition(Expression.LessThan(funca, funcb), tmpda, Expression.Constant(0.0));
+                        else if (tmpdb != null)
+                            result[k] = Expression.Condition(Expression.LessThan(funca, funcb), Expression.Constant(0.0), tmpdb);
+                    }
+                }
+            }
+
+            for (var i = 2; i < arguments.Length; i++)
+            {
+                // First two arguments
+                var a = result[0];
+                var b = arguments[i][0];
+                result[0] = Expression.Call(MinMethod, a, b);
+                for (var k = 1; k < size; k++)
+                {
+                    if (arguments[0][k] != null || arguments[1][k] != null)
+                    {
+                        CircuitWarning.Warning(null, "Trying to derive Min() for which the derivative may not exist in some points");
+                        var tmpda = result[k];
+                        var tmpdb = arguments[i][k];
+                        var funca = a;
+                        var funcb = arguments[i][0];
+                        if (tmpda != null && tmpdb != null)
+                            result[k] = Expression.Condition(Expression.LessThan(funca, funcb), tmpda, tmpdb); // Use the derivative of the function that is currently the smallest
+                        else if (tmpda != null)
+                            result[k] = Expression.Condition(Expression.LessThan(funca, funcb), tmpda, Expression.Constant(0.0));
+                        else if (tmpdb != null)
+                            result[k] = Expression.Condition(Expression.LessThan(funca, funcb), Expression.Constant(0.0), tmpdb);
+                    }
+                }
+            }
             return result;
         }
         public static Derivatives<Expression> ApplyMax(Derivatives<Expression>[] arguments)
         {
             arguments.ThrowIfEmpty(nameof(arguments));
-            var result = new ExpressionTreeDerivatives();
-            var min = arguments[0][0];
-            for (var i = 1; i < arguments.Length; i++)
+            var size = 1;
+            for (var i = 0; i < arguments.Length; i++)
+                size = Math.Max(size, arguments[i].Count);
+            var result = new ExpressionTreeDerivatives(size);
+            if (arguments.Length == 1)
             {
-                min = Expression.Call(MaxMethod, min, arguments[i][0]);
-                for (var k = 1; k < arguments[i].Count; k++)
-                    if (arguments[i][k] != null)
-                        throw new CircuitException("Cannot differentiate Min()");
+                result[0] = arguments[0][0];
+                return result;
             }
-            result[0] = min;
+
+            {
+                // First two arguments
+                var a = arguments[0][0];
+                var b = arguments[1][0];
+                result[0] = Expression.Call(MaxMethod, a, b);
+                for (var k = 1; k < size; k++)
+                {
+                    if (arguments[0][k] != null || arguments[1][k] != null)
+                    {
+                        CircuitWarning.Warning(null, "Trying to derive Min() for which the derivative may not exist in some points");
+                        var tmpda = arguments[0][k];
+                        var tmpdb = arguments[1][k];
+                        var funca = arguments[0][0];
+                        var funcb = arguments[1][0];
+                        if (tmpda != null && tmpdb != null)
+                            result[k] = Expression.Condition(Expression.GreaterThan(funca, funcb), tmpda, tmpdb); // Use the derivative of the function that is currently the smallest
+                        else if (tmpda != null)
+                            result[k] = Expression.Condition(Expression.GreaterThan(funca, funcb), tmpda, Expression.Constant(0.0));
+                        else if (tmpdb != null)
+                            result[k] = Expression.Condition(Expression.GreaterThan(funca, funcb), Expression.Constant(0.0), tmpdb);
+                    }
+                }
+            }
+
+            for (var i = 2; i < arguments.Length; i++)
+            {
+                // First two arguments
+                var a = result[0];
+                var b = arguments[i][0];
+                result[0] = Expression.Call(MaxMethod, a, b);
+                for (var k = 1; k < size; k++)
+                {
+                    if (arguments[0][k] != null || arguments[1][k] != null)
+                    {
+                        CircuitWarning.Warning(null, "Trying to derive Min() for which the derivative may not exist in some points");
+                        var tmpda = result[k];
+                        var tmpdb = arguments[i][k];
+                        var funca = a;
+                        var funcb = arguments[i][0];
+                        if (tmpda != null && tmpdb != null)
+                            result[k] = Expression.Condition(Expression.GreaterThan(funca, funcb), tmpda, tmpdb); // Use the derivative of the function that is currently the smallest
+                        else if (tmpda != null)
+                            result[k] = Expression.Condition(Expression.GreaterThan(funca, funcb), tmpda, Expression.Constant(0.0));
+                        else if (tmpdb != null)
+                            result[k] = Expression.Condition(Expression.GreaterThan(funca, funcb), Expression.Constant(0.0), tmpdb);
+                    }
+                }
+            }
             return result;
         }
 
