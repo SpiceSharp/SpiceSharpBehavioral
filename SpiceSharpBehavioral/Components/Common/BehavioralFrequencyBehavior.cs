@@ -167,7 +167,6 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         /// <summary>
         /// Initialize small-signal parameters.
         /// </summary>
-        /// <param name="simulation">The simulation.</param>
         public virtual void InitializeParameters()
         {
             _initializeMethod?.Invoke();

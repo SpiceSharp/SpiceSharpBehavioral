@@ -154,7 +154,6 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         /// <summary>
         /// Unsetup the behavior.
         /// </summary>
-        /// <param name="simulation">The simulation.</param>
         public override void Unbind()
         {
             base.Unbind();

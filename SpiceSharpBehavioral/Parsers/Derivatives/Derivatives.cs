@@ -54,7 +54,7 @@ namespace SpiceSharpBehavioral.Parsers
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Derivatives"/> class.
+        /// Creates a new instance of the <see cref="Derivatives{T}"/> class.
         /// </summary>
         /// <param name="capacity">The capacity.</param>
         public Derivatives(int capacity)
@@ -64,7 +64,7 @@ namespace SpiceSharpBehavioral.Parsers
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Derivatives"/> class.
+        /// Creates a new instance of the <see cref="Derivatives{T}"/> class.
         /// </summary>
         public Derivatives()
             : this(4)

@@ -92,6 +92,11 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
+        /// <summary>
+        /// Binary OR.
+        /// </summary>
+        /// <param name="b">The other operand.</param>
+        /// <returns></returns>
         public override Derivatives<Func<double>> Or(Derivatives<Func<double>> b)
         {
             var result = new DoubleDerivatives();

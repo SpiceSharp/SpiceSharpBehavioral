@@ -17,9 +17,7 @@ namespace SpiceSharpBehavioral.Components.BehavioralVoltageSourceBehaviors
         /// <summary>
         /// Gets the current through the source.
         /// </summary>
-        /// <param name="state">The state.</param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException">state</exception>
         [ParameterName("i"), ParameterName("current"), ParameterInfo("Voltage source current")]
         public double GetCurrent() => State.ThrowIfNotBound(this).Solution[BranchEq];
 

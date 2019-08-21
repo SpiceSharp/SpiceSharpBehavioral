@@ -2,6 +2,8 @@
 using SpiceSharp;
 using NUnit.Framework;
 using SpiceSharp.Simulations;
+using System.Numerics;
+using System;
 
 namespace SpiceSharpBehavioralTests.Components
 {
@@ -65,6 +67,19 @@ namespace SpiceSharpBehavioralTests.Components
             // Do simulation
             var op = new OP("op");
             AnalyzeOp(ckt, op, new[] { new RealVoltageExport(op, "b") }, new[] { 0.75 });
+        }
+
+        [Test]
+        public void When_SmallSignalAnalysis_Expect_Reference()
+        {
+            var ckt = new Circuit(
+                new VoltageSource("V1", "in", "0", 3)
+                    .SetParameter("acmag", 1.0),
+                new BehavioralVoltageSource("E1", "out", "0", "V(in)^2+2"));
+
+            // Do simulation
+            var ac = new AC("ac");
+            AnalyzeAC(ckt, ac, new[] { new ComplexVoltageExport(ac, "out") }, new Func<Complex>[] { () => new Complex(6.0, 0.0) });
         }
     }
 }

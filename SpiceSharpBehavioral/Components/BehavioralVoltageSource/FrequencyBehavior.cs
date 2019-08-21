@@ -67,7 +67,7 @@ namespace SpiceSharpBehavioral.Components.BehavioralVoltageSourceBehaviors
             }
 
             // First we copy the branch equation from the biasing behavior
-            int branchEq = ((BiasingBehavior)BiasingBehavior).BranchEq;
+            int branchEq = context.GetBehavior<BiasingBehavior>().BranchEq;
             PosIndex = 0;
             NegIndex = branchEq;
 

@@ -9,18 +9,46 @@ namespace SpiceSharpBehavioral.Parsers
     /// </summary>
     public class ExpressionTreeDerivatives : Derivatives<Expression>
     {
+        /// <summary>
+        /// Zero.
+        /// </summary>
         public static readonly Expression Zero = Expression.Constant(0.0);
+
+        /// <summary>
+        /// One.
+        /// </summary>
         public static readonly Expression One = Expression.Constant(1.0);
+
+        /// <summary>
+        /// Method info for Log().
+        /// </summary>
         public static readonly MethodInfo LogInfo = typeof(Math).GetTypeInfo().GetMethod("Log", new[] { typeof(double) });
+
+        /// <summary>
+        /// Method info for Pow().
+        /// </summary>
         public static readonly MethodInfo PowInfo = typeof(Math).GetTypeInfo().GetMethod("Pow", new[] { typeof(double), typeof(double) });
+
+        /// <summary>
+        /// Method info for Square().
+        /// </summary>
         public static readonly MethodInfo SquareInfo = typeof(ExpressionTreeDerivatives).GetTypeInfo().GetMethod("Square", new[] { typeof(double) });
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="ExpressionTreeDerivatives"/>.
+        /// </summary>
         public ExpressionTreeDerivatives()
-        { }
+        {
+        }
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="ExpressionTreeDerivatives"/>.
+        /// </summary>
+        /// <param name="capacity">The capacity.</param>
         public ExpressionTreeDerivatives(int capacity)
             : base(capacity)
-        { }
+        {
+        }
 
         /// <summary>
         /// Get a method that computes the derivative.
