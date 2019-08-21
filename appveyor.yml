@@ -31,3 +31,5 @@ build_script:
 artifacts:
   - path: SpiceSharpBehavioral\bin\Release\*.nupkg
     name: NuGet package
+  - path: SpiceSharpBehavioralCoverage.xml
+    name: Coverage report
