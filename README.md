@@ -9,6 +9,13 @@ The parser uses Dijkstra's Shunting-Yard algorithm to parse the expressions into
 
 Please use the library with care.
 
+## Current build status
+
+|    | Status |
+|:---|-------:|
+|AppVeyor CI (Windows)|[![Build status](https://ci.appveyor.com/api/projects/status/1olsxasmk451200k/branch/master?svg=true)](https://ci.appveyor.com/project/SpiceSharp/spicesharpbehavioral/branch/master)|
+|Travis CI (Linux/iOS/Mono)|[![Build Status](https://travis-ci.org/SpiceSharp/SpiceSharpBehavioral.svg?branch=master)](https://travis-ci.org/SpiceSharp/SpiceSharpBehavioral)|
+
 ## Usage
 
 Including this library allows you to use two extra components:
@@ -74,7 +81,7 @@ namespace Example2
                 {
                     var arg = e[0];
                     var result = new ExpressionTreeDerivatives(arg.Count);
-                    
+
                     // Index 0 contains the actual function value
                     result[0] = Expression.Call(typeof(Math).GetTypeInfo().GetMethod("Exp"), arg[0]);
 
