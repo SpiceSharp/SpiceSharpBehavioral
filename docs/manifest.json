@@ -1,0 +1,911 @@
+{
+  "homepages": [],
+  "source_base_path": "D:/Sven/Documents/Visual Studio Projects/SpiceSharpBehavioral",
+  "xrefmap": "xrefmap.yml",
+  "files": [
+    {
+      "type": "Conceptual",
+      "source_relative_path": "README.md",
+      "output": {
+        ".html": {
+          "relative_path": "README.html",
+          "hash": "ARg9JlcBTQK3ysp94KFSZA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharp.Components.BehavioralCurrentSource.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharp.Components.BehavioralCurrentSource.html",
+          "hash": "/ogOR59Ehb6QaXtpvgUO/w=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharp.Components.BehavioralVoltageSource.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharp.Components.BehavioralVoltageSource.html",
+          "hash": "v8eyktN4IFVDY1AzFohKUg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharp.Components.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharp.Components.html",
+          "hash": "Yv2SOxr7wXOeE4aU2ZryMw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Components.BehavioralBehaviors.BaseParameters.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Components.BehavioralBehaviors.BaseParameters.html",
+          "hash": "GdeQZawSbhtGA6eMHXtk+g=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Components.BehavioralBehaviors.BehavioralBiasingBehavior.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Components.BehavioralBehaviors.BehavioralBiasingBehavior.html",
+          "hash": "dnjH6ZK81I1vPtjGrshVHg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Components.BehavioralBehaviors.BehavioralComponent.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Components.BehavioralBehaviors.BehavioralComponent.html",
+          "hash": "0Z8jyXNJArXhXQMVQb60kA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Components.BehavioralBehaviors.BehavioralFrequencyBehavior.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Components.BehavioralBehaviors.BehavioralFrequencyBehavior.html",
+          "hash": "MiBp9mCdBjhJ4AmovGwg3A=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Components.BehavioralBehaviors.BehavioralFunction.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Components.BehavioralBehaviors.BehavioralFunction.html",
+          "hash": "QzZDwCDhQ2OaapIM+x5ptA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Components.BehavioralBehaviors.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Components.BehavioralBehaviors.html",
+          "hash": "CWTJzQoSIzXXT6FojxDFZg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Components.BehavioralCurrentSourceBehaviors.BiasingBehavior.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Components.BehavioralCurrentSourceBehaviors.BiasingBehavior.html",
+          "hash": "holdaYjubuuYvNsmlDZ3hQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Components.BehavioralCurrentSourceBehaviors.FrequencyBehavior.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Components.BehavioralCurrentSourceBehaviors.FrequencyBehavior.html",
+          "hash": "GIgZF+QJO81fSX67qIm8hg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Components.BehavioralCurrentSourceBehaviors.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Components.BehavioralCurrentSourceBehaviors.html",
+          "hash": "lyk0BxXTjudBkdVSGl0ZEg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Components.BehavioralVoltageSourceBehaviors.BiasingBehavior.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Components.BehavioralVoltageSourceBehaviors.BiasingBehavior.html",
+          "hash": "FjkMKrw7U+TC6c1agNTbgQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Components.BehavioralVoltageSourceBehaviors.FrequencyBehavior.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Components.BehavioralVoltageSourceBehaviors.FrequencyBehavior.html",
+          "hash": "ToR52vLUSP2R8BaUXjrTww=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Components.BehavioralVoltageSourceBehaviors.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Components.BehavioralVoltageSourceBehaviors.html",
+          "hash": "RZVUsK+aC0ZqAk2k2dNQpg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Operator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Operator.html",
+          "hash": "8BV6gCsKMwm1r/ESSoibpA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.Derivatives-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.Derivatives-1.html",
+          "hash": "ZJGU19aOi6/319sN8Q/rRA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.DoubleDerivatives.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.DoubleDerivatives.html",
+          "hash": "ruwFUCX16xlFcWCpeWerOA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.ExpressionTreeDerivativeParser.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.ExpressionTreeDerivativeParser.html",
+          "hash": "MOaLxhqyKWZKqRy2+NSagw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.ExpressionTreeDerivativePropertyEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.ExpressionTreeDerivativePropertyEventArgs.html",
+          "hash": "0+5BNcEvXjsgm5b+LAcTeg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.ExpressionTreeDerivatives.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.ExpressionTreeDerivatives.html",
+          "hash": "J9d+8eMP2aoERxg1I1z4dw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.ExpressionTreeParser.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.ExpressionTreeParser.html",
+          "hash": "YKhZxHbSCt++FcDSAjocVA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.ExpressionTreeSpicePropertyEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.ExpressionTreeSpicePropertyEventArgs.html",
+          "hash": "tXIBllNUa+fjS8E/FyFdKA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.FunctionFoundEventArgs-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.FunctionFoundEventArgs-1.html",
+          "hash": "6SRFrJYTVnDTVGvK4bbYTQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.ExpressionTreeDerivativesFunction.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.ExpressionTreeDerivativesFunction.html",
+          "hash": "jmvep+hvkBl3nF92hd167Q=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.html",
+          "hash": "C5Qq4+abm0lxHohZTQkIgg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeParserHelper.ExpressionFunction.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeParserHelper.ExpressionFunction.html",
+          "hash": "9nrUMwLAv9/KN4XnJD5OVQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeParserHelper.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeParserHelper.html",
+          "hash": "AG/bwUnLjGNPUDt0JhA0rg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.Helper.SimpleDerivativeParserHelper.DoubleDerivativesFunction.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.Helper.SimpleDerivativeParserHelper.DoubleDerivativesFunction.html",
+          "hash": "IN1cmxzRq93x0NluJTlryw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.Helper.SimpleDerivativeParserHelper.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.Helper.SimpleDerivativeParserHelper.html",
+          "hash": "uVlXd0GkJLDYU2V17U/2Nw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.Helper.SimpleParserHelper.SimpleFunction.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.Helper.SimpleParserHelper.SimpleFunction.html",
+          "hash": "j0ZDIkOTAf/eILRHCgrziw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.Helper.SimpleParserHelper.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.Helper.SimpleParserHelper.html",
+          "hash": "NVNolesoVUVPY5GSocG2qw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.Helper.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.Helper.html",
+          "hash": "+7ir5aA8KNmc4PM81ICI+w=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.IDerivatives.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.IDerivatives.html",
+          "hash": "OsPDWLKdafTHoxGg8O0uKg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.IParser-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.IParser-1.html",
+          "hash": "2pYrZiX1A8EQXlOQ3aGSbg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.ISpiceDerivativeParser-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.ISpiceDerivativeParser-1.html",
+          "hash": "Aoc6hWUmtCmp+iTrsdMsaQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.Operators.ArgumentOperator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.Operators.ArgumentOperator.html",
+          "hash": "9ELHL7ID1LzqXgYc5LBw6w=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.Operators.ArithmeticOperator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.Operators.ArithmeticOperator.html",
+          "hash": "j62r3kwCXl9NAj3VkoO9bA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.Operators.BracketOperator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.Operators.BracketOperator.html",
+          "hash": "21ghWfw2+GJ/XVRym8WRLA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.Operators.ClosingTernaryOperator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.Operators.ClosingTernaryOperator.html",
+          "hash": "qxJNmJh/C71h19J+/fYGeQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.Operators.DoubleDoubleMethod.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.Operators.DoubleDoubleMethod.html",
+          "hash": "sPzPgtCYTemf+dz1DxcGdA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.Operators.DoubleMethod.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.Operators.DoubleMethod.html",
+          "hash": "iTUP5Taipg1HjzwHgngGBA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.Operators.FunctionOperator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.Operators.FunctionOperator.html",
+          "hash": "GDcFBoL6JJHq6Yyv12CKug=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.Operators.MethodDescription.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.Operators.MethodDescription.html",
+          "hash": "zCsHqwf3ZjxZHJh77s/1IA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.Operators.MethodSignature.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.Operators.MethodSignature.html",
+          "hash": "q35KSrmbh4MAZUUL53Aiew=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.Operators.OperatorPrecedence.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.Operators.OperatorPrecedence.html",
+          "hash": "ouYNupXuyN3NUEHsBM4lYA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.Operators.OperatorType.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.Operators.OperatorType.html",
+          "hash": "JSLaybVSSs+jHqMDa8/0Qg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.Operators.TernaryOperator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.Operators.TernaryOperator.html",
+          "hash": "xX9ErjZ9pewGo0lMqxrf1Q=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.Operators.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.Operators.html",
+          "hash": "KdiPJQeNHC08LoADsRagfg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.ParserException.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.ParserException.html",
+          "hash": "u6FcerXYHkgh/IAro+N9dw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.ShuntingYard.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.ShuntingYard.html",
+          "hash": "h2WZZDN37xUBzD94ELyRqw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.SimpleDerivativeParser.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.SimpleDerivativeParser.html",
+          "hash": "L58JI6S7CAZxbWpWjrKf/g=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.SimpleDerivativePropertyEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.SimpleDerivativePropertyEventArgs.html",
+          "hash": "XkherHpD5gyfw0MulRqsRQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.SimpleParser.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.SimpleParser.html",
+          "hash": "J0BId6/QGSxKuRkvE5ekAg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.SimpleSpicePropertyEventArgs.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.SimpleSpicePropertyEventArgs.html",
+          "hash": "Gvw+exIV/NKPhqtW4UobAA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.SpiceParser.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.SpiceParser.html",
+          "hash": "bnhQheKL/yStAfM5UkX7Lg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.SpiceProperty.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.SpiceProperty.html",
+          "hash": "KoJeP9Sp6jbLPPY3ckxtvg=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.SpicePropertyFoundEventArgs-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.SpicePropertyFoundEventArgs-1.html",
+          "hash": "yPUt2tBSgBuh8pn3RgUzSA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.StandardArithmeticParser.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.StandardArithmeticParser.html",
+          "hash": "z9LzqrfOcyYX85ZCK2HHeQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.VariableFoundEventArgs-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.VariableFoundEventArgs-1.html",
+          "hash": "IrfLDUvME7m/uuE8F3wvag=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.Parsers.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.Parsers.html",
+          "hash": "cwk4eSvPWfpfdaRBe60Inw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/SpiceSharpBehavioral.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SpiceSharpBehavioral.html",
+          "hash": "HnxS+xT/tyfbRaX6fYliXA=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "SpiceSharpBehavioral/obj/api/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toc.html",
+          "hash": "HS+/CqHRICgB1pyzn8bsew=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "api/images/favicon.ico",
+      "output": {
+        "resource": {
+          "relative_path": "api/images/favicon.ico"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "api/images/favicon.png",
+      "output": {
+        "resource": {
+          "relative_path": "api/images/favicon.png"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "api/images/favicon.svg",
+      "output": {
+        "resource": {
+          "relative_path": "api/images/favicon.svg"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Resource",
+      "source_relative_path": "api/images/logo_full.svg",
+      "output": {
+        "resource": {
+          "relative_path": "api/images/logo_full.svg"
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "api/index.md",
+      "output": {
+        ".html": {
+          "relative_path": "api/index.html",
+          "hash": "55J5PqbsL6e633znTKWJRw=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "index.md",
+      "output": {
+        ".html": {
+          "relative_path": "index.html",
+          "hash": "1PD3TVYQJqF9UzhZOre0IQ=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "toc.html",
+          "hash": "3o8SByYDrpwhbXOQIr3K2A=="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    }
+  ],
+  "incremental_info": [
+    {
+      "status": {
+        "can_incremental": false,
+        "details": "Disable incremental build by force rebuild option.",
+        "incrementalPhase": "build",
+        "total_file_count": 0,
+        "skipped_file_count": 0,
+        "full_build_reason_code": "ForceRebuild"
+      },
+      "processors": {
+        "ResourceDocumentProcessor": {
+          "can_incremental": false,
+          "details": "Processor ResourceDocumentProcessor cannot support incremental build because the processor doesn't implement ISupportIncrementalDocumentProcessor interface.",
+          "incrementalPhase": "build",
+          "total_file_count": 0,
+          "skipped_file_count": 0
+        },
+        "ConceptualDocumentProcessor": {
+          "can_incremental": false,
+          "incrementalPhase": "build",
+          "total_file_count": 3,
+          "skipped_file_count": 0
+        },
+        "ManagedReferenceDocumentProcessor": {
+          "can_incremental": false,
+          "incrementalPhase": "build",
+          "total_file_count": 62,
+          "skipped_file_count": 0
+        },
+        "TocDocumentProcessor": {
+          "can_incremental": false,
+          "details": "Processor TocDocumentProcessor cannot support incremental build because the processor doesn't implement ISupportIncrementalDocumentProcessor interface.",
+          "incrementalPhase": "build",
+          "total_file_count": 0,
+          "skipped_file_count": 0
+        }
+      }
+    },
+    {
+      "status": {
+        "can_incremental": false,
+        "details": "Cannot support incremental post processing, the reason is: it's disabled.",
+        "incrementalPhase": "postProcessing",
+        "total_file_count": 0,
+        "skipped_file_count": 0
+      },
+      "processors": {}
+    }
+  ],
+  "version_info": {},
+  "groups": [
+    {
+      "xrefmap": "xrefmap.yml"
+    }
+  ]
+}
