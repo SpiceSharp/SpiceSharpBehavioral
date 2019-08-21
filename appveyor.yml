@@ -24,7 +24,7 @@ before_build:
 build_script:
   - msbuild SpiceSharpBehavioral\SpiceSharpBehavioral.csproj -p:Configuration=Debug
   - msbuild SpiceSharpBehavioralTests\SpiceSharpBehavioralTests.csproj -p:Configuration=Debug
-  - OpenCover.Console.exe -register:user -oldStyle -target:"packages\NUnit.ConsoleRunner.3.10.0\tools\nunit3-console.exe" -targetargs:"SpiceSharpBehavioralTests\SpiceSharpBehavioralTests.csproj /noshadow" -filter:"+[*]* -[SpiceSharpBehavioralTests*]*" -output:"SpiceSharpBehavioralCoverage.xml"
+  - OpenCover.Console.exe -register:user -oldStyle -target:"packages\NUnit.ConsoleRunner.3.10.0\tools\nunit3-console.exe" -targetargs:"SpiceSharpBehavioralTests\SpiceSharpBehavioralTests.csproj" -filter:"+[*]* -[SpiceSharpBehavioralTests*]*" -output:"SpiceSharpBehavioralCoverage.xml"
   - codecov -f "SpiceSharpBehavioralCoverage.xml"
   - msbuild SpiceSharpBehavioral\SpiceSharpBehavioral.csproj -p:Configuration=Release
 
