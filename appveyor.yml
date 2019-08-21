@@ -22,12 +22,12 @@ before_build:
   - choco install codecov
 
 build_script:
-  - msbuild SpiceSharp\SpiceSharp.csproj -p:Configuration=Debug
-  - msbuild SpiceSharpTest\SpiceSharpTest.csproj -p:Configuration=Debug
-  - OpenCover.Console.exe -register:user -oldStyle -target:"packages\NUnit.ConsoleRunner.3.10.0\tools\nunit3-console.exe" -targetargs:"SpiceSharpBehavioralTests\SpiceSharpBehavioralTests.csproj" -filter:"+[*]* -[SpiceSharpBehavioralTests*]*" -output:"SpiceSharpCoverage.xml"
-  - codecov -f "SpiceSharpCoverage.xml"
-  - msbuild SpiceSharp\SpiceSharp.csproj -p:Configuration=Release
+  - msbuild SpiceSharpBehavioral\SpiceSharpBehavioral.csproj -p:Configuration=Debug
+  - msbuild SpiceSharpBehavioralTests\SpiceSharpBehavioralTests.csproj -p:Configuration=Debug
+  - OpenCover.Console.exe -register:user -oldStyle -target:"packages\NUnit.ConsoleRunner.3.10.0\tools\nunit3-console.exe" -targetargs:"SpiceSharpBehavioralTests\SpiceSharpBehavioralTests.csproj" -filter:"+[*]* -[SpiceSharpBehavioralTests*]*" -output:"SpiceSharpBehavioralCoverage.xml"
+  - codecov -f "SpiceSharpBehavioralCoverage.xml"
+  - msbuild SpiceSharpBehavioral\SpiceSharpBehavioral.csproj -p:Configuration=Release
 
 artifacts:
-  - path: SpiceSharp\bin\Release\*.nupkg
+  - path: SpiceSharpBehavioral\bin\Release\*.nupkg
     name: NuGet package

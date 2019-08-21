@@ -1,5 +1,5 @@
 language: csharp
-solution: SpiceSharp.sln
+solution: SpiceSharpBehavioral.sln
 
 os:
   - linux
@@ -9,7 +9,7 @@ install:
   - nuget restore
 
 script:
-  - msbuild ./SpiceSharp.sln /p:Configuration=Debug
+  - msbuild ./SpiceSharpBehavioral.sln /p:Configuration=Debug
   - mono ./packages/NUnit.ConsoleRunner.3.10.0/tools/nunit3-console.exe ./SpiceSharpBehavioralTests/bin/Debug/SpiceSharpBehavioralTests.dll
 
 branches:
