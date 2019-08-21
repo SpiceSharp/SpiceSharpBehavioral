@@ -27,7 +27,6 @@ namespace SpiceSharpBehavioral.Parsers.Operators
         /// </summary>
         /// <param name="other">The other.</param>
         /// <returns></returns>
-        /// <exception cref="Exception">Invalid argument usage</exception>
         public override bool AllowPrecedence(Operator other)
         {
             // If we ever have another operator trying to pass this one,

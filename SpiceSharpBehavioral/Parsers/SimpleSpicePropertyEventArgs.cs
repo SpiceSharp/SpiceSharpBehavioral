@@ -30,7 +30,7 @@ namespace SpiceSharpBehavioral.Parsers
         public bool Found { get; private set; }
 
         /// <summary>
-        /// Creates a new instance of the <see cref="SimpleSpicePropertyEventArgs"/> class.
+        /// Initializes a new instance of the <see cref="SimpleSpicePropertyEventArgs"/> class.
         /// </summary>
         /// <param name="property"></param>
         public SimpleSpicePropertyEventArgs(SpiceProperty property)

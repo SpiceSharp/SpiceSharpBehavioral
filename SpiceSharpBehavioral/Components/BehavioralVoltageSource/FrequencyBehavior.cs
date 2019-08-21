@@ -44,7 +44,7 @@ namespace SpiceSharpBehavioral.Components.BehavioralVoltageSourceBehaviors
         protected MatrixElement<Complex> BranchNegPtr { get; private set; }
 
         /// <summary>
-        /// Creates a new instance of the <see cref="FrequencyBehavior"/> class.
+        /// Initializes a new instance of the <see cref="FrequencyBehavior"/> class.
         /// </summary>
         /// <param name="name">The name of the behavior</param>
         public FrequencyBehavior(string name)

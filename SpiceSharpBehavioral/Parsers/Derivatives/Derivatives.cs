@@ -27,11 +27,6 @@ namespace SpiceSharpBehavioral.Parsers
         /// </value>
         /// <param name="index">The index.</param>
         /// <returns></returns>
-        /// <exception cref="ArgumentException">
-        /// Invalid index
-        /// or
-        /// Invalid index
-        /// </exception>
         public T this[int index]
         {
             get
@@ -54,7 +49,7 @@ namespace SpiceSharpBehavioral.Parsers
         }
 
         /// <summary>
-        /// Creates a new instance of the <see cref="Derivatives{T}"/> class.
+        /// Initializes a new instance of the <see cref="Derivatives{T}"/> class.
         /// </summary>
         /// <param name="capacity">The capacity.</param>
         public Derivatives(int capacity)
@@ -64,7 +59,7 @@ namespace SpiceSharpBehavioral.Parsers
         }
 
         /// <summary>
-        /// Creates a new instance of the <see cref="Derivatives{T}"/> class.
+        /// Initializes a new instance of the <see cref="Derivatives{T}"/> class.
         /// </summary>
         public Derivatives()
             : this(4)
@@ -140,38 +135,122 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
+        /// <summary>
+        /// Negate the derivatives.
+        /// </summary>
+        /// <returns>The derivatives.</returns>
         public abstract Derivatives<T> Negate();
 
+        /// <summary>
+        /// Not (binary) the derivatives.
+        /// </summary>
+        /// <returns>The derivatives.</returns>
         public abstract Derivatives<T> Not();
 
-        public abstract Derivatives<T> Pow(Derivatives<T> b);
+        /// <summary>
+        /// Raises the derivatives to a power.
+        /// </summary>
+        /// <param name="exponent">The exponent.</param>
+        /// <returns>The raised power.</returns>
+        public abstract Derivatives<T> Pow(Derivatives<T> exponent);
 
+        /// <summary>
+        /// Or the derivatives.
+        /// </summary>
+        /// <param name="b">The other operand.</param>
+        /// <returns>The derivatives.</returns>
         public abstract Derivatives<T> Or(Derivatives<T> b);
 
+        /// <summary>
+        /// And the derivatives.
+        /// </summary>
+        /// <param name="b">The other operand.</param>
+        /// <returns>The derivatives.</returns>
         public abstract Derivatives<T> And(Derivatives<T> b);
 
+        /// <summary>
+        /// Conditional derivatives.
+        /// </summary>
+        /// <param name="iftrue">Argument if true.</param>
+        /// <param name="iffalse">Argument if false.</param>
+        /// <returns>The derivatives.</returns>
         public abstract Derivatives<T> IfThenElse(Derivatives<T> iftrue, Derivatives<T> iffalse);
 
+        /// <summary>
+        /// Check for equality.
+        /// </summary>
+        /// <param name="b">The other operand.</param>
+        /// <returns>A value representing true if equal.</returns>
         public abstract Derivatives<T> Equal(Derivatives<T> b);
 
+        /// <summary>
+        /// Check for inequality.
+        /// </summary>
+        /// <param name="b">The other operand.</param>
+        /// <returns>A value representing true if not equal.</returns>
         public abstract Derivatives<T> NotEqual(Derivatives<T> b);
 
+        /// <summary>
+        /// Add derivatives.
+        /// </summary>
+        /// <param name="b">The other operand.</param>
+        /// <returns>The sum.</returns>
         public abstract Derivatives<T> Add(Derivatives<T> b);
 
+        /// <summary>
+        /// Subtract derivatives.
+        /// </summary>
+        /// <param name="b">The other operand.</param>
+        /// <returns>The difference.</returns>
         public abstract Derivatives<T> Subtract(Derivatives<T> b);
 
+        /// <summary>
+        /// Multiply derivatives.
+        /// </summary>
+        /// <param name="b">The other operand.</param>
+        /// <returns>The multiplied result.</returns>
         public abstract Derivatives<T> Multiply(Derivatives<T> b);
 
+        /// <summary>
+        /// Divide derivatives.
+        /// </summary>
+        /// <param name="b">The other operand.</param>
+        /// <returns>The divided result.</returns>
         public abstract Derivatives<T> Divide(Derivatives<T> b);
 
+        /// <summary>
+        /// Modulo operation on derivatives.
+        /// </summary>
+        /// <param name="b">The other operand.</param>
+        /// <returns>The remainder of the division.</returns>
         public abstract Derivatives<T> Modulo(Derivatives<T> b);
 
+        /// <summary>
+        /// Check less than.
+        /// </summary>
+        /// <param name="b">The other operand.</param>
+        /// <returns>A value representing true if this is less.</returns>
         public abstract Derivatives<T> LessThan(Derivatives<T> b);
 
+        /// <summary>
+        /// Check greater than.
+        /// </summary>
+        /// <param name="b">The other operand.</param>
+        /// <returns>A value representing true if this is greater.</returns>
         public abstract Derivatives<T> GreaterThan(Derivatives<T> b);
 
+        /// <summary>
+        /// Check less or equal.
+        /// </summary>
+        /// <param name="b">The other operand.</param>
+        /// <returns>A value representing true if this is less or equal.</returns>
         public abstract Derivatives<T> LessOrEqual(Derivatives<T> b);
 
+        /// <summary>
+        /// Check greater or equal.
+        /// </summary>
+        /// <param name="b">The operand.</param>
+        /// <returns>A value representing true if this is greater or equal.</returns>
         public abstract Derivatives<T> GreaterOrEqual(Derivatives<T> b);
     }
 }

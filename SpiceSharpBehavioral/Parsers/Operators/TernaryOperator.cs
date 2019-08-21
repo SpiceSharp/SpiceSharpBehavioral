@@ -28,7 +28,6 @@ namespace SpiceSharpBehavioral.Parsers.Operators
         /// <summary>
         /// Closes this instance.
         /// </summary>
-        /// <exception cref="Exception">Ternary operator is already closed.</exception>
         public void Close()
         {
             if (Closed)

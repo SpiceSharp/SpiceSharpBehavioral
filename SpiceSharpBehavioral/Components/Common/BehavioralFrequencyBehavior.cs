@@ -41,7 +41,7 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         private Action _initializeMethod;
 
         /// <summary>
-        /// Creates a new instance of the <see cref="BehavioralFrequencyBehavior"/> class.
+        /// Initializes a new instance of the <see cref="BehavioralFrequencyBehavior"/> class.
         /// </summary>
         /// <param name="name"></param>
         public BehavioralFrequencyBehavior(string name)

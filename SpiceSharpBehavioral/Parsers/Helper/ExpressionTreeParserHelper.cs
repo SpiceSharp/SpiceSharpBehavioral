@@ -6,6 +6,9 @@ using System.Reflection;
 
 namespace SpiceSharpBehavioral.Parsers.Helper
 {
+    /// <summary>
+    /// Helper class for <see cref="ExpressionTreeDerivativeParser"/>.
+    /// </summary>
     public static class ExpressionTreeParserHelper
     {
         /// <summary>
@@ -68,6 +71,12 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         /// Exponentials
         /// </summary>
         private static readonly MethodInfo ExpMethod = typeof(Math).GetTypeInfo().GetMethod("Exp", new[] { typeof(double) });
+
+        /// <summary>
+        /// Applies the exponent.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The exponent result.</returns>
         public static Expression ApplyExp(Expression[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 1);
@@ -80,6 +89,12 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         /// </summary>
         private static readonly MethodInfo LogMethod = typeof(Math).GetTypeInfo().GetMethod("Log", new[] { typeof(double) });
         private static readonly MethodInfo Log2Method = typeof(Math).GetTypeInfo().GetMethod("Log", new[] { typeof(double), typeof(double) });
+
+        /// <summary>
+        /// Applies the logarithm.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The logarithm result.</returns>
         public static Expression ApplyLog(Expression[] arguments)
         {
             arguments.ThrowIfEmpty(nameof(arguments));
@@ -89,6 +104,12 @@ namespace SpiceSharpBehavioral.Parsers.Helper
                 return Expression.Call(Log2Method, arguments[0], arguments[1]);
             throw new CircuitException("Invalid number of arguments, {0} given but 2 expected".FormatString(arguments.Length));
         }
+
+        /// <summary>
+        /// Applies the base-10 logarithm.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The logarithm result.</returns>
         public static Expression ApplyLog10(Expression[] arguments)
         {
             var result = ApplyLog(arguments);
@@ -99,6 +120,12 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         /// Power method.
         /// </summary>
         private static readonly MethodInfo PowMethod = typeof(Math).GetTypeInfo().GetMethod("Pow", new[] { typeof(double), typeof(double) });
+
+        /// <summary>
+        /// Raises to a power.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The power result.</returns>
         public static Expression ApplyPow(Expression[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 2);
@@ -109,6 +136,12 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         /// Square root method.
         /// </summary>
         private static readonly MethodInfo SqrtMethod = typeof(Math).GetTypeInfo().GetMethod("Sqrt", new[] { typeof(double) });
+
+        /// <summary>
+        /// Applies the square root.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The square root result.</returns>
         public static Expression ApplySqrt(Expression[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 1);
@@ -121,16 +154,34 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         private static readonly MethodInfo SinMethod = typeof(Math).GetTypeInfo().GetMethod("Sin", new[] { typeof(double) });
         private static readonly MethodInfo CosMethod = typeof(Math).GetTypeInfo().GetMethod("Cos", new[] { typeof(double) });
         private static readonly MethodInfo TanMethod = typeof(Math).GetTypeInfo().GetMethod("Tan", new[] { typeof(double) });
+
+        /// <summary>
+        /// Applies the sine.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The sine result.</returns>
         public static Expression ApplySin(Expression[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 1);
             return Expression.Call(SinMethod, arguments[0]);
         }
+
+        /// <summary>
+        /// Applies the cosine.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The cosine result.</returns>
         private static Expression ApplyCos(Expression[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 1);
             return Expression.Call(CosMethod, arguments[0]);
         }
+
+        /// <summary>
+        /// Applies the tangent.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The tangent result.</returns>
         private static Expression ApplyTan(Expression[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 1);
@@ -143,16 +194,34 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         private static readonly MethodInfo AsinMethod = typeof(Math).GetTypeInfo().GetMethod("Asin", new[] { typeof(double) });
         private static readonly MethodInfo AcosMethod = typeof(Math).GetTypeInfo().GetMethod("Acos", new[] { typeof(double) });
         private static readonly MethodInfo AtanMethod = typeof(Math).GetTypeInfo().GetMethod("Atan", new[] { typeof(double) });
+
+        /// <summary>
+        /// Applies the arcsine.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The arcsine result.</returns>
         public static Expression ApplyAsin(Expression[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 1);
             return Expression.Call(AsinMethod, arguments[0]);
         }
+
+        /// <summary>
+        /// Applies the arccosine.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The arccosine result.</returns>
         public static Expression ApplyAcos(Expression[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 1);
             return Expression.Call(AcosMethod, arguments[0]);
         }
+
+        /// <summary>
+        /// Applies the arctangent.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The arctangent result.</returns>
         public static Expression ApplyAtan(Expression[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 1);
@@ -167,11 +236,23 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         private static readonly MethodInfo Round2Method = typeof(Math).GetTypeInfo().GetMethod("Round", new[] { typeof(double), typeof(int) });
         private static readonly MethodInfo MinMethod = typeof(Math).GetTypeInfo().GetMethod("Min", new[] { typeof(double), typeof(double) });
         private static readonly MethodInfo MaxMethod = typeof(Math).GetTypeInfo().GetMethod("Max", new[] { typeof(double), typeof(double) });
+
+        /// <summary>
+        /// Applies the absolute value.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The absolute value result.</returns>
         public static Expression ApplyAbs(Expression[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 1);
             return Expression.Call(AbsMethod, arguments[0]);
         }
+
+        /// <summary>
+        /// Rounds the value.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The rounded result.</returns>
         public static Expression ApplyRound(Expression[] arguments)
         {
             arguments.ThrowIfEmpty(nameof(arguments));
@@ -181,6 +262,12 @@ namespace SpiceSharpBehavioral.Parsers.Helper
                 return Expression.Call(Round2Method, arguments[0], Expression.Convert(Expression.Call(RoundMethod, arguments[1]), typeof(int)));
             throw new CircuitException("Invalid number of arguments for Abs()");
         }
+
+        /// <summary>
+        /// Applies the minimum.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The minimum result.</returns>
         public static Expression ApplyMin(Expression[] arguments)
         {
             arguments.ThrowIfEmpty(nameof(arguments));
@@ -189,6 +276,12 @@ namespace SpiceSharpBehavioral.Parsers.Helper
                 result = Expression.Call(MinMethod, result, arguments[i]);
             return result;
         }
+
+        /// <summary>
+        /// Applies the maximum.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The maximum result.</returns>
         public static Expression ApplyMax(Expression[] arguments)
         {
             arguments.ThrowIfEmpty(nameof(arguments));
@@ -202,7 +295,7 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         /// Delegate for applying a function.
         /// </summary>
         /// <param name="arguments">The arguments.</param>
-        /// <returns></returns>
+        /// <returns>The result of the function.</returns>
         public delegate Expression ExpressionFunction(Expression[] arguments);
     }
 }

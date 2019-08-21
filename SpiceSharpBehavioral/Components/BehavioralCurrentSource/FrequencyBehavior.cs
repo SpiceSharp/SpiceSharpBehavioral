@@ -11,7 +11,7 @@ namespace SpiceSharpBehavioral.Components.BehavioralCurrentSourceBehaviors
     public class FrequencyBehavior : BehavioralFrequencyBehavior
     {
         /// <summary>
-        /// Creates a new instance of the <see cref="FrequencyBehavior"/> class.
+        /// Initializes a new instance of the <see cref="FrequencyBehavior"/> class.
         /// </summary>
         /// <param name="name">The name of the behavior.</param>
         public FrequencyBehavior(string name)

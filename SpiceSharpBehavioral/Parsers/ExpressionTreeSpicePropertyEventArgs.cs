@@ -17,7 +17,7 @@ namespace SpiceSharpBehavioral.Parsers
         public Expression Result { get; set; }
 
         /// <summary>
-        /// Creates a new instance of the <see cref="ExpressionTreeSpicePropertyEventArgs"/>.
+        /// Initializes a new instance of the <see cref="ExpressionTreeSpicePropertyEventArgs"/>.
         /// </summary>
         /// <param name="property"></param>
         public ExpressionTreeSpicePropertyEventArgs(SpiceProperty property)

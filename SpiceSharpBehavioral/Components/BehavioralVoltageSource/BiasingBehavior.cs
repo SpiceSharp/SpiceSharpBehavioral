@@ -24,18 +24,13 @@ namespace SpiceSharpBehavioral.Components.BehavioralVoltageSourceBehaviors
         /// <summary>
         /// Gets the power dissipated by the source.
         /// </summary>
-        /// <param name="state">The state.</param>
         /// <returns></returns>
-        /// <exception cref="ArgumentNullException">state</exception>
         [ParameterName("p"), ParameterName("power"), ParameterInfo("Instantaneous power")]
         public double GetPower() => (State.ThrowIfNotBound(this).Solution[PosNode] - State.Solution[NegNode]) * -State.Solution[BranchEq];
 
         /// <summary>
         /// Gets the voltage applied by the source.
         /// </summary>
-        /// <value>
-        /// The voltage.
-        /// </value>
         [ParameterName("v"), ParameterName("voltage"), ParameterInfo("Instantaneous voltage")]
         public double Voltage => CurrentValue;
 
@@ -75,7 +70,7 @@ namespace SpiceSharpBehavioral.Components.BehavioralVoltageSourceBehaviors
         protected MatrixElement<double> BranchNegPtr { get; private set; }
 
         /// <summary>
-        /// Creates a new instance of the <see cref="BiasingBehavior"/> class.
+        /// Initializes a new instance of the <see cref="BiasingBehavior"/> class.
         /// </summary>
         /// <param name="name">The name.</param>
         public BiasingBehavior(string name) : base(name) { }

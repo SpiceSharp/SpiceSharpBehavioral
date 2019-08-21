@@ -21,7 +21,6 @@ namespace SpiceSharpBehavioral.Parsers.Operators
         /// </value>
         /// <param name="index">The index.</param>
         /// <returns></returns>
-        /// <exception cref="ArgumentException">Index out of bounds</exception>
         public Type this[int index]
         {
             get
@@ -55,7 +54,6 @@ namespace SpiceSharpBehavioral.Parsers.Operators
         /// Initializes a new instance of the <see cref="MethodSignature"/> class.
         /// </summary>
         /// <param name="types">The types.</param>
-        /// <exception cref="ArgumentNullException">types</exception>
         public MethodSignature(IEnumerable<Type> types)
         {
             if (types == null)
@@ -67,7 +65,6 @@ namespace SpiceSharpBehavioral.Parsers.Operators
         /// Initializes a new instance of the <see cref="MethodSignature"/> class.
         /// </summary>
         /// <param name="method">The method.</param>
-        /// <exception cref="ArgumentNullException">method</exception>
         public MethodSignature(MethodInfo method)
         {
             if (method == null)

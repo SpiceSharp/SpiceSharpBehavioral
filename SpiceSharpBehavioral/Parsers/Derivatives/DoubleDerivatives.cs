@@ -8,24 +8,26 @@ namespace SpiceSharpBehavioral.Parsers
     public class DoubleDerivatives : Derivatives<Func<double>>
     {
         /// <summary>
-        /// Creates a new instance of the <see cref="DoubleDerivatives"/> class.
+        /// Initializes a new instance of the <see cref="DoubleDerivatives"/> class.
         /// </summary>
         public DoubleDerivatives()
         { }
 
         /// <summary>
-        /// Creates a new instance of the <see cref="DoubleDerivatives"/> class.
+        /// Initializes a new instance of the <see cref="DoubleDerivatives"/> class.
         /// </summary>
-        /// <param name="capacity"></param>
+        /// <param name="capacity">The capacity.</param>
         public DoubleDerivatives(int capacity)
             : base(capacity)
         { }
 
         /// <summary>
-        /// Check equality.
+        /// Determines whether the specified <see cref="System.Object" />, is equal to this instance.
         /// </summary>
-        /// <param name="obj">The other object.</param>
-        /// <returns></returns>
+        /// <param name="obj">The <see cref="System.Object" /> to compare with this instance.</param>
+        /// <returns>
+        ///   <c>true</c> if the specified <see cref="System.Object" /> is equal to this instance; otherwise, <c>false</c>.
+        /// </returns>
         public override bool Equals(object obj)
         {
             return base.Equals(obj);
@@ -41,10 +43,10 @@ namespace SpiceSharpBehavioral.Parsers
         }
 
         /// <summary>
-        /// Calculate the power.
+        /// Raises the derivatives to a power.
         /// </summary>
         /// <param name="exponent">The exponent.</param>
-        /// <returns></returns>
+        /// <returns>The raised power.</returns>
         public override Derivatives<Func<double>> Pow(Derivatives<Func<double>> exponent)
         {
             var size = Math.Max(Count, exponent.Count);
@@ -93,10 +95,12 @@ namespace SpiceSharpBehavioral.Parsers
         }
 
         /// <summary>
-        /// Binary OR.
+        /// Or the derivatives.
         /// </summary>
         /// <param name="b">The other operand.</param>
-        /// <returns></returns>
+        /// <returns>
+        /// The derivatives.
+        /// </returns>
         public override Derivatives<Func<double>> Or(Derivatives<Func<double>> b)
         {
             var result = new DoubleDerivatives();
@@ -106,6 +110,13 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
+        /// <summary>
+        /// And the derivatives.
+        /// </summary>
+        /// <param name="b">The other operand.</param>
+        /// <returns>
+        /// The derivatives.
+        /// </returns>
         public override Derivatives<Func<double>> And(Derivatives<Func<double>> b)
         {
             var result = new DoubleDerivatives();
@@ -115,6 +126,14 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
+        /// <summary>
+        /// Conditional derivatives.
+        /// </summary>
+        /// <param name="iftrue">Argument if true.</param>
+        /// <param name="iffalse">Argument if false.</param>
+        /// <returns>
+        /// The derivatives.
+        /// </returns>
         public override Derivatives<Func<double>> IfThenElse(Derivatives<Func<double>> iftrue, Derivatives<Func<double>> iffalse)
         {
             var size = Math.Max(iftrue.Count, iffalse.Count);
@@ -129,6 +148,11 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
+        /// <summary>
+        /// Equals the specified other.
+        /// </summary>
+        /// <param name="other">The other.</param>
+        /// <returns></returns>
         public override Derivatives<Func<double>> Equal(Derivatives<Func<double>> other)
         {
             var result = new DoubleDerivatives();
@@ -138,6 +162,11 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
+        /// <summary>
+        /// Nots the equal.
+        /// </summary>
+        /// <param name="other">The other.</param>
+        /// <returns></returns>
         public override Derivatives<Func<double>> NotEqual(Derivatives<Func<double>> other)
         {
             var result = new DoubleDerivatives();
@@ -147,6 +176,12 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
+        /// <summary>
+        /// Negate the derivatives.
+        /// </summary>
+        /// <returns>
+        /// The derivatives.
+        /// </returns>
         public override Derivatives<Func<double>> Negate()
         {
             var result = new DoubleDerivatives(Count);
@@ -159,6 +194,12 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
+        /// <summary>
+        /// Not (binary) the derivatives.
+        /// </summary>
+        /// <returns>
+        /// The derivatives.
+        /// </returns>
         public override Derivatives<Func<double>> Not()
         {
             var result = new DoubleDerivatives();
@@ -167,6 +208,13 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
+        /// <summary>
+        /// Add derivatives.
+        /// </summary>
+        /// <param name="b">The other operand.</param>
+        /// <returns>
+        /// The sum.
+        /// </returns>
         public override Derivatives<Func<double>> Add(Derivatives<Func<double>> b)
         {
             var size = Math.Max(Count, b.Count);
@@ -185,6 +233,13 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
+        /// <summary>
+        /// Subtract derivatives.
+        /// </summary>
+        /// <param name="b">The other operand.</param>
+        /// <returns>
+        /// The difference.
+        /// </returns>
         public override Derivatives<Func<double>> Subtract(Derivatives<Func<double>> b)
         {
             var size = Math.Max(Count, b.Count);
@@ -203,6 +258,13 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
+        /// <summary>
+        /// Multiply derivatives.
+        /// </summary>
+        /// <param name="b">The other operand.</param>
+        /// <returns>
+        /// The multiplied result.
+        /// </returns>
         public override Derivatives<Func<double>> Multiply(Derivatives<Func<double>> b)
         {
             var size = Math.Max(Count, b.Count);
@@ -224,6 +286,13 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
+        /// <summary>
+        /// Divide derivatives.
+        /// </summary>
+        /// <param name="b">The other operand.</param>
+        /// <returns>
+        /// The divided result.
+        /// </returns>
         public override Derivatives<Func<double>> Divide(Derivatives<Func<double>> b)
         {
             var size = Math.Max(Count, b.Count);
@@ -253,6 +322,13 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
+        /// <summary>
+        /// Modulo operation on derivatives.
+        /// </summary>
+        /// <param name="b">The other operand.</param>
+        /// <returns>
+        /// The remainder of the division.
+        /// </returns>
         public override Derivatives<Func<double>> Modulo(Derivatives<Func<double>> b)
         {
             var result = new DoubleDerivatives();
@@ -262,6 +338,13 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
+        /// <summary>
+        /// Check greater than.
+        /// </summary>
+        /// <param name="b">The other operand.</param>
+        /// <returns>
+        /// A value representing true if this is greater.
+        /// </returns>
         public override Derivatives<Func<double>> GreaterThan(Derivatives<Func<double>> b)
         {
             var result = new DoubleDerivatives();
@@ -271,6 +354,13 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
+        /// <summary>
+        /// Check less than.
+        /// </summary>
+        /// <param name="b">The other operand.</param>
+        /// <returns>
+        /// A value representing true if this is less.
+        /// </returns>
         public override Derivatives<Func<double>> LessThan(Derivatives<Func<double>> b)
         {
             var result = new DoubleDerivatives();
@@ -280,6 +370,13 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
+        /// <summary>
+        /// Check greater or equal.
+        /// </summary>
+        /// <param name="b">The operand.</param>
+        /// <returns>
+        /// A value representing true if this is greater or equal.
+        /// </returns>
         public override Derivatives<Func<double>> GreaterOrEqual(Derivatives<Func<double>> b)
         {
             var result = new DoubleDerivatives();
@@ -289,6 +386,13 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
+        /// <summary>
+        /// Check less or equal.
+        /// </summary>
+        /// <param name="b">The other operand.</param>
+        /// <returns>
+        /// A value representing true if this is less or equal.
+        /// </returns>
         public override Derivatives<Func<double>> LessOrEqual(Derivatives<Func<double>> b)
         {
             var result = new DoubleDerivatives();
