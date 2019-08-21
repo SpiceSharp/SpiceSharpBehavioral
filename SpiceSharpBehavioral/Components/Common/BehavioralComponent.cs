@@ -1,5 +1,4 @@
 ﻿using SpiceSharp;
-using SpiceSharp.Behaviors;
 using SpiceSharp.Circuits;
 using SpiceSharp.Components;
 using SpiceSharp.Simulations;
@@ -8,6 +7,9 @@ using System;
 
 namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
 {
+    /// <summary>
+    /// Template for a behavioral component.
+    /// </summary>
     public abstract class BehavioralComponent : Component
     {
         /// <summary>
@@ -34,6 +36,9 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
             // We first want to create the behaviors of sources for which we will use the current branches
             var parser = new SimpleParser();
 
+            // Get our own parameter
+            var bp = simulation.EntityParameters[Name].Get<BaseParameters>();
+
             // We want to avoid throwing exceptions on variables, functions or spice properties, we just want to find the
             // voltage sources our component depends on
             parser.VariableFound += (sender, e) => e.Result = 0.0;
@@ -42,7 +47,12 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
             {
                 if (e.Property.Identifier == "i")
                 {
+                    // Get the component name
                     var source = e.Property[0];
+                    if (bp.Instance != null)
+                        source = bp.Instance.GenerateIdentifier(source);
+
+                    // Make sure its behaviors are created before ours
                     entities[source].CreateBehaviors(types, simulation, entities);
                 }
                 e.Apply(() => 0.0);
@@ -51,6 +61,18 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
 
             // Now we can continue with out own behavior creation
             base.CreateBehaviors(types, simulation, entities);
+        }
+
+        /// <summary>
+        /// Clone the entity.
+        /// </summary>
+        /// <param name="data">Instancing data.</param>
+        /// <returns></returns>
+        public override Entity Clone(InstanceData data)
+        {
+            var result = (BehavioralComponent) base.Clone(data);
+            result.ParameterSets.Get<BaseParameters>().Instance = data;
+            return result;
         }
     }
 }

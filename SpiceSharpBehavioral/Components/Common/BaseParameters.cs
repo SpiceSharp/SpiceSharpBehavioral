@@ -3,6 +3,7 @@ using SpiceSharp.Attributes;
 using SpiceSharpBehavioral.Parsers;
 using System.Collections.Generic;
 using SpiceSharpBehavioral.Parsers.Helper;
+using SpiceSharp.Circuits;
 
 namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
 {
@@ -32,6 +33,15 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
             set => _spicePropertyComparer = value ?? EqualityComparer<string>.Default;
         }
         private EqualityComparer<string> _spicePropertyComparer = EqualityComparer<string>.Default;
+
+        /// <summary>
+        /// Gets or sets the instance data used by the component.
+        /// </summary>
+        /// <remarks>
+        /// We need this data during the parsing of expressions to map local nodes
+        /// to global nodes.
+        /// </remarks>
+        public InstanceData Instance { get; set; }
 
         /// <summary>
         /// Calculate the defaults

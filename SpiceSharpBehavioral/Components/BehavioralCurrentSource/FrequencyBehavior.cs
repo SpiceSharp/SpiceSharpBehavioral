@@ -1,5 +1,6 @@
-﻿using SpiceSharp;
+﻿using SpiceSharp.Behaviors;
 using SpiceSharp.Components;
+using SpiceSharp.Simulations;
 using SpiceSharpBehavioral.Components.BehavioralBehaviors;
 
 namespace SpiceSharpBehavioral.Components.BehavioralCurrentSourceBehaviors
@@ -7,7 +8,7 @@ namespace SpiceSharpBehavioral.Components.BehavioralCurrentSourceBehaviors
     /// <summary>
     /// Frequency behavior for a <see cref="BehavioralCurrentSource"/>.
     /// </summary>
-    public class FrequencyBehavior : BehavioralFrequencyBehavior, IConnectedBehavior
+    public class FrequencyBehavior : BehavioralFrequencyBehavior
     {
         /// <summary>
         /// Creates a new instance of the <see cref="FrequencyBehavior"/> class.
@@ -19,14 +20,21 @@ namespace SpiceSharpBehavioral.Components.BehavioralCurrentSourceBehaviors
         }
 
         /// <summary>
-        /// Connects the specified pins.
+        /// Bind the behavior.
         /// </summary>
-        /// <param name="pins">The pins.</param>
-        public void Connect(params int[] pins)
+        /// <param name="simulation">The simulation.</param>
+        /// <param name="context">The context.</param>
+        public override void Bind(Simulation simulation, BindingContext context)
         {
-            pins.ThrowIfNot(nameof(pins), 2);
-            NegIndex = pins[0];
-            PosIndex = pins[1];
+            // Get node connections
+            if (context is ComponentBindingContext cc)
+            {
+                PosIndex = cc.Pins[0];
+                NegIndex = cc.Pins[1];
+            }
+
+            // Do other behavioral stuff
+            base.Bind(simulation, context);
         }
     }
 }
