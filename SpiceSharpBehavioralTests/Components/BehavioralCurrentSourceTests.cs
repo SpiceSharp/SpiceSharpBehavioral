@@ -4,6 +4,7 @@ using NUnit.Framework;
 using SpiceSharp.Simulations;
 using System;
 using System.Numerics;
+using SpiceSharpBehavioral.Parsers;
 
 namespace SpiceSharpBehavioralTests.Components
 {
@@ -15,12 +16,13 @@ namespace SpiceSharpBehavioralTests.Components
         {
             var ckt = new Circuit(
                 new VoltageSource("V1", "in", "0", 1),
-                new BehavioralCurrentSource("H1", "out", "0", "V(in)*10"),
+                new BehavioralCurrentSource("H1", "out", "0", "V(in) + V(in) + 10 "),
                 new Resistor("Rl", "out", "0", 1));
+            ckt["H1"].SetParameter("parser", new SimpleDerivativeParser());
 
             var op = new OP("op");
 
-            AnalyzeOp(ckt, op, new[] { new RealVoltageExport(op, "out") }, new[] { -10.0 });
+            AnalyzeOp(ckt, op, new[] { new RealVoltageExport(op, "out") }, new[] { -12.0 });
         }
 
         [Test]
@@ -77,7 +79,7 @@ namespace SpiceSharpBehavioralTests.Components
             var ckt = new Circuit(
                 new VoltageSource("V1", "in", "0", 4)
                     .SetParameter("acmag", 1.0),
-                new BehavioralCurrentSource("H1", "out", "0", "V(in)^2+2"),
+                new BehavioralCurrentSource("H1", "out", "0", "V(in)^2 + 2"),
                 new Resistor("R1", "out", "0", 1));
 
             // Do simulation

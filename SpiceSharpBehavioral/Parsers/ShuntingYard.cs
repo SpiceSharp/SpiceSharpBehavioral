@@ -74,6 +74,8 @@ namespace SpiceSharpBehavioral.Parsers
                 // Skip spaces
                 while (Index < Count && Input[Index] == ' ')
                     Index++;
+                if (Index >= Count)
+                    break;
 
                 // Parse a binary operator
                 if (ExpectInfixPostfix)
