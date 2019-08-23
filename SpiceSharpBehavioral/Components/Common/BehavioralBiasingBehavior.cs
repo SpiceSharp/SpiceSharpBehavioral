@@ -126,8 +126,12 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
                     if (property.ArgumentCount != 1)
                         return;
 
+                    var component = property[0];
+                    if (BaseParameters.Instance != null && BaseParameters.Instance is ComponentInstanceData cid)
+                        component = cid.GenerateIdentifier(component);
+
                     // Get the voltage behavior to find the branch equation
-                    if (simulation.EntityBehaviors.TryGetBehaviors(property[0], out var ebd))
+                    if (simulation.EntityBehaviors.TryGetBehaviors(component, out var ebd))
                     {
                         // Check for voltage source behaviors
                         if (ebd.TryGet<SpiceSharp.Components.VoltageSourceBehaviors.BiasingBehavior>(out var vsrcb))
