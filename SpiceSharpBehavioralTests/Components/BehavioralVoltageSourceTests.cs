@@ -51,7 +51,7 @@ namespace SpiceSharpBehavioralTests.Components
         public void When_Subcircuit_Expect_Reference()
         {
             var subckt = new Circuit(
-                new BehavioralVoltageSource("E1", "internal", "0", "V(in)+1"),
+                new BehavioralVoltageSource("E1", "internal", "0", "V( in ) + 1"),
                 new Resistor("R1", "internal", "out", 1e3));
             var ckt = new Circuit(
                 new VoltageSource("V1", "a", "0", 0.5),
