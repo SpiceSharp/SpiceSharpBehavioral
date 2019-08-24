@@ -1,13 +1,18 @@
 ﻿namespace SpiceSharpBehavioral.Parsers.Operators
 {
+    /// <summary>
+    /// Operator for closing the ternary condition.
+    /// </summary>
+    /// <seealso cref="SpiceSharpBehavioral.Operator" />
     public class ClosingTernaryOperator : Operator
     {
         /// <summary>
-        /// Determines whether this operator should be executed first
-        /// assuming this operator comes after it.
+        /// Determines whether the operator has precedence over another operator.
         /// </summary>
-        /// <param name="other">The other (previous) operator.</param>
-        /// <returns></returns>
+        /// <param name="other">The other operator.</param>
+        /// <returns>
+        ///   <c>true</c> if this operator has precedence over the other operator; otherwise, <c>false</c>.
+        /// </returns>
         public override bool HasPrecedenceOver(Operator other)
         {
             // Cases where we want the other operator to be executed first
@@ -22,12 +27,12 @@
         }
 
         /// <summary>
-        /// Allows another operator to cause this
-        /// one to execute first even though the other one comes
-        /// after it.
+        /// Determines whether the operator allows precedence of another operator.
         /// </summary>
-        /// <param name="other">The other.</param>
-        /// <returns></returns>
+        /// <param name="other">The other operator.</param>
+        /// <returns>
+        ///   <c>true</c> if this operator allows precedence from another operator; otherwise, <c>false</c>.
+        /// </returns>
         public override bool AllowPrecedence(Operator other)
         {
             // Should be removed manually

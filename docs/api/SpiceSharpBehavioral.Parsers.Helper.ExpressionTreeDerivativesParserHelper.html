@@ -1,0 +1,828 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class ExpressionTreeDerivativesParserHelper
+   </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class ExpressionTreeDerivativesParserHelper
+   ">
+    <meta name="generator" content="docfx 2.44.0.0">
+    
+    <link rel="shortcut icon" href="../api/images/favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    
+    
+    
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../api/images/favicon.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper">
+  
+  
+  <h1 id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper" class="text-break">Class ExpressionTreeDerivativesParserHelper
+  </h1>
+  <div class="markdown level0 summary"><p>Helper methods for a <a class="xref" href="SpiceSharpBehavioral.Parsers.ExpressionTreeDerivativeParser.html">ExpressionTreeDerivativeParser</a>.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><span class="xref">ExpressionTreeDerivativesParserHelper</span></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">System.Object.ToString()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="SpiceSharpBehavioral.Parsers.Helper.html">SpiceSharpBehavioral.Parsers.Helper</a></h6>
+  <h6><strong>Assembly</strong>: SpiceSharpBehavioral.dll</h6>
+  <h5 id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static class ExpressionTreeDerivativesParserHelper</code></pre>
+  </div>
+  <h3 id="properties">Properties
+  </h3>
+  <a id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_DefaultFunctions_" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.DefaultFunctions*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_DefaultFunctions" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.DefaultFunctions">DefaultFunctions</h4>
+  <div class="markdown level1 summary"><p>The default functions.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Dictionary&lt;string, ExpressionTreeDerivativesParserHelper.ExpressionTreeDerivativesFunction&gt; DefaultFunctions { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.Dictionary</span>&lt;<span class="xref">System.String</span>, <a class="xref" href="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.ExpressionTreeDerivativesFunction.html">ExpressionTreeDerivativesParserHelper.ExpressionTreeDerivativesFunction</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  <a id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_ApplyAbs_" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.ApplyAbs*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_ApplyAbs_SpiceSharpBehavioral_Parsers_Derivatives_System_Linq_Expressions_Expression____" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.ApplyAbs(SpiceSharpBehavioral.Parsers.Derivatives{System.Linq.Expressions.Expression}[])">ApplyAbs(Derivatives&lt;Expression&gt;[])</h4>
+  <div class="markdown level1 summary"><p>Applies the absolute value.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Derivatives&lt;Expression&gt; ApplyAbs(Derivatives&lt;Expression&gt;[] arguments)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Derivatives-1.html">Derivatives</a>&lt;<span class="xref">System.Linq.Expressions.Expression</span>&gt;[]</td>
+        <td><span class="parametername">arguments</span></td>
+        <td><p>The arguments.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Derivatives-1.html">Derivatives</a>&lt;<span class="xref">System.Linq.Expressions.Expression</span>&gt;</td>
+        <td><p>The absolute value result.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_ApplyAcos_" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.ApplyAcos*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_ApplyAcos_SpiceSharpBehavioral_Parsers_Derivatives_System_Linq_Expressions_Expression____" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.ApplyAcos(SpiceSharpBehavioral.Parsers.Derivatives{System.Linq.Expressions.Expression}[])">ApplyAcos(Derivatives&lt;Expression&gt;[])</h4>
+  <div class="markdown level1 summary"><p>Applies the arccosine.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Derivatives&lt;Expression&gt; ApplyAcos(Derivatives&lt;Expression&gt;[] arguments)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Derivatives-1.html">Derivatives</a>&lt;<span class="xref">System.Linq.Expressions.Expression</span>&gt;[]</td>
+        <td><span class="parametername">arguments</span></td>
+        <td><p>The arguments.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Derivatives-1.html">Derivatives</a>&lt;<span class="xref">System.Linq.Expressions.Expression</span>&gt;</td>
+        <td><p>The arccosine result.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_ApplyAsin_" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.ApplyAsin*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_ApplyAsin_SpiceSharpBehavioral_Parsers_Derivatives_System_Linq_Expressions_Expression____" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.ApplyAsin(SpiceSharpBehavioral.Parsers.Derivatives{System.Linq.Expressions.Expression}[])">ApplyAsin(Derivatives&lt;Expression&gt;[])</h4>
+  <div class="markdown level1 summary"><p>Applies the arcsin.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Derivatives&lt;Expression&gt; ApplyAsin(Derivatives&lt;Expression&gt;[] arguments)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Derivatives-1.html">Derivatives</a>&lt;<span class="xref">System.Linq.Expressions.Expression</span>&gt;[]</td>
+        <td><span class="parametername">arguments</span></td>
+        <td><p>The arguments.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Derivatives-1.html">Derivatives</a>&lt;<span class="xref">System.Linq.Expressions.Expression</span>&gt;</td>
+        <td><p>The arcsine result.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_ApplyAtan_" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.ApplyAtan*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_ApplyAtan_SpiceSharpBehavioral_Parsers_Derivatives_System_Linq_Expressions_Expression____" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.ApplyAtan(SpiceSharpBehavioral.Parsers.Derivatives{System.Linq.Expressions.Expression}[])">ApplyAtan(Derivatives&lt;Expression&gt;[])</h4>
+  <div class="markdown level1 summary"><p>Applies the arctangent.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Derivatives&lt;Expression&gt; ApplyAtan(Derivatives&lt;Expression&gt;[] arguments)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Derivatives-1.html">Derivatives</a>&lt;<span class="xref">System.Linq.Expressions.Expression</span>&gt;[]</td>
+        <td><span class="parametername">arguments</span></td>
+        <td><p>The arguments.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Derivatives-1.html">Derivatives</a>&lt;<span class="xref">System.Linq.Expressions.Expression</span>&gt;</td>
+        <td><p>The arctangent result.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_ApplyExp_" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.ApplyExp*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_ApplyExp_SpiceSharpBehavioral_Parsers_Derivatives_System_Linq_Expressions_Expression____" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.ApplyExp(SpiceSharpBehavioral.Parsers.Derivatives{System.Linq.Expressions.Expression}[])">ApplyExp(Derivatives&lt;Expression&gt;[])</h4>
+  <div class="markdown level1 summary"><p>Applies the exponent operator.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Derivatives&lt;Expression&gt; ApplyExp(Derivatives&lt;Expression&gt;[] arguments)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Derivatives-1.html">Derivatives</a>&lt;<span class="xref">System.Linq.Expressions.Expression</span>&gt;[]</td>
+        <td><span class="parametername">arguments</span></td>
+        <td><p>The arguments.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Derivatives-1.html">Derivatives</a>&lt;<span class="xref">System.Linq.Expressions.Expression</span>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_ApplyLog_" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.ApplyLog*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_ApplyLog_SpiceSharpBehavioral_Parsers_Derivatives_System_Linq_Expressions_Expression____" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.ApplyLog(SpiceSharpBehavioral.Parsers.Derivatives{System.Linq.Expressions.Expression}[])">ApplyLog(Derivatives&lt;Expression&gt;[])</h4>
+  <div class="markdown level1 summary"><p>Applies the logarithm.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Derivatives&lt;Expression&gt; ApplyLog(Derivatives&lt;Expression&gt;[] arguments)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Derivatives-1.html">Derivatives</a>&lt;<span class="xref">System.Linq.Expressions.Expression</span>&gt;[]</td>
+        <td><span class="parametername">arguments</span></td>
+        <td><p>The arguments.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Derivatives-1.html">Derivatives</a>&lt;<span class="xref">System.Linq.Expressions.Expression</span>&gt;</td>
+        <td><p>The log result.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_ApplyLog10_" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.ApplyLog10*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_ApplyLog10_SpiceSharpBehavioral_Parsers_Derivatives_System_Linq_Expressions_Expression____" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.ApplyLog10(SpiceSharpBehavioral.Parsers.Derivatives{System.Linq.Expressions.Expression}[])">ApplyLog10(Derivatives&lt;Expression&gt;[])</h4>
+  <div class="markdown level1 summary"><p>Applies the base-10 logarithm.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Derivatives&lt;Expression&gt; ApplyLog10(Derivatives&lt;Expression&gt;[] arguments)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Derivatives-1.html">Derivatives</a>&lt;<span class="xref">System.Linq.Expressions.Expression</span>&gt;[]</td>
+        <td><span class="parametername">arguments</span></td>
+        <td><p>The arguments.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Derivatives-1.html">Derivatives</a>&lt;<span class="xref">System.Linq.Expressions.Expression</span>&gt;</td>
+        <td><p>The logarithm result.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_ApplyMax_" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.ApplyMax*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_ApplyMax_SpiceSharpBehavioral_Parsers_Derivatives_System_Linq_Expressions_Expression____" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.ApplyMax(SpiceSharpBehavioral.Parsers.Derivatives{System.Linq.Expressions.Expression}[])">ApplyMax(Derivatives&lt;Expression&gt;[])</h4>
+  <div class="markdown level1 summary"><p>Applies the maximum.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Derivatives&lt;Expression&gt; ApplyMax(Derivatives&lt;Expression&gt;[] arguments)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Derivatives-1.html">Derivatives</a>&lt;<span class="xref">System.Linq.Expressions.Expression</span>&gt;[]</td>
+        <td><span class="parametername">arguments</span></td>
+        <td><p>The arguments.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Derivatives-1.html">Derivatives</a>&lt;<span class="xref">System.Linq.Expressions.Expression</span>&gt;</td>
+        <td><p>The maximum result.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_ApplyMin_" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.ApplyMin*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_ApplyMin_SpiceSharpBehavioral_Parsers_Derivatives_System_Linq_Expressions_Expression____" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.ApplyMin(SpiceSharpBehavioral.Parsers.Derivatives{System.Linq.Expressions.Expression}[])">ApplyMin(Derivatives&lt;Expression&gt;[])</h4>
+  <div class="markdown level1 summary"><p>Applies the minimum.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Derivatives&lt;Expression&gt; ApplyMin(Derivatives&lt;Expression&gt;[] arguments)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Derivatives-1.html">Derivatives</a>&lt;<span class="xref">System.Linq.Expressions.Expression</span>&gt;[]</td>
+        <td><span class="parametername">arguments</span></td>
+        <td><p>The arguments.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Derivatives-1.html">Derivatives</a>&lt;<span class="xref">System.Linq.Expressions.Expression</span>&gt;</td>
+        <td><p>The minimum result.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_ApplyPow_" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.ApplyPow*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_ApplyPow_SpiceSharpBehavioral_Parsers_Derivatives_System_Linq_Expressions_Expression____" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.ApplyPow(SpiceSharpBehavioral.Parsers.Derivatives{System.Linq.Expressions.Expression}[])">ApplyPow(Derivatives&lt;Expression&gt;[])</h4>
+  <div class="markdown level1 summary"><p>Raises to a power.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Derivatives&lt;Expression&gt; ApplyPow(Derivatives&lt;Expression&gt;[] arguments)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Derivatives-1.html">Derivatives</a>&lt;<span class="xref">System.Linq.Expressions.Expression</span>&gt;[]</td>
+        <td><span class="parametername">arguments</span></td>
+        <td><p>The arguments.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Derivatives-1.html">Derivatives</a>&lt;<span class="xref">System.Linq.Expressions.Expression</span>&gt;</td>
+        <td><p>The result of the power.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_ApplyRound_" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.ApplyRound*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_ApplyRound_SpiceSharpBehavioral_Parsers_Derivatives_System_Linq_Expressions_Expression____" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.ApplyRound(SpiceSharpBehavioral.Parsers.Derivatives{System.Linq.Expressions.Expression}[])">ApplyRound(Derivatives&lt;Expression&gt;[])</h4>
+  <div class="markdown level1 summary"><p>Rounds the derivatives.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Derivatives&lt;Expression&gt; ApplyRound(Derivatives&lt;Expression&gt;[] arguments)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Derivatives-1.html">Derivatives</a>&lt;<span class="xref">System.Linq.Expressions.Expression</span>&gt;[]</td>
+        <td><span class="parametername">arguments</span></td>
+        <td><p>The arguments.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Derivatives-1.html">Derivatives</a>&lt;<span class="xref">System.Linq.Expressions.Expression</span>&gt;</td>
+        <td><p>The rounding result.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_ApplySin_" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.ApplySin*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_ApplySin_SpiceSharpBehavioral_Parsers_Derivatives_System_Linq_Expressions_Expression____" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.ApplySin(SpiceSharpBehavioral.Parsers.Derivatives{System.Linq.Expressions.Expression}[])">ApplySin(Derivatives&lt;Expression&gt;[])</h4>
+  <div class="markdown level1 summary"><p>Applies the sine.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Derivatives&lt;Expression&gt; ApplySin(Derivatives&lt;Expression&gt;[] arguments)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Derivatives-1.html">Derivatives</a>&lt;<span class="xref">System.Linq.Expressions.Expression</span>&gt;[]</td>
+        <td><span class="parametername">arguments</span></td>
+        <td><p>The arguments.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Derivatives-1.html">Derivatives</a>&lt;<span class="xref">System.Linq.Expressions.Expression</span>&gt;</td>
+        <td><p>The sine result.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_ApplySqrt_" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.ApplySqrt*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_ApplySqrt_SpiceSharpBehavioral_Parsers_Derivatives_System_Linq_Expressions_Expression____" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.ApplySqrt(SpiceSharpBehavioral.Parsers.Derivatives{System.Linq.Expressions.Expression}[])">ApplySqrt(Derivatives&lt;Expression&gt;[])</h4>
+  <div class="markdown level1 summary"><p>Applies the square root.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Derivatives&lt;Expression&gt; ApplySqrt(Derivatives&lt;Expression&gt;[] arguments)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Derivatives-1.html">Derivatives</a>&lt;<span class="xref">System.Linq.Expressions.Expression</span>&gt;[]</td>
+        <td><span class="parametername">arguments</span></td>
+        <td><p>The arguments.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Derivatives-1.html">Derivatives</a>&lt;<span class="xref">System.Linq.Expressions.Expression</span>&gt;</td>
+        <td><p>The square root result.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_RegisterDefaultFunctions_" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.RegisterDefaultFunctions*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_RegisterDefaultFunctions_SpiceSharpBehavioral_Parsers_ExpressionTreeDerivativeParser_" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.RegisterDefaultFunctions(SpiceSharpBehavioral.Parsers.ExpressionTreeDerivativeParser)">RegisterDefaultFunctions(ExpressionTreeDerivativeParser)</h4>
+  <div class="markdown level1 summary"><p>Register default functions.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void RegisterDefaultFunctions(this ExpressionTreeDerivativeParser parser)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.ExpressionTreeDerivativeParser.html">ExpressionTreeDerivativeParser</a></td>
+        <td><span class="parametername">parser</span></td>
+        <td><p>The parser.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_Square_" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.Square*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_Square_System_Double_" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.Square(System.Double)">Square(Double)</h4>
+  <div class="markdown level1 summary"><p>Squares the specified value.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static double Square(double x)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Double</span></td>
+        <td><span class="parametername">x</span></td>
+        <td><p>The value.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Double</span></td>
+        <td><p>The squared value.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_UnregisterDefaultFunctions_" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.UnregisterDefaultFunctions*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Helper_ExpressionTreeDerivativesParserHelper_UnregisterDefaultFunctions_SpiceSharpBehavioral_Parsers_ExpressionTreeDerivativeParser_" data-uid="SpiceSharpBehavioral.Parsers.Helper.ExpressionTreeDerivativesParserHelper.UnregisterDefaultFunctions(SpiceSharpBehavioral.Parsers.ExpressionTreeDerivativeParser)">UnregisterDefaultFunctions(ExpressionTreeDerivativeParser)</h4>
+  <div class="markdown level1 summary"><p>Remove the default functions from the parser.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static void UnregisterDefaultFunctions(this ExpressionTreeDerivativeParser parser)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.ExpressionTreeDerivativeParser.html">ExpressionTreeDerivativeParser</a></td>
+        <td><span class="parametername">parser</span></td>
+        <td><p>The parser.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

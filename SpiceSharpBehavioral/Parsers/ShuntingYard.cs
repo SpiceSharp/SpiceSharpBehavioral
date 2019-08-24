@@ -59,11 +59,6 @@ namespace SpiceSharpBehavioral.Parsers
         /// Parses the expression using the Shunting Yard algorithm.
         /// </summary>
         /// <param name="expression">The expression to be parsed.</param>
-        /// <exception cref="ParserException">
-        /// Infix or postfix operator expected
-        /// or
-        /// Cannot continue parsing
-        /// </exception>
         protected virtual void ParseExpression(string expression)
         {
             // Initialize for parsing the expression
@@ -79,6 +74,8 @@ namespace SpiceSharpBehavioral.Parsers
                 // Skip spaces
                 while (Index < Count && Input[Index] == ' ')
                     Index++;
+                if (Index >= Count)
+                    break;
 
                 // Parse a binary operator
                 if (ExpectInfixPostfix)

@@ -10,7 +10,7 @@ namespace SpiceSharpBehavioral.Parsers
     /// division, modulo, powers, equality, non-equality, or, and greater/less (or equal) than and
     /// the ternary operator. It also supports brackets and function calls.
     /// </summary>
-    /// <seealso cref="SpiceSharpBehavioral.ShuntingYard" />
+    /// <seealso cref="ShuntingYard" />
     public abstract class StandardArithmeticParser : ShuntingYard
     {
         // Define all operators for parsing arithmetic expressions
@@ -259,7 +259,6 @@ namespace SpiceSharpBehavioral.Parsers
         /// Acts on an operator as soon as it is encountered.
         /// </summary>
         /// <param name="op">The operator.</param>
-        /// <exception cref="ParserException">Could not find a function by the name of {fo.Name}</exception>
         protected override void PrepareOperator(Operator op)
         {
         }

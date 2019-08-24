@@ -175,6 +175,10 @@ namespace SpiceSharpBehavioral.Parsers
             _stack.Push(Expression.Constant(value));
         }
 
+        /// <summary>
+        /// Push a spice property on the value stack.
+        /// </summary>
+        /// <param name="property">The Spice property.</param>
         protected override void PushSpiceProperty(SpiceProperty property)
         {
             var args = new ExpressionTreeSpicePropertyEventArgs(property);

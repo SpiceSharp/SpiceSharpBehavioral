@@ -159,6 +159,12 @@ namespace SpiceSharpBehavioral.Parsers.Helper
 
             throw new CircuitException("Invalid number of arguments, {0} given but 2 expected".FormatString(arguments.Length));
         }
+
+        /// <summary>
+        /// Applies the 10-base logarithm.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The 10-base log derivatives.</returns>
         public static Derivatives<Func<double>> ApplyLog10(Derivatives<Func<double>>[] arguments)
         {
             var result = ApplyLog(arguments);
@@ -171,8 +177,10 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         }
 
         /// <summary>
-        /// Power method.
+        /// Applies the power method.
         /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The power result.</returns>
         public static Derivatives<Func<double>> ApplyPow(Derivatives<Func<double>>[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 2);
@@ -182,8 +190,10 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         }
 
         /// <summary>
-        /// Square root method.
+        /// Applies the square root.
         /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The square root result.</returns>
         public static Derivatives<Func<double>> ApplySqrt(Derivatives<Func<double>>[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 1);
@@ -205,8 +215,10 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         }
 
         /// <summary>
-        /// Trigonometry
+        /// Applies the sine.
         /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The sine result.</returns>
         public static Derivatives<Func<double>> ApplySin(Derivatives<Func<double>>[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 1);
@@ -226,6 +238,12 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             }
             return result;
         }
+
+        /// <summary>
+        /// Applies the cosine.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The cosine result.</returns>
         private static Derivatives<Func<double>> ApplyCos(Derivatives<Func<double>>[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 1);
@@ -245,6 +263,12 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             }
             return result;
         }
+
+        /// <summary>
+        /// Applies the tangent.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The tangent result.</returns>
         private static Derivatives<Func<double>> ApplyTan(Derivatives<Func<double>>[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 1);
@@ -270,8 +294,10 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         }
 
         /// <summary>
-        /// Inverse trigonometry.
+        /// Applies the arcsine.
         /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The arcsine result.</returns>
         public static Derivatives<Func<double>> ApplyAsin(Derivatives<Func<double>>[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 1);
@@ -295,6 +321,12 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             }
             return result;
         }
+
+        /// <summary>
+        /// Applies the arccosine.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The arccosine result.</returns>
         public static Derivatives<Func<double>> ApplyAcos(Derivatives<Func<double>>[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 1);
@@ -318,6 +350,12 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             }
             return result;
         }
+
+        /// <summary>
+        /// Applies the arctangent.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The arctangent result.</returns>
         public static Derivatives<Func<double>> ApplyAtan(Derivatives<Func<double>>[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 1);
@@ -343,8 +381,10 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         }
 
         /// <summary>
-        /// Miscellaneous
+        /// Applies the absolute value.
         /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The absolute value result.</returns>
         public static Derivatives<Func<double>> ApplyAbs(Derivatives<Func<double>>[] arguments)
         {
             arguments.ThrowIfNot(nameof(arguments), 1);
@@ -368,6 +408,12 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             }
             return result;
         }
+
+        /// <summary>
+        /// Applies the rounding operator.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The rounded result.</returns>
         public static Derivatives<Func<double>> ApplyRound(Derivatives<Func<double>>[] arguments)
         {
             arguments.ThrowIfEmpty(nameof(arguments));
@@ -402,6 +448,12 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             }
             throw new CircuitException("Invalid number of arguments for Round()");
         }
+
+        /// <summary>
+        /// Applies the minimum operator.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The minimum result.</returns>
         public static Derivatives<Func<double>> ApplyMin(Derivatives<Func<double>>[] arguments)
         {
             arguments.ThrowIfEmpty(nameof(arguments));
@@ -465,6 +517,12 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             }
             return result;
         }
+
+        /// <summary>
+        /// Applies the maximum operator.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The maximum result.</returns>
         public static Derivatives<Func<double>> ApplyMax(Derivatives<Func<double>>[] arguments)
         {
             arguments.ThrowIfEmpty(nameof(arguments));
@@ -533,7 +591,7 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         /// Delegate for applying a function.
         /// </summary>
         /// <param name="arguments">The arguments.</param>
-        /// <returns></returns>
+        /// <returns>The result of the function.</returns>
         public delegate Derivatives<Func<double>> DoubleDerivativesFunction(Derivatives<Func<double>>[] arguments);
     }
 }

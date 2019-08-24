@@ -43,7 +43,7 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         }
 
         /// <summary>
-        /// Creates a new instance of the <see cref="BehavioralFunction"/> class.
+        /// Initializes a new instance of the <see cref="BehavioralFunction"/> class.
         /// </summary>
         /// <param name="map">Maps each derivative to an unknown</param>
         /// <param name="derivatives">The derivatives.</param>

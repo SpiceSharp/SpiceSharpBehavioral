@@ -1,0 +1,17 @@
+language: csharp
+solution: SpiceSharpBehavioral.sln
+
+os:
+  - linux
+  - osx
+
+install:
+  - nuget restore
+
+script:
+  - msbuild ./SpiceSharpBehavioral.sln /p:Configuration=Debug
+  - mono ./packages/NUnit.ConsoleRunner.3.10.0/tools/nunit3-console.exe ./SpiceSharpBehavioralTests/bin/Debug/SpiceSharpBehavioralTests.dll
+
+branches:
+  only:
+  - master

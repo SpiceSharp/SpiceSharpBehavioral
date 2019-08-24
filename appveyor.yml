@@ -1,0 +1,35 @@
+configuration:
+  - Debug
+
+os: Visual Studio 2017
+
+assembly_info:
+  patch: true
+  file: AssemblyInfo.cs
+  assembly_version: '{version}'
+  assembly_file_version: '{version}'
+
+environment:
+  CODECOV_TOKEN: 139acf01-04bd-43e5-833c-f43457da19ec
+
+branches:
+  only:
+    - master
+
+before_build:
+  - nuget restore
+  - choco install opencover.portable
+  - choco install codecov
+
+build_script:
+  - msbuild SpiceSharpBehavioral\SpiceSharpBehavioral.csproj -p:Configuration=Debug
+  - msbuild SpiceSharpBehavioralTests\SpiceSharpBehavioralTests.csproj -p:Configuration=Debug
+  - OpenCover.Console.exe -register -oldStyle -target:"packages\NUnit.ConsoleRunner.3.10.0\tools\nunit3-console.exe" -targetargs:"SpiceSharpBehavioralTests\SpiceSharpBehavioralTests.csproj" -filter:"+[*]* -[SpiceSharpBehavioralTests*]*" -output:"SpiceSharpBehavioralCoverage.xml"
+  - codecov -f "SpiceSharpBehavioralCoverage.xml"
+  - msbuild SpiceSharpBehavioral\SpiceSharpBehavioral.csproj -p:Configuration=Release
+
+artifacts:
+  - path: SpiceSharpBehavioral\bin\Release\*.nupkg
+    name: NuGet package
+  - path: SpiceSharpBehavioralCoverage.xml
+    name: Coverage report

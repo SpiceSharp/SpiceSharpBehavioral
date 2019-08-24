@@ -1,13 +1,16 @@
-﻿using System;
-
-namespace SpiceSharpBehavioral.Parsers
+﻿namespace SpiceSharpBehavioral.Parsers
 {
     /// <summary>
     /// Interface for storing and managing derivatives.
     /// </summary>
-    /// <typeparam name="T">The return types of the variables.</typeparam>
     public interface IDerivatives
     {
+        /// <summary>
+        /// Gets the number of derivatives.
+        /// </summary>
+        /// <value>
+        /// The number of derivatives.
+        /// </value>
         int Count { get; }
     }
 }

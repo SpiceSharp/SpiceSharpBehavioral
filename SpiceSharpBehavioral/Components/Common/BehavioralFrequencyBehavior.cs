@@ -1,23 +1,18 @@
 ﻿using SpiceSharp.Behaviors;
 using SpiceSharp.Simulations;
-using SpiceSharp.Simulations.Behaviors;
 using System;
 using System.Collections.Generic;
 using SpiceSharp;
 using SpiceSharp.Algebra;
 using System.Numerics;
-using System.Linq.Expressions;
-using System.Reflection;
 
 namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
 {
     /// <summary>
     /// Frequency behavior for a behavioral component.
     /// </summary>
-    public abstract class BehavioralFrequencyBehavior : ExportingBehavior, IFrequencyBehavior
+    public abstract class BehavioralFrequencyBehavior : Behavior, IFrequencyBehavior
     {
-        private static readonly PropertyInfo MatrixValueProperty = typeof(MatrixElement<Complex>).GetTypeInfo().GetProperty("Value");
-
         /// <summary>
         /// Gets the biasing behavior.
         /// </summary>
@@ -34,6 +29,11 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         protected int NegIndex { get; set; }
 
         /// <summary>
+        /// Gets the state.
+        /// </summary>
+        protected ComplexSimulationState State { get; private set; }
+
+        /// <summary>
         /// All contributions to the Y-matrix.
         /// </summary>
         private Complex[] _contributions;
@@ -41,7 +41,7 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         private Action _initializeMethod;
 
         /// <summary>
-        /// Creates a new instance of the <see cref="BehavioralFrequencyBehavior"/> class.
+        /// Initializes a new instance of the <see cref="BehavioralFrequencyBehavior"/> class.
         /// </summary>
         /// <param name="name"></param>
         public BehavioralFrequencyBehavior(string name)
@@ -53,22 +53,26 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         /// Setup the behavior.
         /// </summary>
         /// <param name="simulation">The simulation.</param>
-        /// <param name="provider">The setup data provider.</param>
-        public override void Setup(Simulation simulation, SetupDataProvider provider)
+        /// <param name="context">The binding context.</param>
+        public override void Bind(Simulation simulation, BindingContext context)
         {
-            provider.ThrowIfNull(nameof(provider));
+            base.Bind(simulation, context);
 
             // Get behaviors
-            BiasingBehavior = provider.GetBehavior<BehavioralBiasingBehavior>();
+            BiasingBehavior = context.GetBehavior<BehavioralBiasingBehavior>();
+
+            State = ((FrequencySimulation)simulation).ComplexState;
+            var solver = State.Solver;
+            BuildFunctionMethod(solver);
         }
 
         /// <summary>
         /// Unsetup the behavior.
         /// </summary>
-        /// <param name="simulation">The simulation.</param>
-        public override void Unsetup(Simulation simulation)
+        public override void Unbind()
         {
             BiasingBehavior = null;
+            State = null;
             _fillMatrix = null;
             _contributions = null;
             _initializeMethod = null;
@@ -78,7 +82,7 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         /// Get equation pointers.
         /// </summary>
         /// <param name="solver">Gets the equation pointers.</param>
-        public virtual void GetEquationPointers(Solver<Complex> solver)
+        private void BuildFunctionMethod(Solver<Complex> solver)
         {
             var block = new List<Action>();
             var init_block = new List<Action>();
@@ -163,8 +167,7 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         /// <summary>
         /// Initialize small-signal parameters.
         /// </summary>
-        /// <param name="simulation">The simulation.</param>
-        public void InitializeParameters(FrequencySimulation simulation)
+        public virtual void InitializeParameters()
         {
             _initializeMethod?.Invoke();
         }
@@ -172,8 +175,7 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         /// <summary>
         /// Load the Y-matrix and Rhs-vector.
         /// </summary>
-        /// <param name="simulation">The simulation.</param>
-        public virtual void Load(FrequencySimulation simulation)
+        public virtual void Load()
         {
             _fillMatrix?.Invoke();
         }

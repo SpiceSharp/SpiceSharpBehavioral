@@ -6,20 +6,21 @@
     public abstract class Operator
     {
         /// <summary>
-        /// Determines whether this operator should be executed first
-        /// assuming this operator comes after it.
+        /// Determines whether the operator has precedence over another operator.
         /// </summary>
-        /// <param name="other">The other (previous) operator.</param>
-        /// <returns></returns>
+        /// <param name="other">The other operator.</param>
+        /// <returns>
+        ///   <c>true</c> if this operator has precedence over the other operator; otherwise, <c>false</c>.
+        /// </returns>
         public abstract bool HasPrecedenceOver(Operator other);
 
         /// <summary>
-        /// Allows another operator to cause this
-        /// one to execute first even though the other one comes
-        /// after it.
+        /// Determines whether the operator allows precedence of another operator.
         /// </summary>
-        /// <param name="other">The other.</param>
-        /// <returns></returns>
+        /// <param name="other">The other operator.</param>
+        /// <returns>
+        ///     <c>true</c> if this operator allows precedence from another operator; otherwise, <c>false</c>.
+        /// </returns>
         public abstract bool AllowPrecedence(Operator other);
     }
 }

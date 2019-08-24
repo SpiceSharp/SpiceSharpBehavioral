@@ -8,6 +8,14 @@ namespace SpiceSharpBehavioral.Parsers
     public abstract class SpiceParser : StandardArithmeticParser
     {
         /// <summary>
+        /// Gets or sets a value indicating whether or not to trim node names.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if the parser should trim node names; otherwise, <c>false</c>.
+        /// </value>
+        public bool TrimNames { get; set; } = true;
+
+        /// <summary>
         /// Parse unary operators.
         /// </summary>
         /// <returns></returns>
@@ -60,7 +68,13 @@ namespace SpiceSharpBehavioral.Parsers
                         string id = Input[Index].ToString();
                         Index += 2;
                         arg = NextUntil(')');
-                        args = new SpiceProperty(id, arg.Split(','));
+                        var properties = arg.Split(',');
+                        if (TrimNames)
+                        {
+                            for (var i = 0; i < properties.Length; i++)
+                                properties[i] = properties[i].Trim();
+                        }
+                        args = new SpiceProperty(id, properties);
                         Index += arg.Length + 1;
                         PushSpiceProperty(args);
                         return true;
@@ -75,7 +89,13 @@ namespace SpiceSharpBehavioral.Parsers
                         Index += 2;
                         arg = NextUntil(')');
                         Index += arg.Length + 1;
-                        args = new SpiceProperty(id, arg.Split(','));
+                        var properties = arg.Split(',');
+                        if (TrimNames)
+                        {
+                            for (var i = 0; i < properties.Length; i++)
+                                properties[i] = properties[i].Trim();
+                        }
+                        args = new SpiceProperty(id, properties);
                         PushSpiceProperty(args);
                         return true;
                     }
@@ -87,6 +107,11 @@ namespace SpiceSharpBehavioral.Parsers
                     Index += name.Length + 1;
                     arg = NextUntil(']');
                     Index += arg.Length + 1;
+                    if (TrimNames)
+                    {
+                        name = name.Trim();
+                        arg = arg.Trim();
+                    }
                     args = new SpiceProperty("@", name, arg);
                     PushSpiceProperty(args);
                     return true;

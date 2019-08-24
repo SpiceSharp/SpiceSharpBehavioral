@@ -1,0 +1,56 @@
+{
+  "metadata": [
+    {
+      "src": [
+        {
+          "files": [ "**.csproj" ],
+          "src": "SpiceSharpBehavioral",
+          "exclude": [ "obj/**", "bin/**" ]
+        }
+      ],
+      "force": false,
+      "dest": "SpiceSharpBehavioral/obj/api",
+      "properties":
+      {
+        "TargetFramework": "net45"
+      }
+	}
+  ],
+  "build": {
+    "content": [
+      {
+        "files": [ "api/*.yml" ],
+        "src": "SpiceSharpBehavioral/obj"
+      },
+      {
+        "files": [
+            "*.md",
+            "*.yml",
+            "api/*.md", "api/*.yml",
+            "articles/*.md", "articles/*.yml",
+            "articles/**/*.md", "articles/**/*.yml"
+        ],
+        "exclude": [ "appveyor.yml", ".travis.yml", "docs/**", "SpiceSharpBehavioral/**", "SpiceSharpBehavioralTests/**" ]
+      }
+    ],
+    "resource": [
+      {
+        "files": [
+            "api/images/**",
+            "articles/images/**",
+            "articles/**/images/**"
+        ],
+        "exclude": [ "docs/**" ]
+      }
+    ],
+	"globalMetadata" : {
+      "_appFaviconPath": "api/images/favicon.ico",
+      "_appLogoPath": "api/images/favicon.svg",
+      "_disableContribution": "true"
+	},
+    "dest": "docs",
+    "maxParallelism": 4,
+    "template": [ "default", "material/material" ],
+	"force": true
+  }
+}

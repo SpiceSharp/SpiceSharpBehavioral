@@ -1,24 +1,23 @@
 ﻿using SpiceSharp;
 using SpiceSharp.Algebra;
 using SpiceSharp.Behaviors;
-using SpiceSharp.Simulations.Behaviors;
+using SpiceSharp.Components;
 using SpiceSharp.Simulations;
 using SpiceSharpBehavioral.Parsers;
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Reflection;
 
 namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
 {
     /// <summary>
     /// A template for behavioral sources.
     /// </summary>
-    public abstract class BehavioralBiasingBehavior : ExportingBehavior, IBiasingBehavior
+    public abstract class BehavioralBiasingBehavior : Behavior, IBiasingBehavior
     {
-        protected static readonly PropertyInfo ItemProperty = typeof(Vector<double>).GetTypeInfo().GetProperty("Item");
-        protected static readonly PropertyInfo MatrixValueProperty = typeof(MatrixElement<double>).GetTypeInfo().GetProperty("Value");
-        protected static readonly PropertyInfo VectorValueProperty = typeof(VectorElement<double>).GetTypeInfo().GetProperty("Value");
+        /// <summary>
+        /// Gets the current evaluated value.
+        /// </summary>
+        protected double CurrentValue { get; private set; }
 
         /// <summary>
         /// Gets the parsed expressions.
@@ -41,10 +40,13 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         protected int NegIndex { get; set; }
 
         /// <summary>
+        /// Gets the simulation state.
+        /// </summary>
+        protected BaseSimulationState State { get; private set; }
+
+        /// <summary>
         /// Private variables
         /// </summary>
-        private Dictionary<string, SpiceSharp.Components.VoltageSourceBehaviors.BiasingBehavior> _voltageSourceBehaviors = 
-            new Dictionary<string, SpiceSharp.Components.VoltageSourceBehaviors.BiasingBehavior>();
         private Vector<double> _currentSolution;
         private double _cumulated;
         private Action _fillMatrix;
@@ -56,54 +58,23 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         public BehavioralBiasingBehavior(string name) : base(name) { }
 
         /// <summary>
-        /// Setup the behavior.
+        /// Bind the behavior to the simulation.
         /// </summary>
         /// <param name="simulation">The simulation.</param>
-        /// <param name="provider">The setup data provider.</param>
-        public override void Setup(Simulation simulation, SetupDataProvider provider)
+        /// <param name="context">The binding context.</param>
+        public override void Bind(Simulation simulation, BindingContext context)
         {
-            simulation.ThrowIfNull(nameof(simulation));
-            provider.ThrowIfNull(nameof(provider));
+            base.Bind(simulation, context);
 
             // Get parameters
-            BaseParameters = provider.GetParameterSet<BaseParameters>();
+            BaseParameters = context.GetParameterSet<BaseParameters>();
 
-            // This is our chance to find the voltage source behaviors
-            var parser = new SimpleParser();
-            parser.VariableFound += (sender, e) => e.Result = 0.0;
-            parser.FunctionFound += (sender, e) => e.Result = 0.0;
-            parser.SpicePropertyFound += (sender, e) =>
-            {
-                if (BaseParameters.SpicePropertyComparer.Equals(e.Property.Identifier, "I"))
-                {
-                    var source = e.Property[0];
-                    _voltageSourceBehaviors.Add(source, simulation.EntityBehaviors[source].Get<SpiceSharp.Components.VoltageSourceBehaviors.BiasingBehavior>());
-                }
-                e.Apply(() => 0.0, 0, 0.0);
-            };
-            parser.Parse(BaseParameters.Expression);
-        }
-
-        /// <summary>
-        /// Unsetup the behavior.
-        /// </summary>
-        /// <param name="simulation">The simulation.</param>
-        public override void Unsetup(Simulation simulation)
-        {
-            Function = null;
-        }
-
-        /// <summary>
-        /// Get all equation pointers.
-        /// </summary>
-        /// <param name="variables">The variables.</param>
-        /// <param name="solver">The solver.</param>
-        public virtual void GetEquationPointers(VariableSet variables, Solver<double> solver)
-        {
-            var parser = BaseParameters.Parser ?? throw new CircuitException("No parser specified for {0}".FormatString(Name));
-            var map = new Dictionary<int, int>();
+            // We are now going to parse the expression
+            var parser = BaseParameters.Parser.ThrowIfNull("Parser");
+            var variables = simulation.Variables;
 
             // We want to keep track of derivatives, and which column they map to
+            var map = new Dictionary<int, int>();
             int Derivative(int index)
             {
                 if (index <= 0)
@@ -119,10 +90,23 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
                 var property = e.Property;
                 if (BaseParameters.SpicePropertyComparer.Equals(property.Identifier, "V"))
                 {
+                    // Only recognize V(a) or V(a, b)
                     if (property.ArgumentCount != 1 && property.ArgumentCount != 2)
-                        throw new CircuitException("Cannot parse V({0})".FormatString(string.Join(",", property)));
-                    var index = variables.MapNode(property[0]).Index;
-                    var refindex = property.ArgumentCount > 1 ? variables.MapNode(property[1]).Index : 0;
+                        return;
+
+                    // Get the nodes
+                    int index, refindex;
+                    if (BaseParameters.Instance != null && BaseParameters.Instance is ComponentInstanceData cid)
+                    {
+                        index = variables.MapNode(cid.GenerateNodeName(property[0])).Index;
+                        refindex = property.ArgumentCount > 1 ? variables.MapNode(cid.GenerateNodeName(property[1])).Index : 0;
+                    }
+                    else
+                    {
+                        index = variables.MapNode(property[0]).Index;
+                        refindex = property.ArgumentCount > 1 ? variables.MapNode(property[1]).Index : 0;
+                    }
+
                     if (index != refindex)
                     {
                         if (index > 0 && refindex > 0)
@@ -138,12 +122,26 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
                 }
                 else if (BaseParameters.SpicePropertyComparer.Equals(property.Identifier, "I"))
                 {
+                    // Only recognized I(xxx)
                     if (property.ArgumentCount != 1)
-                        throw new CircuitException("Cannot parse I({0})".FormatString(string.Join(",", property)));
+                        return;
+
+                    var component = property[0];
+                    if (BaseParameters.Instance != null && BaseParameters.Instance is ComponentInstanceData cid)
+                        component = cid.GenerateIdentifier(component);
 
                     // Get the voltage behavior to find the branch equation
-                    var index = _voltageSourceBehaviors[property[0]].BranchEq;
-                    e.Apply(() => _currentSolution[index], Derivative(index), 1.0);
+                    if (simulation.EntityBehaviors.TryGetBehaviors(component, out var ebd))
+                    {
+                        // Check for voltage source behaviors
+                        if (ebd.TryGet<SpiceSharp.Components.VoltageSourceBehaviors.BiasingBehavior>(out var vsrcb))
+                        {
+                            int index = vsrcb.BranchEq;
+                            e.Apply(() => _currentSolution[index], Derivative(index), 1.0);
+                        }
+                        else if (ebd.TryGet<SpiceSharp.Components.CurrentSourceBehaviors.BiasingBehavior>(out var isrcb))
+                            e.Apply(() => isrcb.Current);
+                    }
                 }
             };
             parser.SpicePropertyFound += SpicePropertyFound;
@@ -152,7 +150,21 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
             Function = new BehavioralFunction(map, parsedResult);
 
             // Build the total method
+            State = ((BaseSimulation)simulation).RealState;
+            var solver = State.Solver;
             BuildFunctionMethod(solver);
+        }
+
+        /// <summary>
+        /// Unsetup the behavior.
+        /// </summary>
+        public override void Unbind()
+        {
+            base.Unbind();
+            BaseParameters = null;
+            Function = null;
+            State = null;
+            _currentSolution = null;
         }
 
         /// <summary>
@@ -171,7 +183,11 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
             List<Action> _contributions = new List<Action>();
             {
                 var func = Function.Value;
-                _contributions.Add(() => _cumulated = func());
+                _contributions.Add(() =>
+                {
+                    _cumulated = func();
+                    CurrentValue = _cumulated;
+                });
             }
 
             // Fill Y-matrix
@@ -252,29 +268,19 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         }
 
         /// <summary>
-        /// Creates an expression that returns the vector element at the specified index.
-        /// </summary>
-        /// <param name="vector">The vector.</param>
-        /// <param name="index">The index.</param>
-        /// <returns></returns>
-        private Expression Solution(Expression vector, int index) => Expression.MakeIndex(vector, ItemProperty, new[] { Expression.Constant(index) });
-
-        /// <summary>
         /// Loads the Y-matrix and Rhs-vector.
         /// </summary>
-        /// <param name="simulation">The simulation.</param>
-        public virtual void Load(BaseSimulation simulation)
+        public virtual void Load()
         {
             // We compiled all instructions into one big function, so we can make this simple!
-            _currentSolution = simulation.RealState.Solution;
+            _currentSolution = State.Solution;
             _fillMatrix?.Invoke();
         }
 
         /// <summary>
         /// Tests convergence.
         /// </summary>
-        /// <param name="simulation">The simulation.</param>
         /// <returns></returns>
-        public virtual bool IsConvergent(BaseSimulation simulation) => true;
+        public virtual bool IsConvergent() => true;
     }
 }
