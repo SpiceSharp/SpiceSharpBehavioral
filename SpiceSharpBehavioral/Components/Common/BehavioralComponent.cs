@@ -45,7 +45,7 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
             parser.FunctionFound += (sender, e) => e.Result = 0.0;
             parser.SpicePropertyFound += (sender, e) =>
             {
-                if (e.Property.Identifier == "i")
+                if (bp.SpicePropertyComparer.Equals(e.Property.Identifier, "I"))
                 {
                     // Get the component name
                     var source = e.Property[0];
