@@ -20,7 +20,7 @@ namespace SpiceSharpBehavioral.Parsers.Operators
         /// Initializes a new instance of the <see cref="TernaryOperator"/> class.
         /// </summary>
         public TernaryOperator()
-            : base(OperatorType.OpenTernary, (int) OperatorPrecedence.Unary, false)
+            : base(OperatorType.OpenTernary, (int) OperatorPrecedence.Conditional, false)
         {
             Closed = false;
         }

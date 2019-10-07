@@ -35,6 +35,7 @@ namespace SpiceSharpBehavioralTests.Parsers
             while (true)
             {
                 var parsed = parser.Parse(expression);
+                Derivatives<Func<double>>.FudgeFactor = 0; // Don't fudge the numbers, we're testing here!
                 for (var i = 0; i < reference.Length; i++)
                 {
                     var expected = reference[i](x);
@@ -133,6 +134,14 @@ namespace SpiceSharpBehavioralTests.Parsers
             Check(2 * (2 + 3) * 4, parser.Parse("2 * ((2 + 3)) * 4"));
         }
 
+        [Test]
+        public void When_Conditional_Expect_Reference()
+        {
+            var parser = new SimpleDerivativeParser();
+            Check(1, parser.Parse("1 >= 0 ? 1 : 2"));
+            Check(2, parser.Parse("1 >= 3 ? 1 : 2"));
+        }
+
         private SimpleDerivativeParser Parser
         {
             get
@@ -148,12 +157,12 @@ namespace SpiceSharpBehavioralTests.Parsers
         {
             var parser = Parser;
             Check(new Func<double[], double>[] { x => 6 * x[0], x => 6 }, parser, "6*a");
-            Check(new Func<double[], double>[] { x => x[0] * x[0], x => 2 * x[0] }, parser, "a^2");
+            Check(new Func<double[], double>[] { x => x[0] * Math.Abs(x[0]), x => 2 * Math.Abs(x[0]) }, parser, "a^2");
             Check(new Func<double[], double>[] { x => x[0] * (x[0] - 3), x => 2 * x[0] - 3 }, parser, "a * (a - 3)");
             Check(new Func<double[], double>[] { x => 1 / Math.Pow(x[0], 3), x => -3 * Math.Pow(x[0], 2) / Math.Pow(x[0], 6) }, parser, "1 / a^3");
             Check(new Func<double[], double>[] { x => 2 * x[0] + 3 * x[1], x => 2, x => 3 }, parser, "2 * a + 3 * b");
             Check(new Func<double[], double>[] { x => x[0] * x[1], x => x[1], x => x[0] }, parser, "a * b");
-            Check(new Func<double[], double>[] { x => Math.Pow(x[0], x[1]), x => x[1] * Math.Pow(x[0], x[1] - 1), x => Math.Log(x[0]) * Math.Pow(x[0], x[1]) }, parser, "a^b");
+            Check(new Func<double[], double>[] { x => x[0] < 0 ? -Math.Pow(-x[0], x[1]) :  Math.Pow(x[0], x[1]), x => x[1] * Math.Pow(Math.Abs(x[0]), x[1] - 1), x => Math.Log(Math.Abs(x[0])) * Math.Pow(Math.Abs(x[0]), x[1]) }, parser, "a^b");
         }
 
         [Test]
@@ -176,9 +185,9 @@ namespace SpiceSharpBehavioralTests.Parsers
         {
             var parser = Parser;
             Check(new Func<double[], double>[] {
-                x => Math.Pow(x[0], x[1]),
-                x => x[1] * Math.Pow(x[0], x[1] - 1),
-                x => Math.Pow(x[0], x[1]) * Math.Log(x[0]) }, parser, "Pow(a, b)");
+                x => x[0] < 0 ? -Math.Pow(-x[0], x[1]) : Math.Pow(x[0], x[1]),
+                x => x[1] * Math.Pow(Math.Abs(x[0]), x[1] - 1),
+                x => Math.Pow(Math.Abs(x[0]), x[1]) * Math.Log(Math.Abs(x[0])) }, parser, "Pow(a, b)");
         }
 
         [Test]
@@ -251,15 +260,13 @@ namespace SpiceSharpBehavioralTests.Parsers
             var parser = Parser;
             Check(x => Math.Min(x, 1), parser, "Min(x, 1)");
             Check(new Func<double[], double>[] {
-                x => Math.Min((x[0] + 0.5) * (x[0] + 0.5), Math.Min(x[0] * x[0], (x[0] - 0.5) * (x[0] - 0.5))),
+                x => Math.Min(x[0] < 0 ? -x[0] * x[0] : x[0] * x[0], x[0]),
                 x =>
                 {
-                    if (x[0] < -0.25)
-                        return 2 * (x[0] + 0.5);
-                    if (x[0] < 0.25)
-                        return 2 * x[0];
-                    return 2 * (x[0] - 0.5);
-                }}, parser, "Min((a+0.5)^2, a^2, (a-0.5)^2)");
+                    if (x[0] < -1 || (x[0] > 0 && x[0] < 1))
+                        return Math.Abs(x[0]) * 2;
+                    return 1.0;
+                }}, parser, "Min(a^2, a)");
         }
 
         [Test]
@@ -268,15 +275,13 @@ namespace SpiceSharpBehavioralTests.Parsers
             var parser = Parser;
             Check(x => Math.Max(x, 1), parser, "Max(x, 1)");
             Check(new Func<double[], double>[] {
-                x => Math.Max(-(x[0] + 0.5) * (x[0] + 0.5), Math.Max(-x[0] * x[0], -(x[0] - 0.5) * (x[0] - 0.5))),
+                x => Math.Max(x[0] < 0 ? -x[0] * x[0] : x[0] * x[0], x[0]),
                 x =>
                 {
-                    if (x[0] < -0.25)
-                        return -2 * (x[0] + 0.5);
-                    if (x[0] < 0.25)
-                        return -2 * x[0];
-                    return -2 * (x[0] - 0.5);
-                }}, parser, "Max(-(a+0.5)^2, -a^2, -(a-0.5)^2)");
+                    if (x[0] > 1 || (x[0] < 0 && x[0] > -1))
+                        return Math.Abs(x[0]) * 2;
+                    return 1.0;
+                }}, parser, "Max(a^2, a)");
         }
     }
 }

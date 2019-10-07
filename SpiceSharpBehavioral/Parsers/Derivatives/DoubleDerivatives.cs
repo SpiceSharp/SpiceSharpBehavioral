@@ -53,7 +53,7 @@ namespace SpiceSharpBehavioral.Parsers
             var result = new DoubleDerivatives(size);
             var a0 = this[0];
             var b0 = exponent[0];
-            result[0] = () => Math.Pow(a0(), b0());
+            result[0] = () => SafePow(a0(), b0());
             for (var i = 1; i < size; i++)
             {
                 if (this[i] != null && exponent[i] != null)
@@ -64,9 +64,9 @@ namespace SpiceSharpBehavioral.Parsers
                     var bi = exponent[i];
                     result[i] = () =>
                     {
-                        var tmpa0 = a0();
+                        var tmpa0 = Math.Abs(a0());
                         var tmpb0 = b0();
-                        return tmpb0 * Math.Pow(tmpa0, tmpb0 - 1) * ai() + Math.Pow(tmpa0, tmpb0) * Math.Log(tmpa0) * bi();
+                        return SafePow(tmpa0, tmpb0 - 1) * tmpb0 * ai() + SafePow(tmpa0, tmpb0) * Math.Log(tmpa0) * bi();
                     };
                 }
                 else if (this[i] != null)
@@ -75,8 +75,9 @@ namespace SpiceSharpBehavioral.Parsers
                     var ai = this[i];
                     result[i] = () =>
                     {
-                        var tmp = b0();
-                        return tmp * ai() * Math.Pow(a0(), tmp - 1);
+                        var tmpa0 = Math.Abs(a0());
+                        var tmpb0 = b0();
+                        return SafePow(tmpa0, tmpb0 - 1) * tmpb0 * ai();
                     };
                 }
                 else if (exponent[i] != null)
@@ -85,13 +86,28 @@ namespace SpiceSharpBehavioral.Parsers
                     var bi = exponent[i];
                     result[i] = () =>
                     {
-                        var tmpa0 = a0();
+                        var tmpa0 = Math.Abs(a0());
                         var tmpb0 = b0();
-                        return Math.Pow(tmpa0, tmpb0) * Math.Log(tmpa0) * bi();
+                        return SafePow(tmpa0, tmpb0) * Math.Log(tmpa0) * bi();
                     };
                 }
             }
             return result;
+        }
+
+        /// <summary>
+        /// Safe version of computing powers.
+        /// </summary>
+        /// <param name="a">The base.</param>
+        /// <param name="b">The exponent.</param>
+        /// <returns></returns>
+        public static double SafePow(double a, double b)
+        {
+            if (a.Equals(0.0) && b < 0)
+                a += FudgeFactor;
+            if (a < 0)
+                return -Math.Pow(-a, b);
+            return Math.Pow(a, b);
         }
 
         /// <summary>
@@ -143,7 +159,7 @@ namespace SpiceSharpBehavioral.Parsers
             {
                 var arg2 = iftrue[i] ?? (() => 0.0);
                 var arg3 = iffalse[i] ?? (() => 0.0);
-                result[i] = () => arg().Equals(0.0) ? arg2() : arg3();
+                result[i] = () => arg().Equals(0.0) ? arg3() : arg2();
             }
             return result;
         }
@@ -299,7 +315,7 @@ namespace SpiceSharpBehavioral.Parsers
             var result = new DoubleDerivatives(size);
             var a0 = this[0];
             var b0 = b[0];
-            result[0] = () => a0() / b0();
+            result[0] = () => SafeDivide(a0(), b0());
             for (var i = 1; i < size; i++)
             {
                 var ai = this[i];
@@ -308,18 +324,33 @@ namespace SpiceSharpBehavioral.Parsers
                     result[i] = () =>
                     {
                         var denom = b0();
-                        return (denom * ai() - a0() * bi()) / denom / denom;
+                        return SafeDivide(denom * ai() - a0() * bi(), denom * denom);
                     };
                 else if (ai != null)
-                    result[i] = () => ai() / b0();
+                    result[i] = () => SafeDivide(ai(), b0());
                 else if (bi != null)
                     result[i] = () =>
                     {
                         var denom = b0();
-                        return -a0() * bi() / denom / denom;
+                        return -SafeDivide(a0() * bi(), denom * denom);
                     };
             }
             return result;
+        }
+
+        /// <summary>
+        /// Safe version of division where division by 0 is avoided.
+        /// </summary>
+        /// <param name="a">The numerator.</param>
+        /// <param name="b">The denominator.</param>
+        /// <returns></returns>
+        private static double SafeDivide(double a, double b)
+        {
+            if (b >= 0)
+                b += FudgeFactor;
+            else
+                b -= FudgeFactor;
+            return a / b;
         }
 
         /// <summary>
