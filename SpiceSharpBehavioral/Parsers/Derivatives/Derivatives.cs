@@ -12,6 +12,19 @@ namespace SpiceSharpBehavioral.Parsers
         private T[] _derivatives;
 
         /// <summary>
+        /// Gets or sets the fudge factor for numerical edge-cases.
+        /// </summary>
+        /// <remarks>
+        /// One should not be able to divide by 0, or raise 0 to a negative power. However, the simulator
+        /// may not know this, so we introduce a fudge factor to remove this.
+        /// If the exact solution is expected, use 0 as the fudge factor.
+        /// </remarks>
+        /// <value>
+        /// The fudge factor.
+        /// </value>
+        public static double FudgeFactor { get; set; } = 1e-30;
+
+        /// <summary>
         /// Gets the number of derivatives.
         /// </summary>
         /// <value>

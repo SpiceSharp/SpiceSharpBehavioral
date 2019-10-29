@@ -27,12 +27,22 @@ namespace SpiceSharpBehavioral.Parsers
         /// <summary>
         /// Method info for Pow().
         /// </summary>
-        public static readonly MethodInfo PowInfo = typeof(Math).GetTypeInfo().GetMethod("Pow", new[] { typeof(double), typeof(double) });
+        public static readonly MethodInfo PowInfo = typeof(ExpressionTreeDerivatives).GetTypeInfo().GetMethod("SafePow", new[] { typeof(double), typeof(double) });
+
+        /// <summary>
+        /// Method info for Abs().
+        /// </summary>
+        public static readonly MethodInfo AbsInfo = typeof(Math).GetTypeInfo().GetMethod("Abs", new[] { typeof(double) });
 
         /// <summary>
         /// Method info for Square().
         /// </summary>
         public static readonly MethodInfo SquareInfo = typeof(ExpressionTreeDerivatives).GetTypeInfo().GetMethod("Square", new[] { typeof(double) });
+
+        /// <summary>
+        /// Method for division.
+        /// </summary>
+        private static readonly MethodInfo Division = typeof(ExpressionTreeDerivatives).GetTypeInfo().GetMethod("SafeDivide", new[] { typeof(double), typeof(double) });
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExpressionTreeDerivatives"/>.
@@ -167,11 +177,11 @@ namespace SpiceSharpBehavioral.Parsers
             if (a0 == null && b0 == null)
             {
                 // This doesn't make much sense (0^0 is invalid) but Math.Pow does it like that so we will too
-                result[0] = Expression.Constant(1.0);
+                result[0] = One;
                 return result;
             }
             if (a0 == null)
-                a0 = Expression.Constant(0.0);
+                a0 = Zero;
             if (b0 == null)
             {
                 // (fx)^0 = 1
@@ -179,6 +189,8 @@ namespace SpiceSharpBehavioral.Parsers
                 return result;
             }
             result[0] = Expression.Call(PowInfo, a0, b0);
+            if (a0 != One && a0 != Zero)
+                a0 = Expression.Call(AbsInfo, a0);
             for (var i = 1; i < size; i++)
             {
                 // (fx^b)' = b * fx^(b-1) * f'x
@@ -192,13 +204,28 @@ namespace SpiceSharpBehavioral.Parsers
                 // = fx^(gx-1)*f'x + fx^gx*ln(fx)*g'x
                 if (exponent[i] != null)
                 {
-                    var contribution = Expression.Multiply(result[0], Expression.Multiply(
-                        Expression.Call(LogInfo, a0), exponent[i]));
+                    var contribution = Expression.Multiply(Expression.Call(PowInfo, a0, b0),
+                        Expression.Multiply(Expression.Call(LogInfo, a0), exponent[i]));
                     result[i] = result[i] == null ? contribution :
                         Expression.Add(result[i], contribution);
                 }
             }
             return result;
+        }
+
+        /// <summary>
+        /// Safe version of computing powers.
+        /// </summary>
+        /// <param name="a">The base.</param>
+        /// <param name="b">The exponent.</param>
+        /// <returns></returns>
+        public static double SafePow(double a, double b)
+        {
+            if (a.Equals(0.0) && b < 0)
+                a += FudgeFactor;
+            if (a < 0)
+                return -Math.Pow(-a, b);
+            return Math.Pow(a, b);
         }
 
         /// <summary>
@@ -379,7 +406,7 @@ namespace SpiceSharpBehavioral.Parsers
                 return null;
             if (b0 == null)
                 throw new DivideByZeroException();
-            result[0] = Expression.Divide(a0, b0);
+            result[0] = Expression.Call(Division, a0, b0);
             for (var i = 1; i < size; i++)
             {
                 if (this[i] == null)
@@ -388,7 +415,7 @@ namespace SpiceSharpBehavioral.Parsers
                         result[i] = null;
                     else
                         // (a/gx)' = -a/gx^2*g'x
-                        result[i] = Expression.Divide(
+                        result[i] = Expression.Call(Division,
                             Expression.Negate(Expression.Multiply(a0, b[i])),
                             Expression.Call(SquareInfo, b0));
                 }
@@ -396,10 +423,10 @@ namespace SpiceSharpBehavioral.Parsers
                 {
                     if (b[i] == null)
                         // (fx/b)' = f'x/b
-                        result[i] = Expression.Divide(this[i], b0);
+                        result[i] = Expression.Call(Division, this[i], b0);
                     else
                         // (fx/gx)' = (f'x*gx-fx*g'x)/gx^2
-                        result[i] = Expression.Divide(
+                        result[i] = Expression.Call(Division,
                             Expression.Subtract(
                                 Expression.Multiply(this[i], b0),
                                 Expression.Multiply(a0, b[i])),
@@ -409,6 +436,21 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
+        /// <summary>
+        /// Safe version of division where division by 0 is avoided.
+        /// </summary>
+        /// <param name="a">The numerator.</param>
+        /// <param name="b">The denominator.</param>
+        /// <returns></returns>
+        public static double SafeDivide(double a, double b)
+        {
+            if (b >= 0)
+                b += FudgeFactor;
+            else
+                b -= FudgeFactor;
+            return a / b;
+        }
+        
         /// <summary>
         /// Modulo operation on derivatives.
         /// </summary>

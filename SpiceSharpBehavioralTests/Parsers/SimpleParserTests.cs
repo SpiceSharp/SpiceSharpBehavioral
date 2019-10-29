@@ -60,6 +60,14 @@ namespace SpiceSharpBehavioralTests.Parsers
             Check(2 * (2 + 3) * 4, parser.Parse("2 * ((2 + 3)) * 4"));
         }
 
+        [Test]
+        public void When_Conditional_Expect_Reference()
+        {
+            var parser = new SimpleParser();
+            Check(1, parser.Parse("1 >= 0 ? 1 : 2"));
+            Check(2, parser.Parse("1 >= 3 ? 1 : 2"));
+        }
+
         private SimpleParser Parser
         {
             get
