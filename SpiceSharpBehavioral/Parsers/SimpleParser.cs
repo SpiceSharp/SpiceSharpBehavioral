@@ -31,6 +31,11 @@ namespace SpiceSharpBehavioral.Parsers
         private Stack<double> _stack = new Stack<double>();
 
         /// <summary>
+        /// The tolerance for equality.
+        /// </summary>
+        public double EqualityTolerance { get; set; } = 0.0;
+
+        /// <summary>
         /// Parse an expression.
         /// </summary>
         /// <param name="expression">The expression.</param>
@@ -145,6 +150,16 @@ namespace SpiceSharpBehavioral.Parsers
                             b = _stack.Pop();
                             a = _stack.Pop();
                             _stack.Push(a <= b ? 1.0 : 0.0);
+                            break;
+                        case OperatorType.IsEqual:
+                            b = _stack.Pop();
+                            a = _stack.Pop();
+                            _stack.Push(Math.Abs(a - b) <= EqualityTolerance ? 1.0 : 0.0);
+                            break;
+                        case OperatorType.IsNotEqual:
+                            b = _stack.Pop();
+                            a = _stack.Pop();
+                            _stack.Push(Math.Abs(a - b) > EqualityTolerance ? 1.0 : 0.0);
                             break;
                         default:
                             throw new ParserException("Unimplemented arithmetic operator", Input, Index);

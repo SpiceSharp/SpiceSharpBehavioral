@@ -68,6 +68,40 @@ namespace SpiceSharpBehavioralTests.Parsers
             Check(2, parser.Parse("1 >= 3 ? 1 : 2"));
         }
 
+        [Test]
+        public void When_Equal_Expect_Reference()
+        {
+            var parser = new SimpleParser();
+            Check(1, parser.Parse("3 == 3 ? 1 : 2"));
+            Check(2, parser.Parse("3 == 5 ? 1 : 2"));
+        }
+
+
+        [Test]
+        public void When_NotEqual_Expect_Reference()
+        {
+            var parser = new SimpleParser();
+            Check(1, parser.Parse("3 != 5 ? 1 : 2"));
+            Check(2, parser.Parse("3 != 3 ? 1 : 2"));
+        }
+
+        [Test]
+        public void When_NotEqual_With_NonZeroTolerance_Expect_Reference()
+        {
+            var parser = new SimpleParser();
+            parser.EqualityTolerance = 0.1;
+            Check(1, parser.Parse("3 != 4.05 ? 1 : 2"));
+            Check(2, parser.Parse("3 != 3.05 ? 1 : 2"));
+        }
+
+        [Test]
+        public void When_Equal_With_NonZeroTolerance_Expect_Reference()
+        {
+            var parser = new SimpleParser();
+            parser.EqualityTolerance = 0.1;
+            Check(1, parser.Parse("3 == 3.05 ? 1 : 2"));
+        }
+
         private SimpleParser Parser
         {
             get
