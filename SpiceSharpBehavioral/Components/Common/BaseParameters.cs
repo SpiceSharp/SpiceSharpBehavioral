@@ -1,9 +1,11 @@
-﻿using SpiceSharp;
+﻿using System;
+using SpiceSharp;
 using SpiceSharp.Attributes;
 using SpiceSharpBehavioral.Parsers;
 using System.Collections.Generic;
 using SpiceSharpBehavioral.Parsers.Helper;
 using SpiceSharp.Circuits;
+using SpiceSharp.Simulations;
 
 namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
 {
@@ -22,7 +24,7 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         /// Gets or sets the parser used to parse the expression.
         /// </summary>
         [ParameterName("parser"), ParameterInfo("The parser that is used to parse the expression")]
-        public ISpiceDerivativeParser<double> Parser { get; set; }
+        public Func<Simulation, ISpiceDerivativeParser<double>> Parser { get; set; }
 
         /// <summary>
         /// Gets or sets the comparer for Spice properties.
@@ -52,7 +54,7 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
             {
                 var parser = new SimpleDerivativeParser();
                 parser.RegisterDefaultFunctions();
-                Parser = parser;
+                Parser = (Simulation s) => parser;
             }
         }
     }

@@ -18,7 +18,7 @@ namespace SpiceSharpBehavioralTests.Components
                 new VoltageSource("V1", "in", "0", 1),
                 new BehavioralCurrentSource("H1", "out", "0", "V(in) + V(in) + 10 "),
                 new Resistor("Rl", "out", "0", 1));
-            ckt["H1"].SetParameter("parser", new SimpleDerivativeParser());
+            ckt["H1"].SetParameter<Func<Simulation, ISpiceDerivativeParser<double>>>("parser", (Simulation sim) => new SimpleDerivativeParser(), null);
 
             var op = new OP("op");
 
