@@ -16,13 +16,13 @@
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../styles/docfx.css">
     <link rel="stylesheet" href="../styles/main.css">
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     
     
-  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -188,6 +188,36 @@
       </tr>
     </tbody>
   </table>
+  <a id="SpiceSharpBehavioral_Parsers_Derivatives_1_FudgeFactor_" data-uid="SpiceSharpBehavioral.Parsers.Derivatives`1.FudgeFactor*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Derivatives_1_FudgeFactor" data-uid="SpiceSharpBehavioral.Parsers.Derivatives`1.FudgeFactor">FudgeFactor</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the fudge factor for numerical edge-cases.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static double FudgeFactor { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Double</span></td>
+        <td><p>The fudge factor.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 id="SpiceSharpBehavioral_Parsers_Derivatives_1_FudgeFactor_remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>One should not be able to divide by 0, or raise 0 to a negative power. However, the simulator
+may not know this, so we introduce a fudge factor to remove this.
+If the exact solution is expected, use 0 as the fudge factor.</p>
+</div>
   <a id="SpiceSharpBehavioral_Parsers_Derivatives_1_Item_" data-uid="SpiceSharpBehavioral.Parsers.Derivatives`1.Item*"></a>
   <h4 id="SpiceSharpBehavioral_Parsers_Derivatives_1_Item_System_Int32_" data-uid="SpiceSharpBehavioral.Parsers.Derivatives`1.Item(System.Int32)">Item[Int32]</h4>
   <div class="markdown level1 summary"><p>Gets or sets the derivative at the specified index.</p>

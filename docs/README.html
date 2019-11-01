@@ -14,13 +14,13 @@
     <link rel="stylesheet" href="styles/docfx.vendor.css">
     <link rel="stylesheet" href="styles/docfx.css">
     <link rel="stylesheet" href="styles/main.css">
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
     <meta property="docfx:navrel" content="toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     
     
-  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -63,14 +63,9 @@
 <h1 id="spicesharpbehavioral">SpiceSharpBehavioral</h1>
 
 <p>This library extends Spice# components with behavioral sources for modelling electronics circuits.</p>
-<h2 id="how-does-it-work">How does it work?</h2>
-<p>The parser uses Dijkstra&#39;s Shunting-Yard algorithm to parse the expressions into LINQ expression trees. It automatically constructs derivatives to other unknown variables (eg. &quot;V(in)&quot;), to be able to correctly load the Y-matrix and Rhs-vector each iteration. Still, there are some things it <em>cannot</em> do:</p>
-<ul>
-<li><strong>Unsolvable circuits</strong> can occur. It becomes possible to bias circuits in impossible situations. For example, a component that does not dissipate power (but generates is), will cause the simulator to possibly throw cryptic exceptions as the circuit experiences a meltdown.</li>
-<li><strong>Unstable circuits</strong>. Nonlinear devices are notorious when it comes to convergence or numerical stability. For example, an exponential curve is known to converge very slowly for diodes, so Spice# implements a number of &quot;tricks&quot; to aid convergence. Using this library means that these &quot;tricks&quot; are now also to the user to implement.</li>
-</ul>
-<p>Please use the library with care.</p>
-<h2 id="usage">Usage</h2>
+<h2 id="documentation">Documentation</h2>
+<p>The API can be found <a href="https://spicesharp.github.io/SpiceSharpBehavioral/">here</a></p>
+<h2 id="quickstart">Quickstart</h2>
 <p>Including this library allows you to use two extra components:</p>
 <ul>
 <li><code>BehavioralVoltageSource</code></li>
@@ -101,62 +96,48 @@ namespace Example
         }
     }
 }
-</code></pre><p>The parser is exposed as a parameter of the behavioral source. It is possible to register for parser events to extend its functionality. You have:</p>
+</code></pre><h2 id="installation">Installation</h2>
+<p>Spice#.Behavioral is available as a NuGet package.</p>
+<p><a href="https://www.nuget.org/packages/SpiceSharpBehavioral/"><img src="https://buildstats.info/nuget/spicesharpbehavioral" alt="NuGet Badge"></a> Spice#.Behavioral</p>
+<h2 id="how-does-it-work">How does it work?</h2>
+<p>The parser parses expressions into functions. It automatically constructs derivatives to other unknown variables (eg. &quot;V(in)&quot;), to be able to correctly load the Y-matrix and Rhs-vector each iteration. Still, there are some things it <em>cannot</em> do:</p>
 <ul>
-<li><code>VariableFound</code> for defining variables that can be used.</li>
-<li><code>FunctionFound</code> if you want to define mathematical functions in your expressions.</li>
-<li><code>SpicePropertyFound</code> if you want to add address <code>V(...)</code>, <code>I(...)</code> or <code>@...[...]</code> expressions.</li>
+<li><strong>Unsolvable circuits</strong> can occur. It becomes possible to bias circuits in impossible situations. For example, a component that does not dissipate power (but generates is), will cause the simulator to possibly throw cryptic exceptions as the circuit experiences a meltdown.</li>
+<li><strong>Unstable circuits</strong>. Nonlinear devices are notorious when it comes to convergence or numerical stability. For example, an exponential curve is known to converge very slowly for diodes, so Spice# implements a number of &quot;tricks&quot; to aid convergence. Using this library means that these &quot;tricks&quot; are now also to the user to implement.</li>
 </ul>
-<p>This example extends the parser to detect an exponential.</p>
-<pre><code class="lang-csharp">using System;
-using System.Linq.Expressions;
-using System.Reflection;
-using SpiceSharp;
-using SpiceSharp.Components;
-using SpiceSharp.Simulations;
-using SpiceSharpBehavioral.Parsers;
-
-namespace Example2
-{
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            var ckt = new Circuit(
-                new VoltageSource(&quot;V1&quot;, &quot;in&quot;, &quot;0&quot;, 0.0),
-                new BehavioralVoltageSource(&quot;A1&quot;, &quot;out&quot;, &quot;0&quot;, &quot;Exp(V(in))&quot;));
-            var parser = new ExpressionTreeDerivativeParser();
-            parser.FunctionFound += (sender, e) =&gt;
-            {
-                if (e.Name == &quot;Exp&quot;)
-                {
-                    var arg = e[0];
-                    var result = new ExpressionTreeDerivatives(arg.Count);
-
-                    // Index 0 contains the actual function value
-                    result[0] = Expression.Call(typeof(Math).GetTypeInfo().GetMethod(&quot;Exp&quot;), arg[0]);
-
-                    // The other indices contain the derivatives, for which we need to apply the chain rule:
-                    // f(g(x))&#39; = f&#39;(g(x)) * g&#39;(x)
-                    for (var i = 1; i &lt; arg.Count; i++)
-                        result[i] = arg[i] == null ? null : Expression.Multiply(arg[i], result[0]);
-                    e.Result = result;
-                }
-            };
-            ckt[&quot;A1&quot;].SetParameter(&quot;parser&quot;, parser);
-
-            var dc = new DC(&quot;dc&quot;, &quot;V1&quot;, -1, 1, 0.1);
-            dc.ExportSimulationData += (sender, e) =&gt;
-            {
-                Console.WriteLine(e.GetVoltage(&quot;out&quot;));
-            };
-            dc.Run(ckt);
-            Console.ReadKey();
-        }
-    }
-}
-</code></pre><p>A list of differentiable functions have been implemented for convenience through the use of extension methods. Include the namespace <code>SpiceSharpBehavioral.Parsers.Helper</code> to enable the method <code>RegisterDefaultFunctions()</code> on a parser.</p>
-<p>Defining a mathematical function will inevitably require you to also think about how its derivative should behave. If the derivative is chosen well, then the simulator will more likely converge quickly to the right value. The example also shows that you require access to LINQ expressions.</p>
+<p>Please use the library with care.</p>
+<h2 id="current-build-status">Current build status</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:right">Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">AppVeyor CI (Windows)</td>
+<td style="text-align:right"><a href="https://ci.appveyor.com/project/SpiceSharp/spicesharpbehavioral/branch/master"><img src="https://ci.appveyor.com/api/projects/status/1olsxasmk451200k/branch/master?svg=true" alt="Build status"></a></td>
+</tr>
+<tr>
+<td style="text-align:left">Travis CI (Linux/iOS/Mono)</td>
+<td style="text-align:right"><a href="https://travis-ci.org/SpiceSharp/SpiceSharpBehavioral"><img src="https://travis-ci.org/SpiceSharp/SpiceSharpBehavioral.svg?branch=master" alt="Build Status"></a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="aim-of-spicebehavioral">Aim of Spice#.Behavioral?</h2>
+<p>The aim is to provide an easier way of prototyping models in the Spice# simulator. While it is technically possible for anyone to extend Spice# with custom models and components to have full control over its behaviors, Spice#.Behavioral takes away a lot of that work.</p>
+<p>Advantages:</p>
+<ul>
+<li>No prior knowledge needed about Newton-Raphson, Modified Nodal Analysis, etc.</li>
+<li>No need for calculating derivatives by hand for models.</li>
+<li>Changing models is likely easier and faster.</li>
+</ul>
+<p>Disadvantages:</p>
+<ul>
+<li>General performance can be sub-optimal.</li>
+<li>It may be unclear for the inexperienced user why a simulation may be unstable or badly behaving.</li>
+</ul>
 </article>
           </div>
           
