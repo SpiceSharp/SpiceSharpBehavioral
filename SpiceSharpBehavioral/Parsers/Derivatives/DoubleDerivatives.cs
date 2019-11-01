@@ -174,7 +174,7 @@ namespace SpiceSharpBehavioral.Parsers
             var result = new DoubleDerivatives();
             var arg1 = this[0];
             var arg2 = other[0];
-            result[0] = () => arg1.Equals(arg2) ? 1 : 0;
+            result[0] = () => arg1().Equals(arg2()) ? 1 : 0;
             return result;
         }
 
