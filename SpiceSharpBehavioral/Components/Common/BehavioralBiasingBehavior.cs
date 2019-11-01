@@ -70,7 +70,7 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
             BaseParameters = context.GetParameterSet<BaseParameters>();
 
             // We are now going to parse the expression
-            var parser = BaseParameters.Parser.ThrowIfNull("Parser");
+            var parser = BaseParameters.Parser.ThrowIfNull("Parser")(simulation);
             var variables = simulation.Variables;
 
             // We want to keep track of derivatives, and which column they map to
