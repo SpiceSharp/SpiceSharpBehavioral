@@ -247,6 +247,14 @@ namespace SpiceSharpBehavioralTests.Parsers
         }
 
         [Test]
+        public void When_Abs_NotSimpleArgument_Expect_Reference()
+        {
+            var parser = Parser;
+            Check(new Func<double[], double>[] { x => Math.Abs(2 * x[0]), x => x[0] > 0 ? 2 : x[0] < 0 ? -2 : 0 }, parser, "Abs(2*a)");
+        }
+
+
+        [Test]
         public void When_Round_Expect_Reference()
         {
             var parser = Parser;

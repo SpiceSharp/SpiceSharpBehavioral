@@ -402,7 +402,7 @@ namespace SpiceSharpBehavioral.Parsers.Helper
                     result[i] = () =>
                     {
                         var tmp = a0();
-                        return tmp > 0 ? 1 : tmp < 0 ? -1 : 0;
+                        return tmp > 0 ? ai() : tmp < 0 ? -ai() : 0;
                     };
                 }
             }
