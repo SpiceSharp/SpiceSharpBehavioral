@@ -44,6 +44,7 @@ namespace SpiceSharpBehavioral.Parsers
             if (index > 0)
                 result[index] = Expression.Constant(derivative);
             Result = result;
+            Applied = true;
         }
     }
 }

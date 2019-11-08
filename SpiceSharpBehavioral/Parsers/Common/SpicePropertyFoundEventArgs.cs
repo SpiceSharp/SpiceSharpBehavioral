@@ -15,6 +15,11 @@ namespace SpiceSharpBehavioral.Parsers
         public SpiceProperty Property { get; }
 
         /// <summary>
+        /// Gets or sets whether the method has been applied or not.
+        /// </summary>
+        public bool Applied { get; protected set; }
+
+        /// <summary>
         /// Apply a method as the result.
         /// </summary>
         /// <param name="value">The function that returns the value for the current iteration.</param>

@@ -40,6 +40,7 @@ namespace SpiceSharpBehavioral.Parsers
             if (index > 0)
                 result[index] = () => derivative;
             Result = result;
+            Applied = true;
         }
     }
 }

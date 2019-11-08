@@ -34,6 +34,7 @@ namespace SpiceSharpBehavioral.Parsers
         public override void Apply(Func<double> value, int index, double derivative)
         {
             Result = Expression.Call(Expression.Constant(value), InvokeMethod);
+            Applied = true;
         }
     }
 }

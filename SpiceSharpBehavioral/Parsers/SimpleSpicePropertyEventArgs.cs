@@ -48,7 +48,10 @@ namespace SpiceSharpBehavioral.Parsers
         public override void Apply(Func<double> value, int index, double derivative)
         {
             if (value != null)
+            {
                 Result = value();
+                Applied = true;
+            }
         }
     }
 }
