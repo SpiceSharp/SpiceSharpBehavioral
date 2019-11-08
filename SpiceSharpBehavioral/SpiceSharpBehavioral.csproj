@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard1.5;netstandard2.0;net45;netcoreapp2.0</TargetFrameworks>
-    <Version>1.1.2</Version>
+    <Version>1.1.4</Version>
     <Authors>Sven Boulanger</Authors>
 	  <Title>Spice#.Behavioral</Title>
     <Description>Spice#.Behavioral is a library that allows using behavioral components in the circuit simulator Spice#.</Description>
@@ -11,12 +11,12 @@
     <RepositoryUrl>https://github.com/SpiceSharp/SpiceSharpBehavioral</RepositoryUrl>
     <PackageTags>circuit electronics netlist parser spice simulator simulation ode solver design behavioral modeling</PackageTags>
     <PackageIconUrl>https://raw.githubusercontent.com/SpiceSharp/SpiceSharp/master/api/images/logo_full.svg?sanitize=true</PackageIconUrl>
-    <AssemblyVersion>1.1.2.0</AssemblyVersion>
+    <AssemblyVersion>1.1.4.0</AssemblyVersion>
     <PackageReleaseNotes>Refer to the GitHub release for release notes.</PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Company />
     <NeutralLanguage>en</NeutralLanguage>
-    <FileVersion>1.1.2.0</FileVersion>
+    <FileVersion>1.1.4.0</FileVersion>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

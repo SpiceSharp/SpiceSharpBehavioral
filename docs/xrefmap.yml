@@ -1133,6 +1133,23 @@ references:
   fullName.vb: SpiceSharpBehavioral.Parsers.Derivatives(Of T).Equals
   nameWithType: Derivatives<T>.Equals
   nameWithType.vb: Derivatives(Of T).Equals
+- uid: SpiceSharpBehavioral.Parsers.Derivatives`1.FudgeFactor
+  name: FudgeFactor
+  href: api/SpiceSharpBehavioral.Parsers.Derivatives-1.html#SpiceSharpBehavioral_Parsers_Derivatives_1_FudgeFactor
+  commentId: P:SpiceSharpBehavioral.Parsers.Derivatives`1.FudgeFactor
+  fullName: SpiceSharpBehavioral.Parsers.Derivatives<T>.FudgeFactor
+  fullName.vb: SpiceSharpBehavioral.Parsers.Derivatives(Of T).FudgeFactor
+  nameWithType: Derivatives<T>.FudgeFactor
+  nameWithType.vb: Derivatives(Of T).FudgeFactor
+- uid: SpiceSharpBehavioral.Parsers.Derivatives`1.FudgeFactor*
+  name: FudgeFactor
+  href: api/SpiceSharpBehavioral.Parsers.Derivatives-1.html#SpiceSharpBehavioral_Parsers_Derivatives_1_FudgeFactor_
+  commentId: Overload:SpiceSharpBehavioral.Parsers.Derivatives`1.FudgeFactor
+  isSpec: "True"
+  fullName: SpiceSharpBehavioral.Parsers.Derivatives<T>.FudgeFactor
+  fullName.vb: SpiceSharpBehavioral.Parsers.Derivatives(Of T).FudgeFactor
+  nameWithType: Derivatives<T>.FudgeFactor
+  nameWithType.vb: Derivatives(Of T).FudgeFactor
 - uid: SpiceSharpBehavioral.Parsers.Derivatives`1.GetHashCode
   name: GetHashCode()
   href: api/SpiceSharpBehavioral.Parsers.Derivatives-1.html#SpiceSharpBehavioral_Parsers_Derivatives_1_GetHashCode
@@ -1718,6 +1735,19 @@ references:
   isSpec: "True"
   fullName: SpiceSharpBehavioral.Parsers.DoubleDerivatives.Pow
   nameWithType: DoubleDerivatives.Pow
+- uid: SpiceSharpBehavioral.Parsers.DoubleDerivatives.SafePow(System.Double,System.Double)
+  name: SafePow(Double, Double)
+  href: api/SpiceSharpBehavioral.Parsers.DoubleDerivatives.html#SpiceSharpBehavioral_Parsers_DoubleDerivatives_SafePow_System_Double_System_Double_
+  commentId: M:SpiceSharpBehavioral.Parsers.DoubleDerivatives.SafePow(System.Double,System.Double)
+  fullName: SpiceSharpBehavioral.Parsers.DoubleDerivatives.SafePow(System.Double, System.Double)
+  nameWithType: DoubleDerivatives.SafePow(Double, Double)
+- uid: SpiceSharpBehavioral.Parsers.DoubleDerivatives.SafePow*
+  name: SafePow
+  href: api/SpiceSharpBehavioral.Parsers.DoubleDerivatives.html#SpiceSharpBehavioral_Parsers_DoubleDerivatives_SafePow_
+  commentId: Overload:SpiceSharpBehavioral.Parsers.DoubleDerivatives.SafePow
+  isSpec: "True"
+  fullName: SpiceSharpBehavioral.Parsers.DoubleDerivatives.SafePow
+  nameWithType: DoubleDerivatives.SafePow
 - uid: SpiceSharpBehavioral.Parsers.DoubleDerivatives.Subtract(SpiceSharpBehavioral.Parsers.Derivatives{System.Func{System.Double}})
   name: Subtract(Derivatives<Func<Double>>)
   href: api/SpiceSharpBehavioral.Parsers.DoubleDerivatives.html#SpiceSharpBehavioral_Parsers_DoubleDerivatives_Subtract_SpiceSharpBehavioral_Parsers_Derivatives_System_Func_System_Double___
@@ -1913,6 +1943,12 @@ references:
   isSpec: "True"
   fullName: SpiceSharpBehavioral.Parsers.ExpressionTreeDerivatives.ExpressionTreeDerivatives
   nameWithType: ExpressionTreeDerivatives.ExpressionTreeDerivatives
+- uid: SpiceSharpBehavioral.Parsers.ExpressionTreeDerivatives.AbsInfo
+  name: AbsInfo
+  href: api/SpiceSharpBehavioral.Parsers.ExpressionTreeDerivatives.html#SpiceSharpBehavioral_Parsers_ExpressionTreeDerivatives_AbsInfo
+  commentId: F:SpiceSharpBehavioral.Parsers.ExpressionTreeDerivatives.AbsInfo
+  fullName: SpiceSharpBehavioral.Parsers.ExpressionTreeDerivatives.AbsInfo
+  nameWithType: ExpressionTreeDerivatives.AbsInfo
 - uid: SpiceSharpBehavioral.Parsers.ExpressionTreeDerivatives.Add(SpiceSharpBehavioral.Parsers.Derivatives{System.Linq.Expressions.Expression})
   name: Add(Derivatives<Expression>)
   href: api/SpiceSharpBehavioral.Parsers.ExpressionTreeDerivatives.html#SpiceSharpBehavioral_Parsers_ExpressionTreeDerivatives_Add_SpiceSharpBehavioral_Parsers_Derivatives_System_Linq_Expressions_Expression__
@@ -2220,6 +2256,32 @@ references:
   commentId: F:SpiceSharpBehavioral.Parsers.ExpressionTreeDerivatives.PowInfo
   fullName: SpiceSharpBehavioral.Parsers.ExpressionTreeDerivatives.PowInfo
   nameWithType: ExpressionTreeDerivatives.PowInfo
+- uid: SpiceSharpBehavioral.Parsers.ExpressionTreeDerivatives.SafeDivide(System.Double,System.Double)
+  name: SafeDivide(Double, Double)
+  href: api/SpiceSharpBehavioral.Parsers.ExpressionTreeDerivatives.html#SpiceSharpBehavioral_Parsers_ExpressionTreeDerivatives_SafeDivide_System_Double_System_Double_
+  commentId: M:SpiceSharpBehavioral.Parsers.ExpressionTreeDerivatives.SafeDivide(System.Double,System.Double)
+  fullName: SpiceSharpBehavioral.Parsers.ExpressionTreeDerivatives.SafeDivide(System.Double, System.Double)
+  nameWithType: ExpressionTreeDerivatives.SafeDivide(Double, Double)
+- uid: SpiceSharpBehavioral.Parsers.ExpressionTreeDerivatives.SafeDivide*
+  name: SafeDivide
+  href: api/SpiceSharpBehavioral.Parsers.ExpressionTreeDerivatives.html#SpiceSharpBehavioral_Parsers_ExpressionTreeDerivatives_SafeDivide_
+  commentId: Overload:SpiceSharpBehavioral.Parsers.ExpressionTreeDerivatives.SafeDivide
+  isSpec: "True"
+  fullName: SpiceSharpBehavioral.Parsers.ExpressionTreeDerivatives.SafeDivide
+  nameWithType: ExpressionTreeDerivatives.SafeDivide
+- uid: SpiceSharpBehavioral.Parsers.ExpressionTreeDerivatives.SafePow(System.Double,System.Double)
+  name: SafePow(Double, Double)
+  href: api/SpiceSharpBehavioral.Parsers.ExpressionTreeDerivatives.html#SpiceSharpBehavioral_Parsers_ExpressionTreeDerivatives_SafePow_System_Double_System_Double_
+  commentId: M:SpiceSharpBehavioral.Parsers.ExpressionTreeDerivatives.SafePow(System.Double,System.Double)
+  fullName: SpiceSharpBehavioral.Parsers.ExpressionTreeDerivatives.SafePow(System.Double, System.Double)
+  nameWithType: ExpressionTreeDerivatives.SafePow(Double, Double)
+- uid: SpiceSharpBehavioral.Parsers.ExpressionTreeDerivatives.SafePow*
+  name: SafePow
+  href: api/SpiceSharpBehavioral.Parsers.ExpressionTreeDerivatives.html#SpiceSharpBehavioral_Parsers_ExpressionTreeDerivatives_SafePow_
+  commentId: Overload:SpiceSharpBehavioral.Parsers.ExpressionTreeDerivatives.SafePow
+  isSpec: "True"
+  fullName: SpiceSharpBehavioral.Parsers.ExpressionTreeDerivatives.SafePow
+  nameWithType: ExpressionTreeDerivatives.SafePow
 - uid: SpiceSharpBehavioral.Parsers.ExpressionTreeDerivatives.Square(System.Double)
   name: Square(Double)
   href: api/SpiceSharpBehavioral.Parsers.ExpressionTreeDerivatives.html#SpiceSharpBehavioral_Parsers_ExpressionTreeDerivatives_Square_System_Double_
@@ -4717,6 +4779,19 @@ references:
   commentId: T:SpiceSharpBehavioral.Parsers.SimpleParser
   fullName: SpiceSharpBehavioral.Parsers.SimpleParser
   nameWithType: SimpleParser
+- uid: SpiceSharpBehavioral.Parsers.SimpleParser.EqualityTolerance
+  name: EqualityTolerance
+  href: api/SpiceSharpBehavioral.Parsers.SimpleParser.html#SpiceSharpBehavioral_Parsers_SimpleParser_EqualityTolerance
+  commentId: P:SpiceSharpBehavioral.Parsers.SimpleParser.EqualityTolerance
+  fullName: SpiceSharpBehavioral.Parsers.SimpleParser.EqualityTolerance
+  nameWithType: SimpleParser.EqualityTolerance
+- uid: SpiceSharpBehavioral.Parsers.SimpleParser.EqualityTolerance*
+  name: EqualityTolerance
+  href: api/SpiceSharpBehavioral.Parsers.SimpleParser.html#SpiceSharpBehavioral_Parsers_SimpleParser_EqualityTolerance_
+  commentId: Overload:SpiceSharpBehavioral.Parsers.SimpleParser.EqualityTolerance
+  isSpec: "True"
+  fullName: SpiceSharpBehavioral.Parsers.SimpleParser.EqualityTolerance
+  nameWithType: SimpleParser.EqualityTolerance
 - uid: SpiceSharpBehavioral.Parsers.SimpleParser.ExecuteOperator(SpiceSharpBehavioral.Operator)
   name: ExecuteOperator(Operator)
   href: api/SpiceSharpBehavioral.Parsers.SimpleParser.html#SpiceSharpBehavioral_Parsers_SimpleParser_ExecuteOperator_SpiceSharpBehavioral_Operator_
@@ -4935,6 +5010,19 @@ references:
   isSpec: "True"
   fullName: SpiceSharpBehavioral.Parsers.SpiceParser.PushValue
   nameWithType: SpiceParser.PushValue
+- uid: SpiceSharpBehavioral.Parsers.SpiceParser.TrimNames
+  name: TrimNames
+  href: api/SpiceSharpBehavioral.Parsers.SpiceParser.html#SpiceSharpBehavioral_Parsers_SpiceParser_TrimNames
+  commentId: P:SpiceSharpBehavioral.Parsers.SpiceParser.TrimNames
+  fullName: SpiceSharpBehavioral.Parsers.SpiceParser.TrimNames
+  nameWithType: SpiceParser.TrimNames
+- uid: SpiceSharpBehavioral.Parsers.SpiceParser.TrimNames*
+  name: TrimNames
+  href: api/SpiceSharpBehavioral.Parsers.SpiceParser.html#SpiceSharpBehavioral_Parsers_SpiceParser_TrimNames_
+  commentId: Overload:SpiceSharpBehavioral.Parsers.SpiceParser.TrimNames
+  isSpec: "True"
+  fullName: SpiceSharpBehavioral.Parsers.SpiceParser.TrimNames
+  nameWithType: SpiceParser.TrimNames
 - uid: SpiceSharpBehavioral.Parsers.SpiceProperty
   name: SpiceProperty
   href: api/SpiceSharpBehavioral.Parsers.SpiceProperty.html

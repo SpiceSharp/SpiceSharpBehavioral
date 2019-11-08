@@ -10,19 +10,19 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class BaseParameters
    ">
-    <meta name="generator" content="docfx 2.44.0.0">
+    <meta name="generator" content="docfx 2.47.0.0">
     
     <link rel="shortcut icon" href="../api/images/favicon.ico">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../styles/docfx.css">
     <link rel="stylesheet" href="../styles/main.css">
-    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
     
     
     
-  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -195,7 +195,7 @@ to global nodes.</p>
   <div class="codewrapper">
     <pre><code class="lang-csharp hljs">[ParameterName(&quot;parser&quot;)]
 [ParameterInfo(&quot;The parser that is used to parse the expression&quot;)]
-public ISpiceDerivativeParser&lt;double&gt; Parser { get; set; }</code></pre>
+public Func&lt;Simulation, ISpiceDerivativeParser&lt;double&gt;&gt; Parser { get; set; }</code></pre>
   </div>
   <h5 class="propertyValue">Property Value</h5>
   <table class="table table-bordered table-striped table-condensed">
@@ -207,7 +207,7 @@ public ISpiceDerivativeParser&lt;double&gt; Parser { get; set; }</code></pre>
     </thead>
     <tbody>
       <tr>
-        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.ISpiceDerivativeParser-1.html">ISpiceDerivativeParser</a>&lt;<span class="xref">System.Double</span>&gt;</td>
+        <td><span class="xref">System.Func</span>&lt;<span class="xref">SpiceSharp.Simulations.Simulation</span>, <a class="xref" href="SpiceSharpBehavioral.Parsers.ISpiceDerivativeParser-1.html">ISpiceDerivativeParser</a>&lt;<span class="xref">System.Double</span>&gt;&gt;</td>
         <td></td>
       </tr>
     </tbody>
