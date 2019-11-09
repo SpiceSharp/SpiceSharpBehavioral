@@ -293,7 +293,7 @@ namespace SpiceSharpBehavioral.Parsers
                 var arg1 = this[i];
                 var arg2 = b[i];
                 if (arg1 != null && arg2 != null)
-                    result[i] = () => a0() * arg1() + arg2() * b0();
+                    result[i] = () => b0() * arg1() + arg2() * a0();
                 else if (arg1 != null)
                     result[i] = () => arg1() * b0();
                 else if (arg2 != null)
