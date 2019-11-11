@@ -18,6 +18,7 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         {
             { "Exp", ApplyExp },
             { "Log", ApplyLog },
+            { "Ln", ApplyLog },
             { "Pow", ApplyPow },
             { "Log10", ApplyLog10 },
             { "Sqrt", ApplySqrt },

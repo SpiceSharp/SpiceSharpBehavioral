@@ -198,6 +198,13 @@ namespace SpiceSharpBehavioralTests.Parsers
         }
 
         [Test]
+        public void When_Ln_Expect_Reference()
+        {
+            var parser = Parser;
+            Check(new Func<double[], double>[] { x => Math.Log(x[0]), x => 1 / x[0] }, parser, "Ln(a)");
+        }
+
+        [Test]
         public void When_Pow_Expect_Reference()
         {
             var parser = Parser;

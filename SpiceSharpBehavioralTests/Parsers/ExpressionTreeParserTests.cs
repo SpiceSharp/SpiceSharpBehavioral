@@ -94,8 +94,17 @@ namespace SpiceSharpBehavioralTests.Parsers
         {
             var parser = Parser;
             Check(Math.Log(5), parser.Parse("Log(5)"));
+            Check(Math.Log(5, 3), parser.Parse("Log(5,3)"));
             Check(Math.Log(-5), parser.Parse("Log(-5)")); // Should give NaN
             Check(Math.Log10(5), parser.Parse("Log10(5)"));
+        }
+
+        [Test]
+        public void When_Ln_Expect_Reference()
+        {
+            var parser = Parser;
+            Check(Math.Log(5), parser.Parse("Ln(5)"));
+            Check(Math.Log(-5), parser.Parse("Ln(-5)"));
         }
 
         [Test]
