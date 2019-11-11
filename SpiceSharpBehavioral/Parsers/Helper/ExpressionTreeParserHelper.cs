@@ -22,8 +22,11 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             { "Log10", ApplyLog10 },
             { "Sqrt", ApplySqrt },
             { "Sin", ApplySin },
+            { "Sinh", ApplySinh },
             { "Cos", ApplyCos },
+            { "Cosh", ApplyCosh },
             { "Tan", ApplyTan },
+            { "Tanh", ApplyTanh },
             { "Asin", ApplyAsin },
             { "Acos", ApplyAcos },
             { "Atan", ApplyAtan },
@@ -146,6 +149,46 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         {
             arguments.ThrowIfNot(nameof(arguments), 1);
             return Expression.Call(SqrtMethod, arguments[0]);
+        }
+
+        /// <summary>
+        /// Hyperbolic Trigonometry
+        /// </summary>
+        private static readonly MethodInfo SinhMethod = typeof(Math).GetTypeInfo().GetMethod("Sinh", new[] { typeof(double) });
+        private static readonly MethodInfo CoshMethod = typeof(Math).GetTypeInfo().GetMethod("Cosh", new[] { typeof(double) });
+        private static readonly MethodInfo TanhMethod = typeof(Math).GetTypeInfo().GetMethod("Tanh", new[] { typeof(double) });
+
+        /// <summary>
+        /// Applies the hyperbolic sine.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The hyperbolic sine result.</returns>
+        public static Expression ApplySinh(Expression[] arguments)
+        {
+            arguments.ThrowIfNot(nameof(arguments), 1);
+            return Expression.Call(SinhMethod, arguments[0]);
+        }
+
+        /// <summary>
+        /// Applies the hyperbolic cosine.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The hyperbolic cosine result.</returns>
+        private static Expression ApplyCosh(Expression[] arguments)
+        {
+            arguments.ThrowIfNot(nameof(arguments), 1);
+            return Expression.Call(CoshMethod, arguments[0]);
+        }
+
+        /// <summary>
+        /// Applies the hyperbolic tangent.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The hyperbolic tangent result.</returns>
+        private static Expression ApplyTanh(Expression[] arguments)
+        {
+            arguments.ThrowIfNot(nameof(arguments), 1);
+            return Expression.Call(TanhMethod, arguments[0]);
         }
 
         /// <summary>

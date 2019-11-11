@@ -219,6 +219,28 @@ namespace SpiceSharpBehavioralTests.Parsers
         }
 
         [Test]
+        public void When_Sinh_Expect_Reference()
+        {
+            var parser = Parser;
+            Check(new Func<double[], double>[] { x => Math.Sinh(x[0]), x => Math.Cosh(x[0]) }, parser, "Sinh(a)");
+        }
+
+        [Test]
+        public void When_Cosh_Expect_Reference()
+        {
+            var parser = Parser;
+            Check(new Func<double[], double>[] { x => Math.Cosh(x[0]), x => Math.Sinh(x[0]) }, parser, "Cosh(a)");
+        }
+
+        [Test]
+        public void When_Tanh_Expect_Reference()
+        {
+            var parser = Parser;
+            Check(new Func<double[], double>[] { x => Math.Tanh(x[0]), x => 1.0 / Math.Cosh(x[0]) / Math.Cosh(x[0]) }, parser, "Tanh(a)");
+        }
+
+
+        [Test]
         public void When_Asin_Expect_Reference()
         {
             var parser = Parser;

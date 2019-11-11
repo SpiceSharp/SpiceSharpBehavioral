@@ -22,8 +22,11 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             { "Log10", ApplyLog10 },
             { "Sqrt", ApplySqrt },
             { "Sin", ApplySin },
+            { "Sinh", ApplySinh },
             { "Cos", ApplyCos },
+            { "Cosh", ApplyCosh },
             { "Tan", ApplyTan },
+            { "Tanh", ApplyTanh },
             { "Asin", ApplyAsin },
             { "Acos", ApplyAcos },
             { "Atan", ApplyAtan },
@@ -310,6 +313,78 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         }
 
         /// <summary>
+        /// Hyperbolic Trigonometry
+        /// </summary>
+        private static readonly MethodInfo SinhMethod = typeof(Math).GetTypeInfo().GetMethod("Sinh", new[] { typeof(double) });
+        private static readonly MethodInfo CoshMethod = typeof(Math).GetTypeInfo().GetMethod("Cosh", new[] { typeof(double) });
+        private static readonly MethodInfo TanhMethod = typeof(Math).GetTypeInfo().GetMethod("Tanh", new[] { typeof(double) });
+
+        /// <summary>
+        /// Applies the hyperbolic sine.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The hyperbolic sine result.</returns>
+        public static Derivatives<Expression> ApplySinh(Derivatives<Expression>[] arguments)
+        {
+            arguments.ThrowIfNot(nameof(arguments), 1);
+            var arg = arguments[0];
+            var result = new ExpressionTreeDerivatives(arg.Count);
+            result[0] = Expression.Call(SinhMethod, arg[0]);
+
+            // Apply the chain rule
+            for (var i = 1; i < arg.Count; i++)
+            {
+                if (arg[i] != null)
+                    result[i] = Expression.Multiply(Expression.Call(CoshMethod, arg[0]), arg[i]);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Applies the hyperbolic cosine.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The hyperbolic cosine result.</returns>
+        private static Derivatives<Expression> ApplyCosh(Derivatives<Expression>[] arguments)
+        {
+            arguments.ThrowIfNot(nameof(arguments), 1);
+            var arg = arguments[0];
+            var result = new ExpressionTreeDerivatives(arg.Count);
+            result[0] = Expression.Call(CoshMethod, arg[0]);
+
+            // Apply the chain rule
+            for (var i = 1; i < arg.Count; i++)
+            {
+                if (arg[i] != null)
+                    result[i] = Expression.Multiply(Expression.Call(SinhMethod, arg[0]), arg[i]);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Applies the hyperbolic tangent.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The hyperbolic tangent result.</returns>
+        private static Derivatives<Expression> ApplyTanh(Derivatives<Expression>[] arguments)
+        {
+            arguments.ThrowIfNot(nameof(arguments), 1);
+            var arg = arguments[0];
+            var result = new ExpressionTreeDerivatives(arg.Count);
+            result[0] = Expression.Call(TanhMethod, arg[0]);
+
+            // Apply chain rule
+            for (var i = 1; i < arg.Count; i++)
+            {
+                if (arg[i] != null)
+                    result[i] = Expression.Divide(arg[i],
+                        (Expression.Multiply(Expression.Call(CoshMethod, arg[0]),
+                            Expression.Call(CoshMethod, arg[0]))));
+            }
+            return result;
+        }
+
+        /// <summary>
         /// Inverse trigonometry.
         /// </summary>
         private static readonly MethodInfo AsinMethod = typeof(Math).GetTypeInfo().GetMethod("Asin", new[] { typeof(double) });
@@ -408,7 +483,7 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             // Apply chain rule
             for (var i = 1; i < arg.Count; i++)
             {
-                if (!arg[i].Equals(0.0))
+                if (arg[i] != null)
                     result[i] = Expression.Multiply(arg[i], 
                         Expression.Condition(
                             Expression.GreaterThan(arg[0], Expression.Constant(0.0)),

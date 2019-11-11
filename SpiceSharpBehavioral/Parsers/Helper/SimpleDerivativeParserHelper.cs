@@ -20,8 +20,11 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             { "Log10", ApplyLog10 },
             { "Sqrt", ApplySqrt },
             { "Sin", ApplySin },
+            { "Sinh", ApplySinh },
             { "Cos", ApplyCos },
+            { "Cosh", ApplyCosh },
             { "Tan", ApplyTan },
+            { "Tanh", ApplyTanh },
             { "Asin", ApplyAsin },
             { "Acos", ApplyAcos },
             { "Atan", ApplyAtan },
@@ -240,6 +243,31 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         }
 
         /// <summary>
+        /// Applies the hyperbolic sine.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The hyperbolic sine result.</returns>
+        public static Derivatives<Func<double>> ApplySinh(Derivatives<Func<double>>[] arguments)
+        {
+            arguments.ThrowIfNot(nameof(arguments), 1);
+            var arg = arguments[0];
+            var result = new DoubleDerivatives(arg.Count);
+            var a0 = arg[0];
+            result[0] = () => Math.Sinh(a0());
+
+            // Apply the chain rule
+            for (var i = 1; i < arg.Count; i++)
+            {
+                if (arg[i] != null)
+                {
+                    var ai = arg[i];
+                    result[i] = () => Math.Cosh(a0()) * ai();
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
         /// Applies the cosine.
         /// </summary>
         /// <param name="arguments">The arguments.</param>
@@ -259,6 +287,31 @@ namespace SpiceSharpBehavioral.Parsers.Helper
                 {
                     var ai = arg[i];
                     result[i] = () => -Math.Sin(a0()) * ai();
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Applies the cosine hyperbolic.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The cosine hyperbolic result.</returns>
+        private static Derivatives<Func<double>> ApplyCosh(Derivatives<Func<double>>[] arguments)
+        {
+            arguments.ThrowIfNot(nameof(arguments), 1);
+            var arg = arguments[0];
+            var result = new DoubleDerivatives(arg.Count);
+            var a0 = arg[0];
+            result[0] = () => Math.Cosh(a0());
+
+            // Apply the chain rule
+            for (var i = 1; i < arg.Count; i++)
+            {
+                if (arg[i] != null)
+                {
+                    var ai = arg[i];
+                    result[i] = () => ai() * Math.Sinh(a0());
                 }
             }
             return result;
@@ -286,6 +339,35 @@ namespace SpiceSharpBehavioral.Parsers.Helper
                     result[i] = () =>
                     {
                         var tmp = Math.Cos(a0());
+                        return ai() / tmp / tmp;
+                    };
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Applies the hyperbolic tangent.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The hyperbolic tangent result.</returns>
+        private static Derivatives<Func<double>> ApplyTanh(Derivatives<Func<double>>[] arguments)
+        {
+            arguments.ThrowIfNot(nameof(arguments), 1);
+            var arg = arguments[0];
+            var result = new DoubleDerivatives(arg.Count);
+            var a0 = arg[0];
+            result[0] = () => Math.Tanh(a0());
+
+            // Apply the chain rule
+            for (var i = 1; i < arg.Count; i++)
+            {
+                if (arg[i] != null)
+                {
+                    var ai = arg[i];
+                    result[i] = () =>
+                    {
+                        var tmp = Math.Cosh(a0());
                         return ai() / tmp / tmp;
                     };
                 }

@@ -170,6 +170,30 @@ namespace SpiceSharpBehavioralTests.Parsers
         }
 
         [Test]
+        public void When_Sinh_Expect_Reference()
+        {
+            var parser = Parser;
+            Check(Math.Sinh(2), parser.Parse("Sinh(2)"));
+            Check(Math.Sinh(-0.5), parser.Parse("Sinh(-0.5)"));
+        }
+
+        [Test]
+        public void When_Cosh_Expect_Reference()
+        {
+            var parser = Parser;
+            Check(Math.Cosh(2), parser.Parse("Cosh(2)"));
+            Check(Math.Cosh(-0.5), parser.Parse("Cosh(-0.5)"));
+        }
+
+        [Test]
+        public void When_Tanh_Expect_Reference()
+        {
+            var parser = Parser;
+            Check(Math.Tanh(2), parser.Parse("Tanh(2)"));
+            Check(Math.Tanh(-0.5), parser.Parse("Tanh(-0.5)"));
+        }
+
+        [Test]
         public void When_Asin_Expect_Reference()
         {
             var parser = Parser;

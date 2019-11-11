@@ -23,8 +23,11 @@ namespace SpiceSharpBehavioral.Parsers.Helper
             { "Log10", ApplyLog10 },
             { "Sqrt", ApplySqrt },
             { "Sin", ApplySin },
+            { "Sinh", ApplySinh },
             { "Cos", ApplyCos },
+            { "Cosh", ApplyCosh },
             { "Tan", ApplyTan },
+            { "Tanh", ApplyTanh },
             { "Asin", ApplyAsin },
             { "Acos", ApplyAcos },
             { "Atan", ApplyAtan },
@@ -121,6 +124,13 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         public static double ApplySin(double[] arguments) => Math.Sin(arguments.ThrowIfNot(nameof(arguments), 1)[0]);
 
         /// <summary>
+        /// Applies the hyperbolic sine.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The hyperbolic sine result.</returns>
+        public static double ApplySinh(double[] arguments) => Math.Sinh(arguments.ThrowIfNot(nameof(arguments), 1)[0]);
+
+        /// <summary>
         /// Applies the cosine.
         /// </summary>
         /// <param name="arguments">The arguments.</param>
@@ -128,11 +138,25 @@ namespace SpiceSharpBehavioral.Parsers.Helper
         private static double ApplyCos(double[] arguments) => Math.Cos(arguments.ThrowIfNot(nameof(arguments), 1)[0]);
 
         /// <summary>
+        /// Applies the hyperbolic cosine.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The hyperbolic cosine result.</returns>
+        private static double ApplyCosh(double[] arguments) => Math.Cosh(arguments.ThrowIfNot(nameof(arguments), 1)[0]);
+
+        /// <summary>
         /// Applies the tangent.
         /// </summary>
         /// <param name="arguments">The arguments.</param>
         /// <returns>The tangent result.</returns>
         private static double ApplyTan(double[] arguments) => Math.Tan(arguments.ThrowIfNot(nameof(arguments), 1)[0]);
+
+        /// <summary>
+        /// Applies the hyperbolic tangent.
+        /// </summary>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>The hyperbolic tangent result.</returns>
+        private static double ApplyTanh(double[] arguments) => Math.Tanh(arguments.ThrowIfNot(nameof(arguments), 1)[0]);
 
         /// <summary>
         /// Applies the arcsine.
