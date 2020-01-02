@@ -1,10 +1,12 @@
-﻿namespace SpiceSharpBehavioral.Parsers
+﻿using SpiceSharp;
+
+namespace SpiceSharpBehavioral.Parsers
 {
     /// <summary>
     /// Describes a class that parses an expression.
     /// </summary>
     /// <typeparam name="T">The return type of the parser.</typeparam>
-    public interface IParser<T>
+    public interface IParser<T> : IParameterized<ParserParameters<T>>
     {
         /// <summary>
         /// Parses an expression.

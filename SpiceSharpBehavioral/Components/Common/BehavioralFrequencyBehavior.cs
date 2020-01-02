@@ -11,41 +11,28 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
     /// <summary>
     /// Frequency behavior for a behavioral component.
     /// </summary>
-    public abstract class BehavioralFrequencyBehavior : Behavior, IFrequencyBehavior
+    public abstract class BehavioralFrequencyBehavior : Behavior
     {
         /// <summary>
-        /// Gets the biasing behavior.
+        /// Gets the state of the complex.
         /// </summary>
-        protected BehavioralBiasingBehavior BiasingBehavior { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the row of positive contributions.
-        /// </summary>
-        protected int PosIndex { get; set; }
-
-        /// <summary>
-        /// Gets or sets the row of negative contributions.
-        /// </summary>
-        protected int NegIndex { get; set; }
-
-        /// <summary>
-        /// Gets the state.
-        /// </summary>
-        protected ComplexSimulationState State { get; private set; }
+        /// <value>
+        /// The state of the complex.
+        /// </value>
+        protected IComplexSimulationState ComplexState { get; }
 
         /// <summary>
         /// All contributions to the Y-matrix.
         /// </summary>
         private Complex[] _contributions;
-        private Action _fillMatrix;
-        private Action _initializeMethod;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BehavioralFrequencyBehavior"/> class.
         /// </summary>
-        /// <param name="name"></param>
-        public BehavioralFrequencyBehavior(string name)
-            : base(name)
+        /// <param name="name">The name.</param>
+        /// <param name="context">The context.</param>
+        public BehavioralFrequencyBehavior(string name, BehavioralBindingContext context)
+            : base(name, context)
         {
         }
 
@@ -59,7 +46,7 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
             base.Bind(simulation, context);
 
             // Get behaviors
-            BiasingBehavior = context.GetBehavior<BehavioralBiasingBehavior>();
+            BiasingBehavior = context.GetBehavior<BehavioralBehavior>();
 
             State = ((FrequencySimulation)simulation).ComplexState;
             var solver = State.Solver;
@@ -67,96 +54,97 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         }
 
         /// <summary>
-        /// Unsetup the behavior.
+        /// Builds the action that can fill up the matrix.
         /// </summary>
-        public override void Unbind()
+        /// <param name="solver">The solver.</param>
+        /// <param name="positive">The positive.</param>
+        /// <param name="negative">The negative.</param>
+        /// <returns>The action.</returns>
+        protected Action Build(ISparseSolver<Complex> solver, Variable positive, Variable negative)
         {
-            BiasingBehavior = null;
-            State = null;
-            _fillMatrix = null;
-            _contributions = null;
-            _initializeMethod = null;
-        }
 
-        /// <summary>
-        /// Get equation pointers.
-        /// </summary>
-        /// <param name="solver">Gets the equation pointers.</param>
-        private void BuildFunctionMethod(Solver<Complex> solver)
-        {
-            var block = new List<Action>();
-            var init_block = new List<Action>();
 
-            // If the contributions cancel each other, don't bother compiling
-            if (PosIndex == NegIndex)
+            // Initialize contributions
+            List<Action> _contributions = new List<Action>();
             {
-                _initializeMethod = null;
-                _fillMatrix = null;
-                return;
+                var func = Function.Value;
+                _contributions.Add(() =>
+                {
+                    _cumulated = func();
+                    CurrentValue = _cumulated;
+                });
             }
 
-            // The biasing behavior has a nice series of derivatives that need to be
-            // calculated here. Since it is a small-signal analysis, we don't need
-            // the actual value, only the derivatives.
-            int count = 0;
-            _contributions = new Complex[BiasingBehavior.Function.DerivativeCount];
-            foreach (var item in BiasingBehavior.Function.Derivatives)
+            // Fill Y-matrix
+            foreach (var item in Function.Derivatives)
             {
-                // Ignore 0-contributions
                 var index = item.Key;
                 var func = item.Value;
+
+                // Ignore 0-contributions
                 if (func == null)
                     continue;
 
-                MatrixElement<Complex> posElt = null, negElt = null;
-                if (PosIndex > 0)
-                    posElt = solver.GetMatrixElement(PosIndex, index);
-                if (NegIndex > 0)
-                    negElt = solver.GetMatrixElement(NegIndex, index);
+                Element<double> posElt = null, negElt = null;
+                if (posIndex > 0)
+                    posElt = solver.GetElement(posIndex, index);
+                if (negIndex > 0)
+                    negElt = solver.GetElement(negIndex, index);
+
                 if (posElt != null && negElt != null)
                 {
-                    var i = count; // Avoid referencing the original count variable
-                    block.Add(() =>
+                    _contributions.Add(() =>
                     {
-                        posElt.Value += _contributions[i];
-                        negElt.Value -= _contributions[i];
+                        var derivative = func();
+                        posElt.Value += derivative;
+                        negElt.Value -= derivative;
+                        _cumulated -= BiasingState.Solution[index] * derivative;
                     });
                 }
                 else if (posElt != null)
                 {
-                    var i = count;
-                    block.Add(() =>
+                    _contributions.Add(() =>
                     {
-                        posElt.Value += _contributions[i];
+                        var derivative = func();
+                        posElt.Value += derivative;
+                        _cumulated -= BiasingState.Solution[index] * derivative;
                     });
                 }
                 else if (negElt != null)
                 {
-                    var i = count;
-                    block.Add(() =>
+                    _contributions.Add(() =>
                     {
-                        negElt.Value -= _contributions[i];
+                        var derivative = func();
+                        negElt.Value -= derivative;
+                        _cumulated -= BiasingState.Solution[index] * derivative;
                     });
                 }
-
-                // Let's also initialize it
-                var i2 = count;
-                init_block.Add(() => _contributions[i2] = func());
-                count++;
             }
 
-            // Compile the methods
-            {
-                var actions = init_block.ToArray();
-                _initializeMethod = () =>
+            // Fill Rhs-vectors
+            Element<double> posRhs = null, negRhs = null;
+            if (posIndex > 0)
+                posRhs = solver.GetElement(posIndex);
+            if (negIndex > 0)
+                negRhs = solver.GetElement(negIndex);
+            if (posRhs != null && negRhs != null)
+                _contributions.Add(() =>
                 {
-                    for (var i = 0; i < actions.Length; i++)
-                        actions[i]();
-                };
-            }
+                    posRhs.Value -= _cumulated;
+                    negRhs.Value += _cumulated;
+                });
+            else if (posRhs != null)
+                _contributions.Add(() => posRhs.Value -= _cumulated);
+            else if (negRhs != null)
+                _contributions.Add(() => negRhs.Value += _cumulated);
+
+            // Build the total behavioral method, ignore if nothing has been done
+            if (_contributions.Count == 0)
+                return null;
+            else
             {
-                var actions = block.ToArray();
-                _fillMatrix = () =>
+                var actions = _contributions.ToArray();
+                return () =>
                 {
                     for (var i = 0; i < actions.Length; i++)
                         actions[i]();

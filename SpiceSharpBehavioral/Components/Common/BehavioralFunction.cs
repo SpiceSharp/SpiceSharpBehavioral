@@ -2,6 +2,7 @@
 using SpiceSharp;
 using SpiceSharpBehavioral.Parsers;
 using System.Collections.Generic;
+using SpiceSharp.Simulations;
 
 namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
 {
@@ -10,7 +11,7 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
     /// </summary>
     public class BehavioralFunction
     {
-        private Dictionary<int, int> _map;
+        private Dictionary<Variable, int> _map;
         private Derivatives<Func<double>> _derivatives;
 
         /// <summary>
@@ -47,7 +48,7 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         /// </summary>
         /// <param name="map">Maps each derivative to an unknown</param>
         /// <param name="derivatives">The derivatives.</param>
-        public BehavioralFunction(Dictionary<int, int> map, Derivatives<Func<double>> derivatives)
+        public BehavioralFunction(Dictionary<Variable, int> map, Derivatives<Func<double>> derivatives)
         {
             _map = map.ThrowIfNull(nameof(map));
             _derivatives = derivatives.ThrowIfNull(nameof(map));

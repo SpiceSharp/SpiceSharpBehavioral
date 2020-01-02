@@ -1,5 +1,6 @@
 ﻿using SpiceSharp.Attributes;
 using SpiceSharp.Behaviors;
+using SpiceSharp.Simulations;
 using SpiceSharpBehavioral.Components.BehavioralBehaviors;
 using SpiceSharpBehavioral.Components.BehavioralCurrentSourceBehaviors;
 
@@ -11,15 +12,6 @@ namespace SpiceSharp.Components
     [Pin(0, "I+"), Pin(1, "I-"), Connected()]
     public class BehavioralCurrentSource : BehavioralComponent
     {
-        static BehavioralCurrentSource()
-        {
-            RegisterBehaviorFactory(typeof(BehavioralCurrentSource), new BehaviorFactoryDictionary()
-            {
-                { typeof(BiasingBehavior), entity => new BiasingBehavior(entity.Name) },
-                { typeof(FrequencyBehavior), entity => new FrequencyBehavior(entity.Name) }
-            });
-        }
-
         /// <summary>
         /// The behavioral current source pin count
         /// </summary>
@@ -32,7 +24,6 @@ namespace SpiceSharp.Components
         public BehavioralCurrentSource(string name)
             : base(name, BehavioralCurrentSourcePinCount)
         {
-            ParameterSets.Add(new BaseParameters());
         }
 
         /// <summary>
@@ -44,10 +35,22 @@ namespace SpiceSharp.Components
         /// <param name="neg">The negative node.</param>
         /// <param name="expression">The expression.</param>
         public BehavioralCurrentSource(string name, string pos, string neg, string expression)
-            : base(name, BehavioralCurrentSourcePinCount)
+            : this(name)
         {
-            ParameterSets.Add(new BaseParameters { Expression = expression });
             Connect(pos, neg);
+            Parameters.Expression = expression;
+        }
+
+        public override void CreateBehaviors(ISimulation simulation)
+        {
+            base.CreateBehaviors(simulation);
+
+            var container = new BehaviorContainer(Name);
+            var context = new ComponentBindingContext(this, simulation);
+            container
+                .AddIfNo<IFrequencyBehavior>(simulation, () => new FrequencyBehavior(Name, context))
+                .AddIfNo<IBiasingBehavior>(simulation, () => new BiasingBehavior(Name, context));
+            simulation.EntityBehaviors.Add(container);
         }
     }
 }

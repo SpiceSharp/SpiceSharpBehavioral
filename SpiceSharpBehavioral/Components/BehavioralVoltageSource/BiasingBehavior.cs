@@ -12,21 +12,33 @@ namespace SpiceSharpBehavioral.Components.BehavioralVoltageSourceBehaviors
     /// <summary>
     /// Biasing behavior for a behavioral voltage source.
     /// </summary>
-    public class BiasingBehavior : BehavioralBiasingBehavior
+    public class BiasingBehavior : BehavioralBehavior, IBiasingBehavior, IBranchedBehavior
     {
+        private readonly int _pos, _neg, _branch;
+        private readonly Action _fill;
+        private readonly ElementSet<double> _elements;
+
+        /// <summary>
+        /// Gets the branch equation variable.
+        /// </summary>
+        /// <value>
+        /// The branch equation variable.
+        /// </value>
+        public Variable Branch { get; }
+
         /// <summary>
         /// Gets the current through the source.
         /// </summary>
         /// <returns></returns>
         [ParameterName("i"), ParameterName("current"), ParameterInfo("Voltage source current")]
-        public double GetCurrent() => State.ThrowIfNotBound(this).Solution[BranchEq];
+        public double Current => BiasingState.Solution[_branch];
 
         /// <summary>
         /// Gets the power dissipated by the source.
         /// </summary>
         /// <returns></returns>
         [ParameterName("p"), ParameterName("power"), ParameterInfo("Instantaneous power")]
-        public double GetPower() => (State.ThrowIfNotBound(this).Solution[PosNode] - State.Solution[NegNode]) * -State.Solution[BranchEq];
+        public double Power => (BiasingState.Solution[_pos] - BiasingState.Solution[_neg]) * -BiasingState.Solution[_branch];
 
         /// <summary>
         /// Gets the voltage applied by the source.
@@ -35,90 +47,32 @@ namespace SpiceSharpBehavioral.Components.BehavioralVoltageSourceBehaviors
         public double Voltage => CurrentValue;
 
         /// <summary>
-        /// Gets the branch equation of the voltage source.
-        /// </summary>
-        public int BranchEq { get; private set; }
-
-        /// <summary>
-        /// Gets the positive node index.
-        /// </summary>
-        protected int PosNode { get; private set; }
-
-        /// <summary>
-        /// Gets the negative node index.
-        /// </summary>
-        protected int NegNode { get; private set; }
-
-        /// <summary>
-        /// Gets the (positive, branch) element.
-        /// </summary>
-        protected MatrixElement<double> PosBranchPtr { get; private set; }
-
-        /// <summary>
-        /// Gets the (negative, branch) element.
-        /// </summary>
-        protected MatrixElement<double> NegBranchPtr { get; private set; }
-
-        /// <summary>
-        /// Gets the (branch, positive) element.
-        /// </summary>
-        protected MatrixElement<double> BranchPosPtr { get; private set; }
-
-        /// <summary>
-        /// Gets the (branch, negative) element.
-        /// </summary>
-        protected MatrixElement<double> BranchNegPtr { get; private set; }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="BiasingBehavior"/> class.
         /// </summary>
         /// <param name="name">The name.</param>
-        public BiasingBehavior(string name) : base(name) { }
-
-        /// <summary>
-        /// Bind the behavior.
-        /// </summary>
-        /// <param name="simulation">The simulation.</param>
         /// <param name="context">The context.</param>
-        public override void Bind(Simulation simulation, BindingContext context)
+        public BiasingBehavior(string name, BehavioralBindingContext context) 
+            : base(name, context) 
         {
-            // Get the nodes
-            if (context is ComponentBindingContext cc)
-            {
-                PosNode = cc.Pins[0];
-                NegNode = cc.Pins[1];
-            }
-
-            // Create a new branch equation for the current through the voltage source
-            var variables = simulation.Variables;
-            BranchEq = variables.Create(Name.Combine("branch"), VariableType.Current).Index;
-            
-            // Note: Because the voltage source equation looks like "v1 - v2 = f(...)" this translates to
-            // "v1 - v2 - f(...) = 0", so that means we need the negative sign here - hence NegIndex.
-            PosIndex = 0;
-            NegIndex = BranchEq;
-
-            // Do other behavioral source stuff
-            base.Bind(simulation, context);
-
-            // Get matrix pointers
-            var solver = State.Solver;
-            PosBranchPtr = solver.GetMatrixElement(PosNode, BranchEq);
-            NegBranchPtr = solver.GetMatrixElement(NegNode, BranchEq);
-            BranchPosPtr = solver.GetMatrixElement(BranchEq, PosNode);
-            BranchNegPtr = solver.GetMatrixElement(BranchEq, NegNode);
+            _pos = BiasingState.Map[context.Nodes[0]];
+            _neg = BiasingState.Map[context.Nodes[1]];
+            Branch = context.Variables.Create(Name.Combine("branch"), VariableType.Current);
+            _branch = BiasingState.Map[Branch];
+            _fill = Build(context.Variables.Ground, Branch);
+            _elements = new ElementSet<double>(BiasingState.Solver,
+                new MatrixLocation(_pos, _branch),
+                new MatrixLocation(_neg, _branch),
+                new MatrixLocation(_branch, _pos),
+                new MatrixLocation(_branch, _neg));
         }
 
         /// <summary>
-        /// Loads the specified simulation.
+        /// Loads the Y-matrix and Rhs-vector.
         /// </summary>
-        public override void Load()
+        void IBiasingBehavior.Load()
         {
-            PosBranchPtr.Value += 1;
-            BranchPosPtr.Value += 1;
-            NegBranchPtr.Value -= 1;
-            BranchNegPtr.Value -= 1;
-            base.Load();
+            _fill?.Invoke();
+            _elements.Add(1.0, -1.0, 1.0, -1.0);
         }
     }
 }

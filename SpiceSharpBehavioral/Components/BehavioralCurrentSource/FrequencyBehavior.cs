@@ -14,7 +14,7 @@ namespace SpiceSharpBehavioral.Components.BehavioralCurrentSourceBehaviors
         /// Initializes a new instance of the <see cref="FrequencyBehavior"/> class.
         /// </summary>
         /// <param name="name">The name of the behavior.</param>
-        public FrequencyBehavior(string name)
+        public FrequencyBehavior(string name, BehavioralBindingContext context)
             : base(name)
         {
         }
