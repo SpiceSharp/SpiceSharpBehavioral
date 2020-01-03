@@ -7,8 +7,9 @@ namespace SpiceSharpBehavioral.Parsers.Double
     /// <summary>
     /// A value factory for doubles.
     /// </summary>
+    /// <seealso cref="ParameterSet" />
     /// <seealso cref="IValueFactory{Double}" />
-    public class ValueFactory : IValueFactory<double>
+    public class ValueFactory : ParameterSet, IValueFactory<double>
     {
         /// <summary>
         /// Gets the variables.

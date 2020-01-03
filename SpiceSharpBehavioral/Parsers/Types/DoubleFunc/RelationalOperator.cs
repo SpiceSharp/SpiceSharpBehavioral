@@ -1,12 +1,14 @@
-﻿using System;
+﻿using SpiceSharp;
+using System;
 
 namespace SpiceSharpBehavioral.Parsers.DoubleFunc
 {
     /// <summary>
     /// Relational operator implementations for functions of doubles.
     /// </summary>
+    /// <seealso cref="ParameterSet" />
     /// <seealso cref="IRelationalOperator{T}" />
-    public class RelationalOperator : IRelationalOperator<Func<double>>
+    public class RelationalOperator : ParameterSet, IRelationalOperator<Func<double>>
     {
         /// <summary>
         /// Gets or sets the absolute tolerance.

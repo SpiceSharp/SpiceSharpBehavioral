@@ -11,7 +11,7 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
     /// <typeparam name="K">The derivative key value.</typeparam>
     /// <typeparam name="V">The value type.</typeparam>
     /// <seealso cref="IConditionalOperator{T}" />
-    public class ConditionalOperator<K, V> : IConditionalOperator<IDerivatives<K, V>>
+    public class ConditionalOperator<K, V> : ParameterSet, IConditionalOperator<IDerivatives<K, V>>
     {
         private readonly IConditionalOperator<V> _parent;
         private readonly IDerivativeFactory<K, V> _factory;

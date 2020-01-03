@@ -8,7 +8,7 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
     /// <typeparam name="K">The derivative key.</typeparam>
     /// <typeparam name="V">The value type.</typeparam>
     /// <seealso cref="IRelationalOperator{T}" />
-    public class RelationalOperator<K, V> : IRelationalOperator<IDerivatives<K, V>>
+    public class RelationalOperator<K, V> : ParameterSet, IRelationalOperator<IDerivatives<K, V>>
     {
         private readonly IRelationalOperator<V> _parent;
         private readonly IDerivativeFactory<K, V> _factory;

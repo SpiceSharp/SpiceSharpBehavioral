@@ -10,7 +10,7 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
     /// <typeparam name="K">The derivative key.</typeparam>
     /// <typeparam name="V">The value type.</typeparam>
     /// <seealso cref="IArithmeticOperator{T}" />
-    public class ArithmeticOperator<K, V> : IArithmeticOperator<IDerivatives<K, V>>
+    public class ArithmeticOperator<K, V> : ParameterSet, IArithmeticOperator<IDerivatives<K, V>>
     {
         private readonly IArithmeticOperator<V> _parent;
         private readonly IDerivativeFactory<K, V> _factory;

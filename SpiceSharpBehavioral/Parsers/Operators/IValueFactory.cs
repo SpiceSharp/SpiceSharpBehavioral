@@ -1,10 +1,12 @@
-﻿namespace SpiceSharpBehavioral.Parsers
+﻿using SpiceSharp;
+
+namespace SpiceSharpBehavioral.Parsers
 {
     /// <summary>
     /// Describes the generation of values based on their textual representation.
     /// </summary>
     /// <typeparam name="T">The base type.</typeparam>
-    public interface IValueFactory<T>
+    public interface IValueFactory<T> : IParameterSet
     {
         /// <summary>
         /// Creates the variable based on its textual representation.

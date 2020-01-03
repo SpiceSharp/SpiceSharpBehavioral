@@ -1,12 +1,14 @@
-﻿using System;
+﻿using SpiceSharp;
+using System;
 
 namespace SpiceSharpBehavioral.Parsers.Double
 {
     /// <summary>
     /// Conditional operators for doubles.
     /// </summary>
+    /// <seealso cref="ParameterSet" />
     /// <seealso cref="IConditionalOperator{Double}" />
-    public class ConditionalOperator : IConditionalOperator<double>
+    public class ConditionalOperator : ParameterSet, IConditionalOperator<double>
     {
         /// <summary>
         /// Applies the logical and (&amp;&amp;) operator.

@@ -1,10 +1,12 @@
-﻿namespace SpiceSharpBehavioral.Parsers
+﻿using SpiceSharp;
+
+namespace SpiceSharpBehavioral.Parsers
 {
     /// <summary>
     /// Describes relational operations on a specified type.
     /// </summary>
     /// <typeparam name="T">The base type.</typeparam>
-    public interface IRelationalOperator<T>
+    public interface IRelationalOperator<T> : IParameterSet
     {
         /// <summary>
         /// Returns a value based on whether or not the operands are equal.

@@ -1,10 +1,12 @@
-﻿namespace SpiceSharpBehavioral.Parsers
+﻿using SpiceSharp;
+
+namespace SpiceSharpBehavioral.Parsers
 {
     /// <summary>
     /// Describes arithmetic operations on a specified type.
     /// </summary>
     /// <typeparam name="T">The base type.</typeparam>
-    public interface IArithmeticOperator<T>
+    public interface IArithmeticOperator<T> : IParameterSet
     {
         /// <summary>
         /// Negates the specified input.

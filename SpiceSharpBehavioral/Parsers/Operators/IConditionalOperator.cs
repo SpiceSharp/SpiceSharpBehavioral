@@ -1,10 +1,12 @@
-﻿namespace SpiceSharpBehavioral.Parsers
+﻿using SpiceSharp;
+
+namespace SpiceSharpBehavioral.Parsers
 {
     /// <summary>
     /// Describes conditional operations on a specified type.
     /// </summary>
     /// <typeparam name="T">The base type.</typeparam>
-    public interface IConditionalOperator<T>
+    public interface IConditionalOperator<T> : IParameterSet
     {
         /// <summary>
         /// Applies the logical not (!) operator.

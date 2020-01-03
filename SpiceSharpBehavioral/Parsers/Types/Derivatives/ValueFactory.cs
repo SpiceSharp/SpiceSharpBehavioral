@@ -1,4 +1,5 @@
 ﻿using SpiceSharp;
+using SpiceSharp.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
     /// <typeparam name="K">The derivative key.</typeparam>
     /// <typeparam name="V">The value type.</typeparam>
     /// <seealso cref="IValueFactory{T}" />
-    public class ValueFactory<K, V> : IValueFactory<IDerivatives<K, V>>
+    public class ValueFactory<K, V> : ParameterSet, IValueFactory<IDerivatives<K, V>>
     {
         private readonly IValueFactory<V> _parent;
         private readonly IArithmeticOperator<V> _arithmetic;
@@ -25,6 +26,7 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
         /// <value>
         /// The variables.
         /// </value>
+        [ParameterName("variables"), ParameterInfo("The variables that are defined for derivatives")]
         public IDictionary<string, IDerivatives<K, V>> Variables { get; }
 
         /// <summary>

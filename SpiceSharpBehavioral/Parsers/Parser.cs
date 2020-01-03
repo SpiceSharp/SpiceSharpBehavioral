@@ -11,7 +11,7 @@ namespace SpiceSharpBehavioral.Parsers
     /// <typeparam name="T">The base type.</typeparam>
     /// <seealso cref="Parameterized" />
     /// <seealso cref="IParser{T}" />
-    public partial class Parser<T> : Parameterized, IParser<T>
+    public partial class Parser<T> : Parameterized, IParser<T>, IParameterized<IParserParameters<T>>
     {
         private string _input;
         private int _index;
@@ -26,21 +26,12 @@ namespace SpiceSharpBehavioral.Parsers
         /// <value>
         /// The parameter set.
         /// </value>
-        public ParserParameters<T> Parameters { get; }
+        public IParserParameters<T> Parameters { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Parser{T}"/> class.
         /// </summary>
-        public Parser()
-        {
-            Parameters = new ParserParameters<T>();
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Parser{T}"/> class.
-        /// </summary>
-        /// <param name="parameters">The parser parameters.</param>
-        public Parser(ParserParameters<T> parameters)
+        public Parser(IParserParameters<T> parameters)
         {
             Parameters = parameters.ThrowIfNull(nameof(parameters));
         }
@@ -222,10 +213,10 @@ namespace SpiceSharpBehavioral.Parsers
                         {
                             string unit = NextWord();
                             _index += unit.Length;
-                            _values.Push(Parameters.Factory.CreateValue(value, unit));
+                            _values.Push(Parameters.ValueFactory.CreateValue(value, unit));
                         }
                         else
-                            _values.Push(Parameters.Factory.CreateValue(value, ""));
+                            _values.Push(Parameters.ValueFactory.CreateValue(value, ""));
                     }
                     else
                     {
@@ -264,7 +255,7 @@ namespace SpiceSharpBehavioral.Parsers
                     else
                     {
                         _index += name.Length;
-                        _values.Push(Parameters.Factory.CreateVariable(name));
+                        _values.Push(Parameters.ValueFactory.CreateVariable(name));
                         return;
                     }
                 case var mc when mc >= '0' && mc <= '9':
@@ -274,10 +265,10 @@ namespace SpiceSharpBehavioral.Parsers
                     {
                         string unit = NextWord();
                         _index += unit.Length;
-                        _values.Push(Parameters.Factory.CreateValue(value, unit));
+                        _values.Push(Parameters.ValueFactory.CreateValue(value, unit));
                     }
                     else
-                        _values.Push(Parameters.Factory.CreateValue(value, ""));
+                        _values.Push(Parameters.ValueFactory.CreateValue(value, ""));
                     return;
             }
             throw new ParserException("Invalid operator", _input, _index);
@@ -540,7 +531,7 @@ namespace SpiceSharpBehavioral.Parsers
                     var arguments = new T[function.Arguments];
                     for (var i = function.Arguments - 1; i >= 0; i--)
                         arguments[i] = _values.Pop();
-                    _values.Push(Parameters.Factory.CreateFunction(function.Name, arguments));
+                    _values.Push(Parameters.ValueFactory.CreateFunction(function.Name, arguments));
                     break;
                 default:
                     throw new Exception("Unrecognized operator");

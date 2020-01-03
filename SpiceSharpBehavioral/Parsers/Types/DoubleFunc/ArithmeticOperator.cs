@@ -1,12 +1,14 @@
-﻿using System;
+﻿using SpiceSharp;
+using System;
 
 namespace SpiceSharpBehavioral.Parsers.DoubleFunc
 {
     /// <summary>
     /// Arithmetic implementation for functions that return doubles.
     /// </summary>
+    /// <seealso cref="ParameterSet" />
     /// <seealso cref="IArithmeticOperator{T}" />
-    public class ArithmeticOperator : IArithmeticOperator<Func<double>>
+    public class ArithmeticOperator : ParameterSet, IArithmeticOperator<Func<double>>
     {
         /// <summary>
         /// Adds two operands.
