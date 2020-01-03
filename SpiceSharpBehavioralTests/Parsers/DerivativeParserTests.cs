@@ -7,7 +7,7 @@ using SpiceSharpBehavioral.Parsers.Derivatives;
 namespace SpiceSharpBehavioralTests.Parsers
 {
     [TestFixture]
-    public class DoubleDerivativeParserTests
+    public class DerivativeParserTests
     {
         protected double RelativeTolerance = 1e-9;
         protected double AbsoluteTolerance = 1e-12;
@@ -15,7 +15,7 @@ namespace SpiceSharpBehavioralTests.Parsers
         protected void Check(Func<double[], double>[] reference, Parser<IDerivatives<char, double>> parser, string expression)
         {
             // Add our variables
-            var variables = parser.Parameters.ValueFactory.GetProperty<IDictionary<string, IDerivatives<char, double>>>("variables");
+            var variables = parser.GetProperty<IDictionary<string, IDerivatives<char, double>>>("variables");
             var derivatives = new IDerivatives<char, double>[reference.Length - 1];
             for (var i = 0; i < reference.Length - 1; i++)
             {

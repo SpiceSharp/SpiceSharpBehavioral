@@ -55,7 +55,7 @@
   <ItemGroup>
     <Compile Include="Parsers\DoubleFuncParserTests.cs" />
     <Compile Include="Parsers\DoubleParserTests.cs" />
-    <Compile Include="Parsers\DoubleDerivativeParserTests.cs" />
+    <Compile Include="Parsers\DerivativeParserTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

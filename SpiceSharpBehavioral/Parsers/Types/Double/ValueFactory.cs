@@ -178,5 +178,18 @@ namespace SpiceSharpBehavioral.Parsers.Double
         /// The value of the variable.
         /// </returns>
         public double CreateVariable(string variable) => Variables[variable];
+
+        /// <summary>
+        /// Creates the property.
+        /// </summary>
+        /// <param name="type">The type of property.</param>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>
+        /// The value of the property.
+        /// </returns>
+        public double CreateProperty(PropertyType type, IReadOnlyList<string> arguments)
+        {
+            throw new NotSupportedException();
+        }
     }
 }

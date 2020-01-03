@@ -1,8 +1,9 @@
 ﻿using SpiceSharp;
+using SpiceSharpBehavioral.Parsers;
 using System;
 using System.Collections.Generic;
 
-namespace SpiceSharpBehavioral.Parsers.DoubleFunc
+namespace SpiceSharpBehavioral.Components.DoubleFunc
 {
     /// <summary>
     /// A value factory for double functions.

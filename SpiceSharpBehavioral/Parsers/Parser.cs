@@ -199,6 +199,8 @@ namespace SpiceSharpBehavioral.Parsers
 
             // Do parameters
             char nc;
+            string name;
+            List<string> arguments;
             switch (c)
             {
                 case '+': PushOperator(Operators.Positive); _expectInfixPostfix = false; _index++; return;
@@ -242,15 +244,46 @@ namespace SpiceSharpBehavioral.Parsers
                         throw new Exception("Invalid bracket");
                     _index++;
                     return;
+                case '@':
+                    _index++;
+                    name = NextWord();
+                    if (NextChar(name.Length) == '[')
+                    {
+                        _index += name.Length + 1;
+                        arguments = new List<string> { name };
+                        arguments.AddRange(NextUntil(']').Split(','));
+                        _values.Push(Parameters.ValueFactory.CreateProperty(PropertyType.Property, arguments));
+                        return;
+                    }
+                    break;
                 case var mc when mc >= 'a' && mc <= 'z' || mc >= 'A' && mc <= 'Z' || mc == '_':
-                    var name = NextWord();
+                    name = NextWord();
                     if (NextChar(name.Length) == '(')
                     {
                         _index += name.Length + 1;
-                        _functions.Push(new FunctionDeclaration(name));
-                        PushOperator(Operators.Function);
-                        _expectInfixPostfix = false;
-                        return;
+                        switch (name)
+                        {
+                            case "v":
+                            case "V":
+                                // Get the arguments
+                                arguments = new List<string>();
+                                arguments.AddRange(NextUntil(')').Split(','));
+                                _values.Push(Parameters.ValueFactory.CreateProperty(PropertyType.Voltage, arguments));
+                                return;
+                            case "i":
+                            case "I":
+                                // Get the arguments
+                                arguments = new List<string>();
+                                arguments.AddRange(NextUntil(')').Split(','));
+                                _values.Push(Parameters.ValueFactory.CreateProperty(PropertyType.Current, arguments));
+                                return;
+                            default:
+                                // Generic function declaration
+                                _functions.Push(new FunctionDeclaration(name));
+                                PushOperator(Operators.Function);
+                                _expectInfixPostfix = false;
+                                return;
+                        }
                     }
                     else
                     {
@@ -415,6 +448,27 @@ namespace SpiceSharpBehavioral.Parsers
                     return sb.ToString();
             }
 
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Nexts the until.
+        /// </summary>
+        /// <param name="last">The last.</param>
+        /// <returns>
+        /// The result until the specified character.
+        /// </returns>
+        private string NextUntil(char last)
+        {
+            var index = _index;
+            StringBuilder sb = new StringBuilder();
+            while (_input[index] != last)
+            {
+                sb.Append(_input[index]);
+                index++;
+                if (index >= _input.Length)
+                    return sb.ToString();
+            }
             return sb.ToString();
         }
 

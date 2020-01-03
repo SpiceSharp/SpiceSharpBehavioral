@@ -33,15 +33,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Components\**" />
     <Compile Remove="Parsers\Common\**" />
     <Compile Remove="Parsers\Derivatives\**" />
     <Compile Remove="Parsers\Helper\**" />
-    <EmbeddedResource Remove="Components\**" />
     <EmbeddedResource Remove="Parsers\Common\**" />
     <EmbeddedResource Remove="Parsers\Derivatives\**" />
     <EmbeddedResource Remove="Parsers\Helper\**" />
-    <None Remove="Components\**" />
     <None Remove="Parsers\Common\**" />
     <None Remove="Parsers\Derivatives\**" />
     <None Remove="Parsers\Helper\**" />
