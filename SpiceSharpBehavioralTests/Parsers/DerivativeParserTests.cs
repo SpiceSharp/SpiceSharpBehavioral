@@ -141,15 +141,15 @@ namespace SpiceSharpBehavioralTests.Parsers
         public void When_Exp_Expect_Reference()
         {
             var parser = new Parser<IDerivatives<char, double>>(new DerivativesParserParameters<char, double>(new DoubleParserParameters()));
-            Check(new Func<double[], double>[] { x => Math.Exp(x[0]), x => Math.Exp(x[0]) }, parser, "Exp(a)");
+            Check(new Func<double[], double>[] { x => Math.Exp(x[0]), x => Math.Exp(x[0]) }, parser, "exp(a)");
         }
 
         [Test]
         public void When_Log_Expect_Reference()
         {
             var parser = new Parser<IDerivatives<char, double>>(new DerivativesParserParameters<char, double>(new DoubleParserParameters()));
-            Check(new Func<double[], double>[] { x => Math.Log(x[0]), x => 1 / x[0] }, parser, "Log(a)");
-            Check(new Func<double[], double>[] { x => Math.Log10(x[0]), x => 1 / Math.Log(10.0) / x[0] }, parser, "Log10(a)");
+            Check(new Func<double[], double>[] { x => Math.Log(x[0]), x => 1 / x[0] }, parser, "log(a)");
+            Check(new Func<double[], double>[] { x => Math.Log10(x[0]), x => 1 / Math.Log(10.0) / x[0] }, parser, "log10(a)");
         }
 
         [Test]
@@ -159,84 +159,84 @@ namespace SpiceSharpBehavioralTests.Parsers
             Check(new Func<double[], double>[] {
                 x => Math.Pow(x[0], x[1]),
                 x => x[1] * Math.Pow(x[0], x[1] - 1),
-                x => Math.Pow(x[0], x[1]) * Math.Log(x[0]) }, parser, "Pow(a, b)");
+                x => Math.Pow(x[0], x[1]) * Math.Log(x[0]) }, parser, "pow(a, b)");
         }
 
         [Test]
         public void When_Sqrt_Expect_Reference()
         {
             var parser = new Parser<IDerivatives<char, double>>(new DerivativesParserParameters<char, double>(new DoubleParserParameters()));
-            Check(new Func<double[], double>[] { x => Math.Sqrt(x[0]), x => 0.5 / Math.Sqrt(x[0]) }, parser, "Sqrt(a)");
+            Check(new Func<double[], double>[] { x => Math.Sqrt(x[0]), x => 0.5 / Math.Sqrt(x[0]) }, parser, "sqrt(a)");
         }
 
         [Test]
         public void When_Sin_Expect_Reference()
         {
             var parser = new Parser<IDerivatives<char, double>>(new DerivativesParserParameters<char, double>(new DoubleParserParameters()));
-            Check(new Func<double[], double>[] { x => Math.Sin(x[0]), x => Math.Cos(x[0]) }, parser, "Sin(a)");
+            Check(new Func<double[], double>[] { x => Math.Sin(x[0]), x => Math.Cos(x[0]) }, parser, "sin(a)");
         }
 
         [Test]
         public void When_Cos_Expect_Reference()
         {
             var parser = new Parser<IDerivatives<char, double>>(new DerivativesParserParameters<char, double>(new DoubleParserParameters()));
-            Check(new Func<double[], double>[] { x => Math.Cos(x[0]), x => -Math.Sin(x[0]) }, parser, "Cos(a)");
+            Check(new Func<double[], double>[] { x => Math.Cos(x[0]), x => -Math.Sin(x[0]) }, parser, "cos(a)");
         }
 
         [Test]
         public void When_Tan_Expect_Reference()
         {
             var parser = new Parser<IDerivatives<char, double>>(new DerivativesParserParameters<char, double>(new DoubleParserParameters()));
-            Check(new Func<double[], double>[] { x => Math.Tan(x[0]), x => 1.0 / Math.Cos(x[0]) / Math.Cos(x[0]) }, parser, "Tan(a)");
+            Check(new Func<double[], double>[] { x => Math.Tan(x[0]), x => 1.0 / Math.Cos(x[0]) / Math.Cos(x[0]) }, parser, "tan(a)");
         }
 
         [Test]
         public void When_Asin_Expect_Reference()
         {
             var parser = new Parser<IDerivatives<char, double>>(new DerivativesParserParameters<char, double>(new DoubleParserParameters()));
-            Check(new Func<double[], double>[] { x => Math.Asin(x[0]), x => 1.0 / Math.Sqrt(1 - x[0] * x[0]) }, parser, "Asin(a)");
+            Check(new Func<double[], double>[] { x => Math.Asin(x[0]), x => 1.0 / Math.Sqrt(1 - x[0] * x[0]) }, parser, "asin(a)");
         }
 
         [Test]
         public void When_Acos_Expect_Reference()
         {
             var parser = new Parser<IDerivatives<char, double>>(new DerivativesParserParameters<char, double>(new DoubleParserParameters()));
-            Check(new Func<double[], double>[] { x => Math.Acos(x[0]), x => -1.0 / Math.Sqrt(1 - x[0] * x[0]) }, parser, "Acos(a)");
+            Check(new Func<double[], double>[] { x => Math.Acos(x[0]), x => -1.0 / Math.Sqrt(1 - x[0] * x[0]) }, parser, "acos(a)");
         }
 
         [Test]
         public void When_Atan_Expect_Reference()
         {
             var parser = new Parser<IDerivatives<char, double>>(new DerivativesParserParameters<char, double>(new DoubleParserParameters()));
-            Check(new Func<double[], double>[] { x => Math.Atan(x[0]), x => 1.0 / (1 + x[0] * x[0]) }, parser, "Atan(a)");
+            Check(new Func<double[], double>[] { x => Math.Atan(x[0]), x => 1.0 / (1 + x[0] * x[0]) }, parser, "atan(a)");
         }
 
         [Test]
         public void When_Abs_Expect_Reference()
         {
             var parser = new Parser<IDerivatives<char, double>>(new DerivativesParserParameters<char, double>(new DoubleParserParameters()));
-            Check(new Func<double[], double>[] { x => Math.Abs(x[0]), x => x[0] > 0 ? 1 : x[0] < 0 ? -1 : 0 }, parser, "Abs(a)");
+            Check(new Func<double[], double>[] { x => Math.Abs(x[0]), x => x[0] > 0 ? 1 : x[0] < 0 ? -1 : 0 }, parser, "abs(a)");
         }
 
         [Test]
         public void When_Abs_NotSimpleArgument_Expect_Reference()
         {
             var parser = new Parser<IDerivatives<char, double>>(new DerivativesParserParameters<char, double>(new DoubleParserParameters()));
-            Check(new Func<double[], double>[] { x => Math.Abs(2 * x[0]), x => x[0] > 0 ? 2 : x[0] < 0 ? -2 : 0 }, parser, "Abs(2*a)");
+            Check(new Func<double[], double>[] { x => Math.Abs(2 * x[0]), x => x[0] > 0 ? 2 : x[0] < 0 ? -2 : 0 }, parser, "abs(2*a)");
         }
         [Test]
         public void When_Round_Expect_Reference()
         {
             var parser = new Parser<IDerivatives<char, double>>(new DerivativesParserParameters<char, double>(new DoubleParserParameters()));
-            Check(new Func<double[], double>[] { x => Math.Round(x[0]), x => 0 }, parser, "Round(a)");
-            Check(new Func<double[], double>[] { x => Math.Round(x[0], 2), x => 0 }, parser, "Round(a, 2)");
+            Check(new Func<double[], double>[] { x => Math.Round(x[0]), x => 0 }, parser, "round(a)");
+            Check(new Func<double[], double>[] { x => Math.Round(x[0], 2), x => 0 }, parser, "round(a, 2)");
         }
 
         [Test]
         public void When_Min_Expect_Reference()
         {
             var parser = new Parser<IDerivatives<char, double>>(new DerivativesParserParameters<char, double>(new DoubleParserParameters()));
-            Check(new Func<double[], double>[] { x => Math.Min(x[0], 1), x => x[0] < 1.0 ? 1 : 0 }, parser, "Min(a, 1)");
+            Check(new Func<double[], double>[] { x => Math.Min(x[0], 1), x => x[0] < 1.0 ? 1 : 0 }, parser, "min(a, 1)");
             Check(new Func<double[], double>[] {
                 x => Math.Min(x[0] < 0 ? -x[0] * x[0] : x[0] * x[0], x[0]),
                 x =>
@@ -244,14 +244,14 @@ namespace SpiceSharpBehavioralTests.Parsers
                     if (x[0] < -1 || (x[0] > 0 && x[0] < 1))
                         return Math.Abs(x[0]) * 2;
                     return 1.0;
-                }}, parser, "Min(a^2, a)");
+                }}, parser, "min(a^2, a)");
         }
 
         [Test]
         public void When_Max_Expect_Reference()
         {
             var parser = new Parser<IDerivatives<char, double>>(new DerivativesParserParameters<char, double>(new DoubleParserParameters()));
-            Check(new Func<double[], double>[] { x => Math.Max(x[0], 1), x => x[0] > 1.0 ? 1 : 0 }, parser, "Max(a, 1)");
+            Check(new Func<double[], double>[] { x => Math.Max(x[0], 1), x => x[0] > 1.0 ? 1 : 0 }, parser, "max(a, 1)");
             Check(new Func<double[], double>[] {
                 x => Math.Max(x[0] < 0 ? -x[0] * x[0] : x[0] * x[0], x[0]),
                 x =>
@@ -259,7 +259,7 @@ namespace SpiceSharpBehavioralTests.Parsers
                     if (x[0] > 1 || (x[0] < 0 && x[0] > -1))
                         return Math.Abs(x[0]) * 2;
                     return 1.0;
-                }}, parser, "Max(a^2, a)");
+                }}, parser, "max(a^2, a)");
         }
     }
 }

@@ -53,6 +53,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Components\Parsers\Derivatives\" />
     <Folder Include="Properties\" />
   </ItemGroup>
 

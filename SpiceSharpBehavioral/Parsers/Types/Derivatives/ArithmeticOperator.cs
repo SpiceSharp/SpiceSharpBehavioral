@@ -111,10 +111,11 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
                 var hasRight = right.TryGetValue(key, out var rightDerivative);
                 if (hasLeft && hasRight)
                 {
-                    n[key] = _parent.Arithmetic.Subtract(_parent.Arithmetic.Divide(leftDerivative, right.Value),
-                        _parent.Arithmetic.Divide(
-                            _parent.Arithmetic.Multiply(left.Value, rightDerivative),
-                            _parent.Arithmetic.Multiply(right.Value, right.Value)));
+                    n[key] = _parent.Arithmetic.Divide(
+                        _parent.Arithmetic.Subtract(
+                            _parent.Arithmetic.Multiply(leftDerivative, right.Value),
+                            _parent.Arithmetic.Multiply(left.Value, rightDerivative)),
+                        _parent.Arithmetic.Pow(right.Value, 2));
                 }
                 else if (hasLeft)
                     n[key] = _parent.Arithmetic.Divide(leftDerivative, right.Value);
@@ -123,7 +124,7 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
                     n[key] = _parent.Arithmetic.Negate(
                         _parent.Arithmetic.Divide(
                             _parent.Arithmetic.Multiply(left.Value, rightDerivative),
-                            _parent.Arithmetic.Multiply(right.Value, right.Value)));
+                            _parent.Arithmetic.Pow(right.Value, 2)));
                 }
             }
             return n;
@@ -162,7 +163,9 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
                 var hasLeft = left.TryGetValue(key, out var leftDerivative);
                 var hasRight = right.TryGetValue(key, out var rightDerivative);
                 if (hasLeft && hasRight)
-                    n[key] = _parent.Arithmetic.Add(_parent.Arithmetic.Multiply(leftDerivative, right.Value), _parent.Arithmetic.Multiply(left.Value, rightDerivative));
+                    n[key] = _parent.Arithmetic.Add(
+                        _parent.Arithmetic.Multiply(leftDerivative, right.Value),
+                        _parent.Arithmetic.Multiply(left.Value, rightDerivative));
                 else if (hasLeft)
                     n[key] = _parent.Arithmetic.Multiply(leftDerivative, right.Value);
                 else if (hasRight)
@@ -206,10 +209,14 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
                 if (hasLeft && hasRight)
                 {
                     n[key] = _parent.Arithmetic.Add(
-                        _parent.Arithmetic.Multiply(_parent.Arithmetic.Multiply(
-                            _parent.Arithmetic.Pow(@base.Value, _parent.Arithmetic.Decrement(exponent.Value)), exponent.Value), leftDerivative),
-                        _parent.Arithmetic.Multiply(_parent.Arithmetic.Multiply(n.Value, _parent.Arithmetic.Log(@base.Value)), rightDerivative)
-                        );
+                        _parent.Arithmetic.Multiply(
+                            _parent.Arithmetic.Multiply(
+                                _parent.Arithmetic.Pow(@base.Value, _parent.Arithmetic.Decrement(exponent.Value)), 
+                                exponent.Value),
+                            leftDerivative),
+                        _parent.Arithmetic.Multiply(
+                            _parent.Arithmetic.Multiply(n.Value, _parent.Arithmetic.Log(@base.Value)),
+                            rightDerivative));
                 }
                 else if (hasLeft)
                     n[key] = _parent.Arithmetic.Multiply(_parent.Arithmetic.Multiply(

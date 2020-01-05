@@ -1,4 +1,5 @@
 ﻿using SpiceSharp;
+using System;
 using System.Collections.Generic;
 
 namespace SpiceSharpBehavioral.Parsers
@@ -50,21 +51,102 @@ namespace SpiceSharpBehavioral.Parsers
     /// <summary>
     /// A list of supported property types.
     /// </summary>
+    [Flags]
     public enum PropertyType
     {
         /// <summary>
-        /// A voltage property V(...).
+        /// A voltage property.
         /// </summary>
-        Voltage,
+        Voltage = 0x01,
 
         /// <summary>
-        /// A current property I(...).
+        /// A current property.
         /// </summary>
-        Current,
+        Current = 0x02,
 
         /// <summary>
-        /// An entity property @...[...].
+        /// The real part of a complex property.
         /// </summary>
-        Property
+        Real = 0x010,
+
+        /// <summary>
+        /// The imaginary part of a complex property.
+        /// </summary>
+        Imaginary = 0x020,
+
+        /// <summary>
+        /// The amplitude of a complex property.
+        /// </summary>
+        Amplitude = 0x030,
+
+        /// <summary>
+        /// The decibels of a complex property.
+        /// </summary>
+        Decibels = 0x040,
+
+        /// <summary>
+        /// The phase of a complex property.
+        /// </summary>
+        Phase = 0x050,
+
+        /// <summary>
+        /// The property of a component.
+        /// </summary>
+        Property = 0x0100,
+
+        /// <summary>
+        /// The real part of a complex voltage VR(...).
+        /// </summary>
+        VoltageReal = Real | Voltage,
+
+        /// <summary>
+        /// The imaginary part of a complex voltage VI(...).
+        /// </summary>
+        VoltageImaginary = Imaginary | Voltage,
+
+        /// <summary>
+        /// The amplitude of a complex voltage VA(...).
+        /// </summary>
+        VoltageAmplitude = Amplitude | Voltage,
+
+        /// <summary>
+        /// The voltage decibels VDB(...).
+        /// </summary>
+        VoltageDecibels = Decibels | Voltage,
+
+        /// <summary>
+        /// The voltage phase VPH(...).
+        /// </summary>
+        VoltagePhase = Phase | Voltage,
+
+        /// <summary>
+        /// The real part of a complex current IR(...).
+        /// </summary>
+        CurrentReal = Real | Current,
+
+        /// <summary>
+        /// The imaginary part of a complex current II(...).
+        /// </summary>
+        CurrentImaginary = Imaginary | Current,
+
+        /// <summary>
+        /// The amplitude of a complex current IA(...).
+        /// </summary>
+        CurrentAmplitude = Amplitude | Current,
+
+        /// <summary>
+        /// The current decibels IDB(...).
+        /// </summary>
+        CurrentDecibels = Decibels | Current,
+
+        /// <summary>
+        /// The current phase IPH(...).
+        /// </summary>
+        CurrentPhase = Phase | Current,
+
+        /// <summary>
+        /// A mask that contains all flags that require a complex input.
+        /// </summary>
+        ComplexMask = Real | Imaginary | Amplitude | Decibels | Phase
     }
 }

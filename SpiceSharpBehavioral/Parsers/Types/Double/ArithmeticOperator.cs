@@ -48,7 +48,7 @@ namespace SpiceSharpBehavioral.Parsers.Double
         /// <returns>
         /// The division (left) / (right).
         /// </returns>
-        public double Divide(double left, double right) => left / right;
+        public virtual double Divide(double left, double right) => left / right;
 
         /// <summary>
         /// Takes the modulo.
@@ -77,7 +77,7 @@ namespace SpiceSharpBehavioral.Parsers.Double
         /// <returns>
         /// The power (base) ^ (exponent).
         /// </returns>
-        public double Pow(double @base, double exponent) => Math.Pow(@base, exponent);
+        public virtual double Pow(double @base, double exponent) => Math.Pow(@base, exponent);
 
         /// <summary>
         /// Takes the natural logarithm.
@@ -86,7 +86,7 @@ namespace SpiceSharpBehavioral.Parsers.Double
         /// <returns>
         /// The natural logarithm Ln(value).
         /// </returns>
-        public double Log(double value) => Math.Log(value);
+        public virtual double Log(double value) => Math.Log(value);
 
         /// <summary>
         /// Increments the specified input.
@@ -114,7 +114,7 @@ namespace SpiceSharpBehavioral.Parsers.Double
         /// <returns>
         /// The power (base) ^ exponent
         /// </returns>
-        public double Pow(double @base, int exponent)
+        public virtual double Pow(double @base, int exponent)
         {
             if (exponent == 0)
                 return 1.0;

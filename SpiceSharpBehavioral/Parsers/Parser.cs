@@ -264,19 +264,29 @@ namespace SpiceSharpBehavioral.Parsers
                         switch (name)
                         {
                             case "v":
-                            case "V":
-                                // Get the arguments
-                                arguments = new List<string>();
-                                arguments.AddRange(NextUntil(')').Split(','));
-                                _values.Push(Parameters.ValueFactory.CreateProperty(PropertyType.Voltage, arguments));
-                                return;
+                            case "V": PushProperty(PropertyType.Voltage); return;
+                            case "vr":
+                            case "VR": PushProperty(PropertyType.VoltageReal); return;
+                            case "vi":
+                            case "VI": PushProperty(PropertyType.VoltageImaginary); return;
+                            case "va":
+                            case "VA": PushProperty(PropertyType.VoltageAmplitude); return;
+                            case "vdb":
+                            case "VDB": PushProperty(PropertyType.VoltageDecibels); return;
+                            case "vph":
+                            case "VPH": PushProperty(PropertyType.VoltagePhase); return;
                             case "i":
-                            case "I":
-                                // Get the arguments
-                                arguments = new List<string>();
-                                arguments.AddRange(NextUntil(')').Split(','));
-                                _values.Push(Parameters.ValueFactory.CreateProperty(PropertyType.Current, arguments));
-                                return;
+                            case "I": PushProperty(PropertyType.Current); return;
+                            case "ir":
+                            case "IR": PushProperty(PropertyType.CurrentReal); return;
+                            case "ii":
+                            case "II": PushProperty(PropertyType.CurrentImaginary); return;
+                            case "IA":
+                            case "ia": PushProperty(PropertyType.CurrentAmplitude); return;
+                            case "IDB":
+                            case "idb": PushProperty(PropertyType.CurrentDecibels); return;
+                            case "IPH":
+                            case "iph": PushProperty(PropertyType.CurrentPhase); return;
                             default:
                                 // Generic function declaration
                                 _functions.Push(new FunctionDeclaration(name));
@@ -305,6 +315,19 @@ namespace SpiceSharpBehavioral.Parsers
                     return;
             }
             throw new ParserException("Invalid operator", _input, _index);
+        }
+
+        /// <summary>
+        /// Pushes a property.
+        /// </summary>
+        /// <param name="type">The property type.</param>
+        private void PushProperty(PropertyType type)
+        {
+            var argTxt = NextUntil(')');
+            var arguments = new List<string>();
+            arguments.AddRange(argTxt.Split(','));
+            _values.Push(Parameters.ValueFactory.CreateProperty(type, arguments));
+            _index += argTxt.Length + 1;
         }
 
         /// <summary>

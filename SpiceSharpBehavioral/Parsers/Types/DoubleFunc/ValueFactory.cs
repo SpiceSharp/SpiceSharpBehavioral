@@ -1,4 +1,5 @@
 ﻿using SpiceSharp;
+using SpiceSharp.Attributes;
 using System;
 using System.Collections.Generic;
 
@@ -17,6 +18,7 @@ namespace SpiceSharpBehavioral.Parsers.DoubleFunc
         /// <value>
         /// The variables.
         /// </value>
+        [ParameterName("variables"), ParameterInfo("The variables")]
         public IDictionary<string, Func<double>> Variables { get; }
 
         /// <summary>
@@ -53,7 +55,7 @@ namespace SpiceSharpBehavioral.Parsers.DoubleFunc
         /// <returns>
         /// The value of the function.
         /// </returns>
-        public Func<double> CreateFunction(string name, Func<double>[] arguments)
+        public virtual Func<double> CreateFunction(string name, Func<double>[] arguments)
         {
             switch (arguments.Length)
             {
@@ -195,7 +197,7 @@ namespace SpiceSharpBehavioral.Parsers.DoubleFunc
         /// <returns>
         /// The value of the property.
         /// </returns>
-        public Func<double> CreateProperty(PropertyType type, IReadOnlyList<string> arguments)
+        public virtual Func<double> CreateProperty(PropertyType type, IReadOnlyList<string> arguments)
         {
             throw new NotSupportedException();
         }

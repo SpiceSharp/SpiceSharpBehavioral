@@ -16,7 +16,21 @@ namespace SpiceSharpBehavioral.Parsers
         IParameterized<RelationalOperator<K, V>>,
         IParameterized<ValueFactory<K, V>>
     {
-        private readonly IParserParameters<V> _parent;
+        /// <summary>
+        /// Gets the base parameters.
+        /// </summary>
+        /// <value>
+        /// The base parameters.
+        /// </value>
+        public IParserParameters<V> Base { get; }
+
+        /// <summary>
+        /// Gets the factory for creating derivatives.
+        /// </summary>
+        /// <value>
+        /// The factory for creating derivatives.
+        /// </value>
+        public IDerivativeFactory<K, V> Factory { get; }
 
         /// <summary>
         /// Gets the arithmetic operators.
@@ -69,12 +83,13 @@ namespace SpiceSharpBehavioral.Parsers
         /// <param name="parent">The parent parser parameters.</param>
         public DerivativesParserParameters(IParserParameters<V> parent)
         {
-            _parent = parent.ThrowIfNull(nameof(parent));
-            var factory = new DerivativeFactory<K, V>();
-            Arithmetic = new ArithmeticOperator<K, V>(parent, factory);
-            Conditional = new ConditionalOperator<K, V>(parent, factory);
-            Relational = new RelationalOperator<K, V>(parent, factory);
-            ValueFactory = new ValueFactory<K, V>(parent, factory);
+            Base = parent.ThrowIfNull(nameof(parent));
+            Factory = new DerivativeFactory<K, V>();
+
+            Arithmetic = new ArithmeticOperator<K, V>(parent, Factory);
+            Conditional = new ConditionalOperator<K, V>(parent, Factory);
+            Relational = new RelationalOperator<K, V>(parent, Factory);
+            ValueFactory = new ValueFactory<K, V>(parent, Factory);
         }
 
         /// <summary>
@@ -85,7 +100,7 @@ namespace SpiceSharpBehavioral.Parsers
         /// </returns>
         ICloneable ICloneable.Clone()
         {
-            var clone = new DerivativesParserParameters<K, V>((IParserParameters<V>)_parent.Clone());
+            var clone = new DerivativesParserParameters<K, V>((IParserParameters<V>)Base.Clone());
             ((ICloneable)clone).CopyFrom(this);
             return clone;
         }
