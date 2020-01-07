@@ -68,6 +68,17 @@ namespace SpiceSharpBehavioral.Parsers
         /// </summary>
         public DoubleFuncParserParameters()
         {
+            ValueFactory.FunctionFound += Defaults.FunctionFound;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DoubleFuncParserParameters"/> class.
+        /// </summary>
+        /// <param name="registerDefaults">if set to <c>true</c>, the default functions are added.</param>
+        public DoubleFuncParserParameters(bool registerDefaults)
+        {
+            if (registerDefaults)
+                ValueFactory.FunctionFound += Defaults.FunctionFound;
         }
 
         /// <summary>

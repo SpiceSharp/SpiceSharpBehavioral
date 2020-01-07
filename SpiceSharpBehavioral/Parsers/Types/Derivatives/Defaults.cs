@@ -64,10 +64,10 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
         /// <param name="e">The <see cref="FunctionFoundEventArgs{Double}"/> instance containing the event data.</param>
         public static void FunctionFound(object sender, FunctionFoundEventArgs<IDerivatives<K, V>> e)
         {
-            if (sender is ValueFactory<K, V> valueFactory)
+            if (sender is IDerivativeOperator<K, V> op)
             {
                 if (_functions.TryGetValue(e.Name, out var description))
-                    e.Result = description(valueFactory.Base, valueFactory.Factory, e.Arguments);
+                    e.Result = description(op.Base, op.Factory, e.Arguments);
             }
         }
 

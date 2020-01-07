@@ -10,10 +10,23 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
     /// <typeparam name="K">The derivative key.</typeparam>
     /// <typeparam name="V">The value type.</typeparam>
     /// <seealso cref="IArithmeticOperator{T}" />
-    public class ArithmeticOperator<K, V> : ParameterSet, IArithmeticOperator<IDerivatives<K, V>>
+    public class ArithmeticOperator<K, V> : ParameterSet, IArithmeticOperator<IDerivatives<K, V>>, IDerivativeOperator<K, V>
     {
-        private readonly IParserParameters<V> _parent;
-        private readonly IDerivativeFactory<K, V> _factory;
+        /// <summary>
+        /// Gets the base parameters.
+        /// </summary>
+        /// <value>
+        /// The base.
+        /// </value>
+        public IParserParameters<V> Base { get; }
+
+        /// <summary>
+        /// Gets the factory for derivatives.
+        /// </summary>
+        /// <value>
+        /// The factory.
+        /// </value>
+        public IDerivativeFactory<K, V> Factory { get; }
 
         /// <summary>
         /// Enumerates the combined keys.
@@ -31,8 +44,8 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
         /// <param name="factory">The factory.</param>
         public ArithmeticOperator(IParserParameters<V> parent, IDerivativeFactory<K, V> factory)
         {
-            _parent = parent.ThrowIfNull(nameof(parent));
-            _factory = factory.ThrowIfNull(nameof(factory));
+            Base = parent.ThrowIfNull(nameof(parent));
+            Factory = factory.ThrowIfNull(nameof(factory));
         }
 
         /// <summary>
@@ -45,8 +58,8 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
         /// </returns>
         public IDerivatives<K, V> Add(IDerivatives<K, V> left, IDerivatives<K, V> right)
         {
-            var n = _factory.Create(left, right);
-            n.Value = _parent.Arithmetic.Add(left.Value, right.Value);
+            var n = Factory.Create(left, right);
+            n.Value = Base.Arithmetic.Add(left.Value, right.Value);
 
             // Adding of derivatives
             foreach (var key in CombinedKeys(left, right))
@@ -54,7 +67,7 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
                 var hasLeft = left.TryGetValue(key, out var leftDerivative);
                 var hasRight = right.TryGetValue(key, out var rightDerivative);
                 if (hasLeft && hasRight)
-                    n[key] = _parent.Arithmetic.Add(leftDerivative, rightDerivative);
+                    n[key] = Base.Arithmetic.Add(leftDerivative, rightDerivative);
                 else if (hasLeft)
                     n[key] = leftDerivative;
                 else if (hasRight)
@@ -73,8 +86,8 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
         /// </returns>
         public IDerivatives<K, V> Subtract(IDerivatives<K, V> left, IDerivatives<K, V> right)
         {
-            var n = _factory.Create(left, right);
-            n.Value = _parent.Arithmetic.Subtract(left.Value, right.Value);
+            var n = Factory.Create(left, right);
+            n.Value = Base.Arithmetic.Subtract(left.Value, right.Value);
 
             // Adding of derivatives
             foreach (var key in CombinedKeys(left, right))
@@ -82,7 +95,7 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
                 var hasLeft = left.TryGetValue(key, out var leftDerivative);
                 var hasRight = right.TryGetValue(key, out var rightDerivative);
                 if (hasLeft && hasRight)
-                    n[key] = _parent.Arithmetic.Subtract(leftDerivative, rightDerivative);
+                    n[key] = Base.Arithmetic.Subtract(leftDerivative, rightDerivative);
                 else if (hasLeft)
                     n[key] = leftDerivative;
                 else if (hasRight)
@@ -101,8 +114,8 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
         /// </returns>
         public IDerivatives<K, V> Divide(IDerivatives<K, V> left, IDerivatives<K, V> right)
         {
-            var n = _factory.Create(left, right);
-            n.Value = _parent.Arithmetic.Divide(left.Value, right.Value);
+            var n = Factory.Create(left, right);
+            n.Value = Base.Arithmetic.Divide(left.Value, right.Value);
 
             // Adding of derivatives
             foreach (var key in CombinedKeys(left, right))
@@ -111,20 +124,20 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
                 var hasRight = right.TryGetValue(key, out var rightDerivative);
                 if (hasLeft && hasRight)
                 {
-                    n[key] = _parent.Arithmetic.Divide(
-                        _parent.Arithmetic.Subtract(
-                            _parent.Arithmetic.Multiply(leftDerivative, right.Value),
-                            _parent.Arithmetic.Multiply(left.Value, rightDerivative)),
-                        _parent.Arithmetic.Pow(right.Value, 2));
+                    n[key] = Base.Arithmetic.Divide(
+                        Base.Arithmetic.Subtract(
+                            Base.Arithmetic.Multiply(leftDerivative, right.Value),
+                            Base.Arithmetic.Multiply(left.Value, rightDerivative)),
+                        Base.Arithmetic.Pow(right.Value, 2));
                 }
                 else if (hasLeft)
-                    n[key] = _parent.Arithmetic.Divide(leftDerivative, right.Value);
+                    n[key] = Base.Arithmetic.Divide(leftDerivative, right.Value);
                 else if (hasRight)
                 {
-                    n[key] = _parent.Arithmetic.Negate(
-                        _parent.Arithmetic.Divide(
-                            _parent.Arithmetic.Multiply(left.Value, rightDerivative),
-                            _parent.Arithmetic.Pow(right.Value, 2)));
+                    n[key] = Base.Arithmetic.Negate(
+                        Base.Arithmetic.Divide(
+                            Base.Arithmetic.Multiply(left.Value, rightDerivative),
+                            Base.Arithmetic.Pow(right.Value, 2)));
                 }
             }
             return n;
@@ -140,8 +153,8 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
         /// </returns>
         public IDerivatives<K, V> Modulo(IDerivatives<K, V> left, IDerivatives<K, V> right)
         {
-            var n = _factory.Create(left, right);
-            n.Value = _parent.Arithmetic.Modulo(left.Value, right.Value);
+            var n = Factory.Create(left, right);
+            n.Value = Base.Arithmetic.Modulo(left.Value, right.Value);
             return n;
         }
 
@@ -155,21 +168,21 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
         /// </returns>
         public IDerivatives<K, V> Multiply(IDerivatives<K, V> left, IDerivatives<K, V> right)
         {
-            var n = _factory.Create(left, right);
-            n.Value = _parent.Arithmetic.Multiply(left.Value, right.Value);
+            var n = Factory.Create(left, right);
+            n.Value = Base.Arithmetic.Multiply(left.Value, right.Value);
 
             foreach (var key in CombinedKeys(left, right))
             {
                 var hasLeft = left.TryGetValue(key, out var leftDerivative);
                 var hasRight = right.TryGetValue(key, out var rightDerivative);
                 if (hasLeft && hasRight)
-                    n[key] = _parent.Arithmetic.Add(
-                        _parent.Arithmetic.Multiply(leftDerivative, right.Value),
-                        _parent.Arithmetic.Multiply(left.Value, rightDerivative));
+                    n[key] = Base.Arithmetic.Add(
+                        Base.Arithmetic.Multiply(leftDerivative, right.Value),
+                        Base.Arithmetic.Multiply(left.Value, rightDerivative));
                 else if (hasLeft)
-                    n[key] = _parent.Arithmetic.Multiply(leftDerivative, right.Value);
+                    n[key] = Base.Arithmetic.Multiply(leftDerivative, right.Value);
                 else if (hasRight)
-                    n[key] = _parent.Arithmetic.Multiply(left.Value, rightDerivative);
+                    n[key] = Base.Arithmetic.Multiply(left.Value, rightDerivative);
             }
             return n;
         }
@@ -183,10 +196,10 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
         /// </returns>
         public IDerivatives<K, V> Negate(IDerivatives<K, V> input)
         {
-            var n = _factory.Create(input);
-            n.Value = _parent.Arithmetic.Negate(input.Value);
+            var n = Factory.Create(input);
+            n.Value = Base.Arithmetic.Negate(input.Value);
             foreach (var pair in input)
-                n[pair.Key] = _parent.Arithmetic.Negate(pair.Value);
+                n[pair.Key] = Base.Arithmetic.Negate(pair.Value);
             return n;
         }
 
@@ -200,30 +213,30 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
         /// </returns>
         public IDerivatives<K, V> Pow(IDerivatives<K, V> @base, IDerivatives<K, V> exponent)
         {
-            var n = _factory.Create(@base, exponent);
-            n.Value = _parent.Arithmetic.Pow(@base.Value, exponent.Value);
+            var n = Factory.Create(@base, exponent);
+            n.Value = Base.Arithmetic.Pow(@base.Value, exponent.Value);
             foreach (var key in CombinedKeys(@base, exponent))
             {
                 var hasLeft = @base.TryGetValue(key, out var leftDerivative);
                 var hasRight = exponent.TryGetValue(key, out var rightDerivative);
                 if (hasLeft && hasRight)
                 {
-                    n[key] = _parent.Arithmetic.Add(
-                        _parent.Arithmetic.Multiply(
-                            _parent.Arithmetic.Multiply(
-                                _parent.Arithmetic.Pow(@base.Value, _parent.Arithmetic.Decrement(exponent.Value)), 
+                    n[key] = Base.Arithmetic.Add(
+                        Base.Arithmetic.Multiply(
+                            Base.Arithmetic.Multiply(
+                                Base.Arithmetic.Pow(@base.Value, Base.Arithmetic.Decrement(exponent.Value)), 
                                 exponent.Value),
                             leftDerivative),
-                        _parent.Arithmetic.Multiply(
-                            _parent.Arithmetic.Multiply(n.Value, _parent.Arithmetic.Log(@base.Value)),
+                        Base.Arithmetic.Multiply(
+                            Base.Arithmetic.Multiply(n.Value, Base.Arithmetic.Log(@base.Value)),
                             rightDerivative));
                 }
                 else if (hasLeft)
-                    n[key] = _parent.Arithmetic.Multiply(_parent.Arithmetic.Multiply(
-                        _parent.Arithmetic.Pow(@base.Value, _parent.Arithmetic.Decrement(exponent.Value)), exponent.Value), leftDerivative);
+                    n[key] = Base.Arithmetic.Multiply(Base.Arithmetic.Multiply(
+                        Base.Arithmetic.Pow(@base.Value, Base.Arithmetic.Decrement(exponent.Value)), exponent.Value), leftDerivative);
                 else if (hasRight)
                 {
-                    n[key] = _parent.Arithmetic.Multiply(_parent.Arithmetic.Multiply(n.Value, _parent.Arithmetic.Log(@base.Value)), rightDerivative);
+                    n[key] = Base.Arithmetic.Multiply(Base.Arithmetic.Multiply(n.Value, Base.Arithmetic.Log(@base.Value)), rightDerivative);
                 }
             }
             return n;
@@ -238,10 +251,10 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
         /// </returns>
         public IDerivatives<K, V> Log(IDerivatives<K, V> value)
         {
-            var n = _factory.Create(value);
-            n.Value = _parent.Arithmetic.Log(value.Value);
+            var n = Factory.Create(value);
+            n.Value = Base.Arithmetic.Log(value.Value);
             foreach (var pair in value)
-                n[pair.Key] = _parent.Arithmetic.Divide(pair.Value, value.Value);
+                n[pair.Key] = Base.Arithmetic.Divide(pair.Value, value.Value);
             return n;
         }
 
@@ -254,8 +267,8 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
         /// </returns>
         public IDerivatives<K, V> Increment(IDerivatives<K, V> input)
         {
-            var n = _factory.Create(input);
-            n.Value = _parent.Arithmetic.Increment(input.Value);
+            var n = Factory.Create(input);
+            n.Value = Base.Arithmetic.Increment(input.Value);
             foreach (var pair in input)
                 n[pair.Key] = pair.Value;
             return n;
@@ -270,8 +283,8 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
         /// </returns>
         public IDerivatives<K, V> Decrement(IDerivatives<K, V> input)
         {
-            var n = _factory.Create(input);
-            n.Value = _parent.Arithmetic.Decrement(input.Value);
+            var n = Factory.Create(input);
+            n.Value = Base.Arithmetic.Decrement(input.Value);
             foreach (var pair in input)
                 n[pair.Key] = pair.Value;
             return n;
@@ -287,10 +300,10 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
         /// </returns>
         public IDerivatives<K, V> Pow(IDerivatives<K, V> @base, int exponent)
         {
-            var n = _factory.Create(@base);
-            n.Value = _parent.Arithmetic.Pow(@base.Value, exponent);
+            var n = Factory.Create(@base);
+            n.Value = Base.Arithmetic.Pow(@base.Value, exponent);
             foreach (var pair in @base)
-                n[pair.Key] = _parent.Arithmetic.Multiply(_parent.Arithmetic.Pow(@base.Value, exponent - 1), pair.Value);
+                n[pair.Key] = Base.Arithmetic.Multiply(Base.Arithmetic.Pow(@base.Value, exponent - 1), pair.Value);
             return n;
         }
     }

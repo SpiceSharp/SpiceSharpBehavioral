@@ -10,10 +10,23 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
     /// <typeparam name="K">The derivative key value.</typeparam>
     /// <typeparam name="V">The value type.</typeparam>
     /// <seealso cref="IConditionalOperator{T}" />
-    public class ConditionalOperator<K, V> : ParameterSet, IConditionalOperator<IDerivatives<K, V>>
+    public class ConditionalOperator<K, V> : ParameterSet, IConditionalOperator<IDerivatives<K, V>>, IDerivativeOperator<K, V>
     {
-        private readonly IParserParameters<V> _parent;
-        private readonly IDerivativeFactory<K, V> _factory;
+        /// <summary>
+        /// Gets the base parameters.
+        /// </summary>
+        /// <value>
+        /// The base.
+        /// </value>
+        public IParserParameters<V> Base { get; }
+
+        /// <summary>
+        /// Gets the factory for derivatives.
+        /// </summary>
+        /// <value>
+        /// The factory.
+        /// </value>
+        public IDerivativeFactory<K, V> Factory { get; }
 
         /// <summary>
         /// Enumerates the combined keys.
@@ -31,8 +44,8 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
         /// <param name="factory">The factory.</param>
         public ConditionalOperator(IParserParameters<V> parent, IDerivativeFactory<K, V> factory)
         {
-            _parent = parent.ThrowIfNull(nameof(parent));
-            _factory = factory.ThrowIfNull(nameof(factory));
+            Base = parent.ThrowIfNull(nameof(parent));
+            Factory = factory.ThrowIfNull(nameof(factory));
         }
 
         /// <summary>
@@ -45,8 +58,8 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
         /// </returns>
         public IDerivatives<K, V> And(IDerivatives<K, V> left, IDerivatives<K, V> right)
         {
-            var n = _factory.Create();
-            n.Value = _parent.Conditional.And(left.Value, right.Value);
+            var n = Factory.Create();
+            n.Value = Base.Conditional.And(left.Value, right.Value);
             return n;
         }
 
@@ -61,18 +74,18 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
         /// </returns>
         public IDerivatives<K, V> IfThenElse(IDerivatives<K, V> condition, IDerivatives<K, V> ifTrue, IDerivatives<K, V> ifFalse)
         {
-            var n = _factory.Create(ifTrue, ifFalse);
-            n.Value = _parent.Conditional.IfThenElse(condition.Value, ifTrue.Value, ifFalse.Value);
+            var n = Factory.Create(ifTrue, ifFalse);
+            n.Value = Base.Conditional.IfThenElse(condition.Value, ifTrue.Value, ifFalse.Value);
             foreach (var key in CombinedKeys(ifTrue, ifFalse))
             {
                 var hasLeft = ifTrue.TryGetValue(key, out var leftDerivative);
                 var hasRight = ifFalse.TryGetValue(key, out var rightDerivative);
                 if (hasLeft && hasRight)
-                    n[key] = _parent.Conditional.IfThenElse(condition.Value, leftDerivative, rightDerivative);
+                    n[key] = Base.Conditional.IfThenElse(condition.Value, leftDerivative, rightDerivative);
                 else if (hasLeft)
-                    n[key] = _parent.Conditional.IfThenElse(condition.Value, leftDerivative, _parent.ValueFactory.CreateValue(0.0));
+                    n[key] = Base.Conditional.IfThenElse(condition.Value, leftDerivative, Base.ValueFactory.CreateValue(0.0));
                 else if (hasRight)
-                    n[key] = _parent.Conditional.IfThenElse(condition.Value, _parent.ValueFactory.CreateValue(0.0), rightDerivative);
+                    n[key] = Base.Conditional.IfThenElse(condition.Value, Base.ValueFactory.CreateValue(0.0), rightDerivative);
             }
             return n;
         }
@@ -86,8 +99,8 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
         /// </returns>
         public IDerivatives<K, V> Not(IDerivatives<K, V> input)
         {
-            var n = _factory.Create();
-            n.Value = _parent.Conditional.Not(input.Value);
+            var n = Factory.Create();
+            n.Value = Base.Conditional.Not(input.Value);
             return n;
         }
 
@@ -101,8 +114,8 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
         /// </returns>
         public IDerivatives<K, V> Or(IDerivatives<K, V> left, IDerivatives<K, V> right)
         {
-            var n = _factory.Create();
-            n.Value = _parent.Conditional.Or(left.Value, right.Value);
+            var n = Factory.Create();
+            n.Value = Base.Conditional.Or(left.Value, right.Value);
             return n;
         }
     }

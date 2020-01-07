@@ -12,7 +12,7 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
     /// <typeparam name="K">The derivative key.</typeparam>
     /// <typeparam name="V">The value type.</typeparam>
     /// <seealso cref="IValueFactory{T}" />
-    public class ValueFactory<K, V> : ValueFactory<IDerivatives<K, V>>
+    public class ValueFactory<K, V> : ValueFactory<IDerivatives<K, V>>, IDerivativeOperator<K, V>
     {
         /// <summary>
         /// Gets the base parser parameters that are used to construct the derivatives.

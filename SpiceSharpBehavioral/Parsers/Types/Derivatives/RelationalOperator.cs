@@ -10,8 +10,21 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
     /// <seealso cref="IRelationalOperator{T}" />
     public class RelationalOperator<K, V> : ParameterSet, IRelationalOperator<IDerivatives<K, V>>
     {
-        private readonly IParserParameters<V> _parent;
-        private readonly IDerivativeFactory<K, V> _factory;
+        /// <summary>
+        /// Gets the base.
+        /// </summary>
+        /// <value>
+        /// The base.
+        /// </value>
+        public IParserParameters<V> Base { get; }
+
+        /// <summary>
+        /// Gets the factory.
+        /// </summary>
+        /// <value>
+        /// The factory.
+        /// </value>
+        public IDerivativeFactory<K, V> Factory { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RelationalOperator{K, V}"/> class.
@@ -20,8 +33,8 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
         /// <param name="factory">The factory.</param>
         public RelationalOperator(IParserParameters<V> parent, IDerivativeFactory<K, V> factory)
         {
-            _parent = parent.ThrowIfNull(nameof(parent));
-            _factory = factory.ThrowIfNull(nameof(factory));
+            Base = parent.ThrowIfNull(nameof(parent));
+            Factory = factory.ThrowIfNull(nameof(factory));
         }
 
         /// <summary>
@@ -34,8 +47,8 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
         /// </returns>
         public IDerivatives<K, V> Equal(IDerivatives<K, V> left, IDerivatives<K, V> right)
         {
-            var n = _factory.Create();
-            n.Value = _parent.Relational.Equal(left.Value, right.Value);
+            var n = Factory.Create();
+            n.Value = Base.Relational.Equal(left.Value, right.Value);
             return n;
         }
 
@@ -49,8 +62,8 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
         /// </returns>
         public IDerivatives<K, V> GreaterOrEqual(IDerivatives<K, V> left, IDerivatives<K, V> right)
         {
-            var n = _factory.Create();
-            n.Value = _parent.Relational.GreaterOrEqual(left.Value, right.Value);
+            var n = Factory.Create();
+            n.Value = Base.Relational.GreaterOrEqual(left.Value, right.Value);
             return n;
         }
 
@@ -64,8 +77,8 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
         /// </returns>
         public IDerivatives<K, V> GreaterThan(IDerivatives<K, V> left, IDerivatives<K, V> right)
         {
-            var n = _factory.Create();
-            n.Value = _parent.Relational.GreaterThan(left.Value, right.Value);
+            var n = Factory.Create();
+            n.Value = Base.Relational.GreaterThan(left.Value, right.Value);
             return n;
         }
 
@@ -79,8 +92,8 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
         /// </returns>
         public IDerivatives<K, V> LessOrEqual(IDerivatives<K, V> left, IDerivatives<K, V> right)
         {
-            var n = _factory.Create();
-            n.Value = _parent.Relational.LessOrEqual(left.Value, right.Value);
+            var n = Factory.Create();
+            n.Value = Base.Relational.LessOrEqual(left.Value, right.Value);
             return n;
         }
 
@@ -94,8 +107,8 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
         /// </returns>
         public IDerivatives<K, V> LessThan(IDerivatives<K, V> left, IDerivatives<K, V> right)
         {
-            var n = _factory.Create();
-            n.Value = _parent.Relational.LessThan(left.Value, right.Value);
+            var n = Factory.Create();
+            n.Value = Base.Relational.LessThan(left.Value, right.Value);
             return n;
         }
 
@@ -109,8 +122,8 @@ namespace SpiceSharpBehavioral.Parsers.Derivatives
         /// </returns>
         public IDerivatives<K, V> NotEqual(IDerivatives<K, V> left, IDerivatives<K, V> right)
         {
-            var n = _factory.Create();
-            n.Value = _parent.Relational.NotEqual(left.Value, right.Value);
+            var n = Factory.Create();
+            n.Value = Base.Relational.NotEqual(left.Value, right.Value);
             return n;
         }
     }

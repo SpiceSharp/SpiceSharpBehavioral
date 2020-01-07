@@ -13,7 +13,7 @@ namespace SpiceSharpBehavioral.Parsers
         /// Gets the arithmetic operators.
         /// </summary>
         /// <value>
-        /// The arithmetic.
+        /// The arithmetic operators.
         /// </value>
         IArithmeticOperator<T> Arithmetic { get; }
 

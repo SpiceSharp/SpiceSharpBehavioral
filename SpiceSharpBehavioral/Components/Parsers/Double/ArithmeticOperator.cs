@@ -1,10 +1,8 @@
 ﻿using SpiceSharp;
 using SpiceSharp.Attributes;
-using SpiceSharp.Components.BehavioralBehaviors;
+using SpiceSharpBehavioral.Components.BehavioralBehaviors;
 using SpiceSharp.Simulations;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SpiceSharpBehavioral.Components.Parsers.Double
 {

@@ -1,8 +1,9 @@
 ﻿using SpiceSharp.Behaviors;
 using SpiceSharp.Simulations;
+using SpiceSharp.Components;
 using System.Collections.Generic;
 
-namespace SpiceSharp.Components.BehavioralBehaviors
+namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
 {
     /// <summary>
     /// A binding context for behavioral components.

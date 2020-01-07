@@ -13,14 +13,6 @@ namespace SpiceSharpBehavioral.Parsers.Double
     public class ValueFactory : ValueFactory<double>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ValueFactory"/> class.
-        /// </summary>
-        public ValueFactory()
-        {
-            FunctionFound += Defaults.FunctionFound;
-        }
-
-        /// <summary>
         /// Creates the value based on its textual representation.
         /// </summary>
         /// <param name="value">The value.</param>

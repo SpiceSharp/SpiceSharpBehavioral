@@ -1,7 +1,7 @@
 ﻿using SpiceSharp;
 using SpiceSharp.Attributes;
 using SpiceSharp.Components;
-using SpiceSharp.Components.BehavioralBehaviors;
+using SpiceSharpBehavioral.Components.BehavioralBehaviors;
 using SpiceSharp.Simulations;
 using SpiceSharpBehavioral.Parsers;
 using System;
