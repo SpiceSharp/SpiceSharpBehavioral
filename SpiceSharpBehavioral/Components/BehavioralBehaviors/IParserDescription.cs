@@ -18,6 +18,6 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         /// <returns>
         /// The parser.
         /// </returns>
-        IParser<IDerivatives<Variable, Func<double>>> Create();
+        IParser<IDerivatives<Variable, Func<double>>> Create(BehavioralBindingContext context);
     }
 }

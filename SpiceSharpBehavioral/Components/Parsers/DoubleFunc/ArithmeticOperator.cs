@@ -1,19 +1,19 @@
-﻿using SpiceSharpBehavioral.Components.BehavioralBehaviors;
-using SpiceSharp.Simulations;
+﻿using SpiceSharp.Simulations;
+using SpiceSharpBehavioral.Components.BehavioralBehaviors;
 using System;
 
-namespace SpiceSharpBehavioral.Components.Parsers.Double
+namespace SpiceSharpBehavioral.Components.Parsers.DoubleFunc
 {
     /// <summary>
-    /// Arithmetic operator for behavioral components.
+    /// Arithmetic operators.
     /// </summary>
-    /// <seealso cref="SpiceSharpBehavioral.Parsers.Double.ArithmeticOperator" />
-    public class ArithmeticOperator : SpiceSharpBehavioral.Parsers.Double.ArithmeticOperator
+    /// <seealso cref="SpiceSharpBehavioral.Parsers.DoubleFunc.ArithmeticOperator" />
+    public class ArithmeticOperator : SpiceSharpBehavioral.Parsers.DoubleFunc.ArithmeticOperator
     {
         private readonly Func<double> _fudgeFactor;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ValueFactory"/> class.
+        /// Initializes a new instance of the <see cref="ArithmeticOperator"/> class.
         /// </summary>
         /// <param name="context">The context.</param>
         public ArithmeticOperator(BehavioralBindingContext context)
@@ -32,16 +32,19 @@ namespace SpiceSharpBehavioral.Components.Parsers.Double
         /// <returns>
         /// The division (left) / (right).
         /// </returns>
-        public override double Divide(double left, double right)
+        public override Func<double> Divide(Func<double> left, Func<double> right)
         {
-            // Stay away from 0
-            if (right >= 0)
-                right += _fudgeFactor();
-            else
-                right -= _fudgeFactor();
-            if (right.Equals(0.0))
-                return double.PositiveInfinity;
-            return left / right;
+            return () =>
+            {
+                var b = right();
+                if (b >= 0)
+                    b += _fudgeFactor();
+                else
+                    b -= _fudgeFactor();
+                if (double.IsPositiveInfinity(b))
+                    return double.PositiveInfinity;
+                return left() / b;
+            };
         }
 
         /// <summary>
@@ -52,9 +55,9 @@ namespace SpiceSharpBehavioral.Components.Parsers.Double
         /// <returns>
         /// The power (base) ^ (exponent).
         /// </returns>
-        public override double Pow(double @base, double exponent)
+        public override Func<double> Pow(Func<double> @base, Func<double> exponent)
         {
-            return Math.Pow(Math.Abs(@base), exponent);
+            return () => Math.Pow(Math.Abs(@base()), exponent());
         }
 
         /// <summary>
@@ -65,15 +68,15 @@ namespace SpiceSharpBehavioral.Components.Parsers.Double
         /// <returns>
         /// The power (base) ^ exponent
         /// </returns>
-        public override double Pow(double @base, int exponent)
+        public override Func<double> Pow(Func<double> @base, int exponent)
         {
-            switch (exponent)
+            return exponent switch
             {
-                case 0: return 1.0;
-                case 1: return Math.Abs(@base);
-                case 2: return @base * @base;
-                default: return Math.Pow(Math.Abs(@base), exponent);
-            }
+                0 => () => 1.0,
+                1 => () => Math.Abs(@base()),
+                2 => () => { var x = @base(); return x * x; },
+                _ => () => Math.Pow(Math.Abs(@base()), exponent),
+            };
         }
     }
 }

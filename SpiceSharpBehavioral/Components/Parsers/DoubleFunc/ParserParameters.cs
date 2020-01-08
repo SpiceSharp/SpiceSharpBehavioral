@@ -1,18 +1,16 @@
 ﻿using SpiceSharp;
-using SpiceSharp.Simulations;
 using SpiceSharpBehavioral.Components.BehavioralBehaviors;
 using SpiceSharpBehavioral.Parsers;
-using SpiceSharpBehavioral.Parsers.Derivatives;
 using System;
 
-namespace SpiceSharpBehavioral.Components.Parsers
+namespace SpiceSharpBehavioral.Components.Parsers.DoubleFunc
 {
     /// <summary>
     /// Parser parameters for components.
     /// </summary>
     /// <seealso cref="ParameterSet" />
     /// <seealso cref="IParserParameters{T}" />
-    public class ParserParameters : ParameterSet, IParserParameters<IDerivatives<Variable, Func<double>>>
+    public class ParserParameters : ParameterSet, IParserParameters<Func<double>>
     {
         /// <summary>
         /// Gets the arithmetic operators.
@@ -20,7 +18,7 @@ namespace SpiceSharpBehavioral.Components.Parsers
         /// <value>
         /// The arithmetic operators.
         /// </value>
-        public IArithmeticOperator<IDerivatives<Variable, Func<double>>> Arithmetic { get; }
+        public IArithmeticOperator<Func<double>> Arithmetic { get; }
 
         /// <summary>
         /// Gets the conditional operators.
@@ -28,7 +26,7 @@ namespace SpiceSharpBehavioral.Components.Parsers
         /// <value>
         /// The conditional operators.
         /// </value>
-        public IConditionalOperator<IDerivatives<Variable, Func<double>>> Conditional { get; }
+        public IConditionalOperator<Func<double>> Conditional { get; }
 
         /// <summary>
         /// Gets the relational operators.
@@ -36,7 +34,7 @@ namespace SpiceSharpBehavioral.Components.Parsers
         /// <value>
         /// The relational operators.
         /// </value>
-        public IRelationalOperator<IDerivatives<Variable, Func<double>>> Relational { get; }
+        public IRelationalOperator<Func<double>> Relational { get; }
 
         /// <summary>
         /// Gets the value factory.
@@ -44,7 +42,7 @@ namespace SpiceSharpBehavioral.Components.Parsers
         /// <value>
         /// The value factory.
         /// </value>
-        public IValueFactory<IDerivatives<Variable, Func<double>>> ValueFactory { get; }
+        public IValueFactory<Func<double>> ValueFactory { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParserParameters"/> class.
@@ -52,12 +50,10 @@ namespace SpiceSharpBehavioral.Components.Parsers
         /// <param name="context">The context.</param>
         public ParserParameters(BehavioralBindingContext context)
         {
-            var parent = new DoubleFunc.ParserParameters(context);
-            var factory = new DerivativeFactory<Variable, Func<double>>();
-            Arithmetic = new ArithmeticOperator<Variable, Func<double>>(parent, factory);
-            Conditional = new ConditionalOperator<Variable, Func<double>>(parent, factory);
-            Relational = new RelationalOperator<Variable, Func<double>>(parent, factory);
-            ValueFactory = new ValueFactory<Variable, Func<double>>(parent, factory);
+            Arithmetic = new ArithmeticOperator(context);
+            Conditional = new SpiceSharpBehavioral.Parsers.DoubleFunc.ConditionalOperator();
+            Relational = new SpiceSharpBehavioral.Parsers.DoubleFunc.RelationalOperator();
+            ValueFactory = new ValueFactory(context);
         }
     }
 }

@@ -39,7 +39,7 @@ namespace SpiceSharpBehavioral.Parsers.DoubleFunc
         /// <returns>
         /// The division (left) / (right).
         /// </returns>
-        public Func<double> Divide(Func<double> left, Func<double> right)
+        public virtual Func<double> Divide(Func<double> left, Func<double> right)
             => () => left() / right();
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace SpiceSharpBehavioral.Parsers.DoubleFunc
         /// <returns>
         /// The power (base) ^ (exponent).
         /// </returns>
-        public Func<double> Pow(Func<double> @base, Func<double> exponent)
+        public virtual Func<double> Pow(Func<double> @base, Func<double> exponent)
             => () => Math.Pow(@base(), exponent());
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace SpiceSharpBehavioral.Parsers.DoubleFunc
         /// <returns>
         /// The power (base) ^ exponent.
         /// </returns>
-        public Func<double> Pow(Func<double> @base, int exponent)
+        public virtual Func<double> Pow(Func<double> @base, int exponent)
         {
             if (exponent == 0)
                 return () => 1.0;

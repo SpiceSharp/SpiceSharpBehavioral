@@ -17,7 +17,7 @@ namespace SpiceSharpBehavioral.Components.BehavioralBehaviors
         /// <value>
         /// The behaviors that the behavioral component uses.
         /// </value>
-        public IDictionary<string, IBehaviorContainer> Behaviors { get; }
+        public IBehaviorContainerCollection Behaviors => Simulation.EntityBehaviors;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BehavioralBindingContext"/> class.

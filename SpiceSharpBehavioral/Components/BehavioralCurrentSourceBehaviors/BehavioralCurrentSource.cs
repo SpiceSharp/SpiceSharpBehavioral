@@ -4,6 +4,13 @@ using SpiceSharpBehavioral.Components.BehavioralBehaviors;
 
 namespace SpiceSharp.Components
 {
+    /// <summary>
+    /// A behavioral current source.
+    /// </summary>
+    /// <seealso cref="Component" />
+    /// <seealso cref="IParameterized{T}" />
+    /// <seealso cref="BaseParameters" />
+    /// <seealso cref="IParserDescription"/>
     public class BehavioralCurrentSource : Component,
         IParameterized<BaseParameters>,
         IParameterized<IParserDescription>

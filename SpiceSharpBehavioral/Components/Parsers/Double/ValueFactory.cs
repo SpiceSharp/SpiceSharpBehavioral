@@ -88,6 +88,12 @@ namespace SpiceSharpBehavioral.Components.Parsers.Double
                         if (arguments[0] < 0)
                             return double.PositiveInfinity;
                         return Math.Log10(arguments[0]);
+                    case "sqrt":
+                        if (arguments[0] < 0)
+                            return double.PositiveInfinity;
+                        return Math.Sqrt(arguments[0]);
+                    case "nint":
+                        return Math.Round(arguments[0]);
                 }
             }
             if (arguments.Length == 2)

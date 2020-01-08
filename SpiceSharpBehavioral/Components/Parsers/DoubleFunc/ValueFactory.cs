@@ -5,9 +5,8 @@ using SpiceSharp.Simulations;
 using SpiceSharpBehavioral.Parsers;
 using System;
 using System.Collections.Generic;
-using System.Numerics;
 
-namespace SpiceSharpBehavioral.Components.Parsers.DoubleFun
+namespace SpiceSharpBehavioral.Components.Parsers.DoubleFunc
 {
     /// <summary>
     /// A factory for values. This class will modify some default implementations of regular
@@ -16,7 +15,7 @@ namespace SpiceSharpBehavioral.Components.Parsers.DoubleFun
     /// <seealso cref="SpiceSharpBehavioral.Parsers.Double.ValueFactory" />
     public class ValueFactory : SpiceSharpBehavioral.Parsers.DoubleFunc.ValueFactory
     {
-        private BehavioralBindingContext _context;
+        private readonly BehavioralBindingContext _context;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ValueFactory"/> class.
@@ -41,7 +40,7 @@ namespace SpiceSharpBehavioral.Components.Parsers.DoubleFun
             if (type == PropertyType.Property)
             {
                 if (arguments.Count == 2 &&
-                    _context.Behaviors.TryGetValue(arguments[0], out var container))
+                    _context.Behaviors.TryGetBehaviors(arguments[0], out var container))
                 {
                     var getter = container.CreatePropertyGetter<double>(arguments[1]);
                     if (getter != null)
@@ -62,7 +61,7 @@ namespace SpiceSharpBehavioral.Components.Parsers.DoubleFun
             else if ((type & PropertyType.Current) != 0)
             {
                 if (arguments.Count == 1 &&
-                    _context.Behaviors.TryGetValue(arguments[0], out var container) &&
+                    _context.Behaviors.TryGetBehaviors(arguments[0], out var container) &&
                     container.TryGetValue(out IBranchedBehavior branched))
                     node = branched.Branch;
                 else
