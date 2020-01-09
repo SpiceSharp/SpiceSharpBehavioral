@@ -12,12 +12,11 @@ namespace SpiceSharpBehavioral.Parsers
         /// Initializes a new instance of the <see cref="ParserException"/> class.
         /// </summary>
         /// <param name="message">The message.</param>
-        /// <param name="index">The index.</param>
-        /// <param name="invalid">The invalid character.</param>
-        public ParserException(string message, int index, char invalid = '\0')
-            : base(invalid == '\0' ?
+        /// <param name="reader">The reader.</param>
+        public ParserException(string message, IReader reader)
+            : base(reader.Index >= reader.Count ?
                 $"{message} after parsing" :
-                $"{message} at character {index} ({invalid})")
+                $"{message} at character {reader.Index - 1} ('{reader.Last}')")
         {
         }
 

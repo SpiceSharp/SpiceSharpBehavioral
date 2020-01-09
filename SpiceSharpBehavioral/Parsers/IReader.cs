@@ -26,6 +26,14 @@ namespace SpiceSharpBehavioral.Parsers
         int Count { get; }
 
         /// <summary>
+        /// Gets the last read character.
+        /// </summary>
+        /// <value>
+        /// The last character.
+        /// </value>
+        char Last { get; }
+
+        /// <summary>
         /// Reads a character.
         /// </summary>
         /// <returns>

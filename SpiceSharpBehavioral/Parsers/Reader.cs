@@ -27,6 +27,14 @@ namespace SpiceSharpBehavioral.Parsers
         public int Count { get; }
 
         /// <summary>
+        /// Gets the last read character.
+        /// </summary>
+        /// <value>
+        /// The last character.
+        /// </value>
+        public char Last { get; private set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Reader"/> class.
         /// </summary>
         /// <param name="input">The input.</param>
@@ -34,6 +42,7 @@ namespace SpiceSharpBehavioral.Parsers
         {
             _input = input.ThrowIfNull(nameof(input));
             Index = 0;
+            Last = '\0';
             Count = input.Length;
         }
 
@@ -60,9 +69,9 @@ namespace SpiceSharpBehavioral.Parsers
         {
             if (Index >= Count)
                 return '\0';
-            var result = _input[Index];
+            Last = _input[Index];
             Index++;
-            return result;
+            return Last;
         }
 
         /// <summary>

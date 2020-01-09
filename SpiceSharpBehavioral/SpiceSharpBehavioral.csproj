@@ -53,7 +53,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Parsers\Types\" />
     <Folder Include="Properties\" />
   </ItemGroup>
 

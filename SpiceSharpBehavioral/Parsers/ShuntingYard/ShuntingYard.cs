@@ -98,12 +98,12 @@ namespace SpiceSharpBehavioral.Parsers.ShuntingYard
 
                 case '=':
                     if (reader.Read() != '=')
-                        throw new ParserException("Unexpected character", reader.Index);
+                        throw new ParserException("Unexpected character", reader);
                     PushOperator(Operators.Equal);
                     break;
                 case '!':
                     if (reader.Read() != '=')
-                        throw new ParserException("Unexpected character", reader.Index);
+                        throw new ParserException("Unexpected character", reader);
                     PushOperator(Operators.NotEqual);
                     break;
                 case '<':
@@ -123,6 +123,16 @@ namespace SpiceSharpBehavioral.Parsers.ShuntingYard
                     }
                     else
                         PushOperator(Operators.Greater);
+                    break;
+                case '&':
+                    if (reader.Read() != '&')
+                        throw new ParserException("Invalid character", reader);
+                    PushOperator(Operators.And);
+                    break;
+                case '|':
+                    if (reader.Read() != '|')
+                        throw new ParserException("Invalid character", reader);
+                    PushOperator(Operators.Or);
                     break;
                 case '?':
                     PushOperator(Operators.Ternary);
@@ -153,7 +163,7 @@ namespace SpiceSharpBehavioral.Parsers.ShuntingYard
                     break;
 
                 default:
-                    throw new ParserException("Unrecognized binary operator", reader.Index);
+                    throw new ParserException("Unrecognized binary operator", reader);
             }
         }
 
@@ -191,7 +201,7 @@ namespace SpiceSharpBehavioral.Parsers.ShuntingYard
                     break;
 
                 default:
-                    throw new ParserException("Unrecognized unary operator", reader.Index);
+                    throw new ParserException("Unrecognized unary operator", reader);
             }
         }
 
@@ -277,6 +287,16 @@ namespace SpiceSharpBehavioral.Parsers.ShuntingYard
                     b = _values.Pop();
                     a = _values.Pop();
                     _values.Push(_definition.LessOrEqual(a, b));
+                    break;
+                case Operators.And:
+                    b = _values.Pop();
+                    a = _values.Pop();
+                    _values.Push(_definition.And(a, b));
+                    break;
+                case Operators.Or:
+                    b = _values.Pop();
+                    a = _values.Pop();
+                    _values.Push(_definition.Or(a, b));
                     break;
 
                 case Operators.TernarySeparator:

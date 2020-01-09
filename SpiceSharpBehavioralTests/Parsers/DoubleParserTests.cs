@@ -75,6 +75,7 @@ namespace SpiceSharpBehavioralTests.Parsers
             var parser = new DoubleParser();
             Check(1, parser.Parse("3 == 3"));
             Check(0, parser.Parse("3 == 5"));
+            Check(1, parser.Parse("3 == 3 == 1"));
         }
 
 
@@ -84,6 +85,43 @@ namespace SpiceSharpBehavioralTests.Parsers
             var parser = new DoubleParser();
             Check(1, parser.Parse("3 != 5 ? 1 : 2"));
             Check(2, parser.Parse("3 != 3 ? 1 : 2"));
+        }
+
+        [Test]
+        public void When_And_Expect_Reference()
+        {
+            var parser = new DoubleParser();
+            Check(0, parser.Parse("0 && 0"));
+            Check(0, parser.Parse("1 && 0"));
+            Check(0, parser.Parse("0 && 1"));
+            Check(1, parser.Parse("1 && 1"));
+        }
+
+        [Test]
+        public void When_Or_Expect_Reference()
+        {
+            var parser = new DoubleParser();
+            Check(0, parser.Parse("0 || 0"));
+            Check(1, parser.Parse("1 || 0"));
+            Check(1, parser.Parse("0 || 1"));
+            Check(1, parser.Parse("1 || 1"));
+        }
+
+        [Test]
+        public void When_AndOr_Expect_Reference()
+        {
+            var parser = new DoubleParser();
+            Check(0, parser.Parse("1 && 0 || 1 && 0"));
+            Check(0, parser.Parse("0 || 1 && 0"));
+        }
+
+        [Test]
+        public void When_Not_Expect_Reference()
+        {
+            var parser = new DoubleParser();
+            Check(0, parser.Parse("!5"));
+            Check(1, parser.Parse("!0"));
+            Check(1, parser.Parse("!!5"));
         }
 
         /*
