@@ -1,20 +1,20 @@
 ﻿using SpiceSharp;
 using System;
 
-namespace SpiceSharpBehavioral.Parsers.Operators
+namespace SpiceSharpBehavioral.Parsers.ShuntingYard
 {
     /// <summary>
-    /// Event arguments used when a variable was found.
+    /// Event arguments that are used when a variable has been found.
     /// </summary>
     /// <typeparam name="T">The value type.</typeparam>
     /// <seealso cref="EventArgs" />
     public class VariableFoundEventArgs<T> : EventArgs
     {
         /// <summary>
-        /// Gets the name.
+        /// Gets the name of the variable.
         /// </summary>
         /// <value>
-        /// The name.
+        /// The variable name.
         /// </value>
         public string Name { get; }
 
@@ -27,18 +27,18 @@ namespace SpiceSharpBehavioral.Parsers.Operators
         public bool Found { get; set; }
 
         /// <summary>
-        /// Gets or sets the variable value.
+        /// Gets or sets the result.
         /// </summary>
         /// <value>
-        /// The variable value.
+        /// The result.
         /// </value>
-        public T Result 
+        public T Result
         {
             get => _result;
             set
             {
-                _result = value;
                 Found = true;
+                _result = value;
             }
         }
         private T _result;
@@ -50,8 +50,6 @@ namespace SpiceSharpBehavioral.Parsers.Operators
         public VariableFoundEventArgs(string name)
         {
             Name = name.ThrowIfNull(nameof(name));
-            Found = false;
-            _result = default;
         }
     }
 }

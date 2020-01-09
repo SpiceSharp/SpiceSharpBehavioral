@@ -2,10 +2,10 @@
 using System;
 using System.Collections.Generic;
 
-namespace SpiceSharpBehavioral.Parsers.Operators
+namespace SpiceSharpBehavioral.Parsers.ShuntingYard
 {
     /// <summary>
-    /// Event arguments used when a function has been found.
+    /// Event arguments that are used when a function has been found.
     /// </summary>
     /// <typeparam name="T">The value type.</typeparam>
     /// <seealso cref="EventArgs" />
@@ -15,7 +15,7 @@ namespace SpiceSharpBehavioral.Parsers.Operators
         /// Gets the name of the function.
         /// </summary>
         /// <value>
-        /// The name of the function.
+        /// The function name.
         /// </value>
         public string Name { get; }
 
@@ -28,7 +28,7 @@ namespace SpiceSharpBehavioral.Parsers.Operators
         public IReadOnlyList<T> Arguments { get; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the variable was found.
+        /// Gets or sets a value indicating whether the function was found.
         /// </summary>
         /// <value>
         ///   <c>true</c> if found; otherwise, <c>false</c>.
@@ -36,18 +36,18 @@ namespace SpiceSharpBehavioral.Parsers.Operators
         public bool Found { get; set; }
 
         /// <summary>
-        /// Gets or sets the variable value.
+        /// Gets or sets the result.
         /// </summary>
         /// <value>
-        /// The variable value.
+        /// The result.
         /// </value>
         public T Result
         {
             get => _result;
             set
             {
-                _result = value;
                 Found = true;
+                _result = value;
             }
         }
         private T _result;
@@ -61,8 +61,6 @@ namespace SpiceSharpBehavioral.Parsers.Operators
         {
             Name = name.ThrowIfNull(nameof(name));
             Arguments = arguments.ThrowIfNull(nameof(arguments));
-            Found = false;
-            _result = default;
         }
     }
 }

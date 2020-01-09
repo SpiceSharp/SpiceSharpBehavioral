@@ -5,20 +5,28 @@ namespace SpiceSharpBehavioral.Parsers
     /// <summary>
     /// A parser exception
     /// </summary>
-    /// <seealso cref="System.Exception" />
+    /// <seealso cref="Exception" />
     public class ParserException : Exception
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ParserException"/> class.
         /// </summary>
         /// <param name="message">The message.</param>
-        /// <param name="input">The input.</param>
         /// <param name="index">The index.</param>
-        public ParserException(string message, string input, int index)
-            : base(
-                index >= input.Length ?
-                    $"{message} after parsing" :
-                    $"{message} at character {index} ('{input[index]}')")
+        /// <param name="invalid">The invalid character.</param>
+        public ParserException(string message, int index, char invalid = '\0')
+            : base(invalid == '\0' ?
+                $"{message} after parsing" :
+                $"{message} at character {index} ({invalid})")
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ParserException"/> class.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        public ParserException(string message)
+            : base(message)
         {
         }
     }

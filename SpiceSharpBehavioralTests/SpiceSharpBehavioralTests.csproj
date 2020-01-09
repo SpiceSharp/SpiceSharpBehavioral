@@ -53,9 +53,7 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Parsers\DoubleFuncParserTests.cs" />
     <Compile Include="Parsers\DoubleParserTests.cs" />
-    <Compile Include="Parsers\DerivativeParserTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

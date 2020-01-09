@@ -1,17 +1,19 @@
 ﻿using SpiceSharp;
 using System;
 
-namespace SpiceSharpBehavioral.Parsers
+namespace SpiceSharpBehavioral.Parsers.ShuntingYard
 {
-    public partial class Parser<T>
+    public partial class ShuntingYard<T>
     {
         private class FunctionDeclaration
         {
             public string Name { get; }
             public int Arguments { get; set; }
-            public FunctionDeclaration(string name)
+            public int Index { get; }
+            public FunctionDeclaration(string name, int index)
             {
                 Name = name.ThrowIfNull(nameof(name));
+                Index = index;
             }
         }
 
@@ -79,9 +81,11 @@ namespace SpiceSharpBehavioral.Parsers
         /// <returns>
         ///   <c>true</c> if the first operator has precedence; otherwise, <c>false</c>.
         /// </returns>
-        private bool HasPrecedence(Operators first, Operators second)
+        private static bool HasPrecedence(Operators first, Operators second)
         {
             // Brackets have special precedence rules
+            if (second == Operators.LeftBracket)
+                return false;
             if (second == Operators.RightBracket)
             {
                 if (first == Operators.LeftBracket)
