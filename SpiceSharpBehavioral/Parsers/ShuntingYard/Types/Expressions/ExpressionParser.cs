@@ -26,10 +26,6 @@ namespace SpiceSharpBehavioral.Parsers
         public ExpressionParser()
             : base(new ShuntingYardDescription<Expression>(new ExpressionOperators()))
         {
-            // We will register our default functions as well
-            var operators = (ExpressionOperators)((ShuntingYardDescription<Expression>)Description).Operators;
-            operators.FunctionFound += ExpressionDefaults.FunctionFound;
-            operators.VariableFound += ExpressionDefaults.VariableFound;
         }
 
         /// <summary>

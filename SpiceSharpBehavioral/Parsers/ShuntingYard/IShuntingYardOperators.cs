@@ -1,13 +1,24 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace SpiceSharpBehavioral.Parsers.ShuntingYard
 {
     /// <summary>
     /// Defines the implementation of the operators used by the <see cref="ShuntingYard{T}"/>.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">The value type.</typeparam>
     public interface IShuntingYardOperators<T>
     {
+        /// <summary>
+        /// Occurs when a function was found.
+        /// </summary>
+        event EventHandler<FunctionFoundEventArgs<T>> FunctionFound;
+
+        /// <summary>
+        /// Occurs when a variable was found.
+        /// </summary>
+        event EventHandler<VariableFoundEventArgs<T>> VariableFound;
+
         /// <summary>
         /// Applies a unary plus operator.
         /// </summary>
@@ -68,6 +79,20 @@ namespace SpiceSharpBehavioral.Parsers.ShuntingYard
         /// <param name="right">The right operand.</param>
         /// <returns>The result.</returns>
         T Pow(T left, T right);
+
+        /// <summary>
+        /// Logarithm.
+        /// </summary>
+        /// <param name="argument">The argument.</param>
+        /// <returns>The result.</returns>
+        T Log(T argument);
+
+        /// <summary>
+        /// Sign of the argument.
+        /// </summary>
+        /// <param name="argument">The argument.</param>
+        /// <returns>The result.</returns>
+        T Sign(T argument);
 
         /// <summary>
         /// Remainder.

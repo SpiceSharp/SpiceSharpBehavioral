@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace SpiceSharpBehavioral.Parsers.ShuntingYard
 {
@@ -23,6 +24,15 @@ namespace SpiceSharpBehavioral.Parsers.ShuntingYard
         /// Occurs when a function was found.
         /// </summary>
         public event EventHandler<FunctionFoundEventArgs<Expression>> FunctionFound;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExpressionOperators"/> class.
+        /// </summary>
+        public ExpressionOperators()
+        {
+            VariableFound += ExpressionDefaults.VariableFound;
+            FunctionFound += ExpressionDefaults.FunctionFound;
+        }
 
         /// <summary>
         /// Addition.
@@ -251,6 +261,15 @@ namespace SpiceSharpBehavioral.Parsers.ShuntingYard
         public Expression Pow(Expression left, Expression right) => Expression.Power(left, right);
 
         /// <summary>
+        /// Logarithm.
+        /// </summary>
+        /// <param name="argument">The argument.</param>
+        /// <returns>
+        /// Rhe result.
+        /// </returns>
+        public Expression Log(Expression argument) => Expression.Call(null, ((Func<double, double>)Math.Log).GetMethodInfo(), argument);
+
+        /// <summary>
         /// Subtraction.
         /// </summary>
         /// <param name="left">The left operand.</param>
@@ -277,5 +296,14 @@ namespace SpiceSharpBehavioral.Parsers.ShuntingYard
         /// The result.
         /// </returns>
         public Expression UnaryPlus(Expression argument) => argument;
+
+        /// <summary>
+        /// Sign of the argument.
+        /// </summary>
+        /// <param name="argument">The argument.</param>
+        /// <returns>
+        /// The result.
+        /// </returns>
+        public Expression Sign(Expression argument) => Expression.Convert(Expression.Call(null, ((Func<double, int>)Math.Sign).GetMethodInfo(), argument), typeof(double));
     }
 }

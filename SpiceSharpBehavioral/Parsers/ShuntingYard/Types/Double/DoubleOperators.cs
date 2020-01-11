@@ -21,6 +21,15 @@ namespace SpiceSharpBehavioral.Parsers.ShuntingYard
         public event EventHandler<FunctionFoundEventArgs<double>> FunctionFound;
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="DoubleOperators"/> class.
+        /// </summary>
+        public DoubleOperators()
+        {
+            VariableFound += DoubleDefaults.VariableFound;
+            FunctionFound += DoubleDefaults.FunctionFound;
+        }
+
+        /// <summary>
         /// Addition.
         /// </summary>
         /// <param name="left">The left operand.</param>
@@ -214,6 +223,15 @@ namespace SpiceSharpBehavioral.Parsers.ShuntingYard
         public double Pow(double left, double right) => Math.Pow(left, right);
 
         /// <summary>
+        /// Logarithm.
+        /// </summary>
+        /// <param name="argument">The argument.</param>
+        /// <returns>
+        /// Rhe result.
+        /// </returns>
+        public double Log(double argument) => Math.Log(argument);
+
+        /// <summary>
         /// Subtraction.
         /// </summary>
         /// <param name="left">The left operand.</param>
@@ -242,5 +260,14 @@ namespace SpiceSharpBehavioral.Parsers.ShuntingYard
         /// The result.
         /// </returns>
         public double Or(double left, double right) => left.Equals(0.0) && right.Equals(0.0) ? 0 : 1;
+
+        /// <summary>
+        /// Sign of the argument.
+        /// </summary>
+        /// <param name="argument">The argument.</param>
+        /// <returns>
+        /// The result.
+        /// </returns>
+        public double Sign(double argument) => Math.Sign(argument);
     }
 }

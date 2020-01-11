@@ -23,10 +23,6 @@ namespace SpiceSharpBehavioral.Parsers
         public DoubleParser()
             : base(new ShuntingYardDescription<double>(new DoubleOperators()))
         {
-            // We will register our default operators as well
-            var operators = (DoubleOperators)((ShuntingYardDescription<double>)Description).Operators;
-            operators.FunctionFound += DoubleDefaults.FunctionFound;
-            operators.VariableFound += DoubleDefaults.VariableFound;
         }
     }
 }
