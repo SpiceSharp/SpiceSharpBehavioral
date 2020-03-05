@@ -33,18 +33,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Parsers\Common\**" />
-    <Compile Remove="Parsers\Derivatives\**" />
-    <Compile Remove="Parsers\Helper\**" />
-    <EmbeddedResource Remove="Parsers\Common\**" />
-    <EmbeddedResource Remove="Parsers\Derivatives\**" />
-    <EmbeddedResource Remove="Parsers\Helper\**" />
-    <None Remove="Parsers\Common\**" />
-    <None Remove="Parsers\Derivatives\**" />
-    <None Remove="Parsers\Helper\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
