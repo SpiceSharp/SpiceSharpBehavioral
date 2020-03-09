@@ -1,49 +1,169 @@
 ﻿using SpiceSharp;
 using SpiceSharp.Components;
 using SpiceSharp.Simulations;
-using SpiceSharp.Diagnostics;
 using SpiceSharpBehavioral.Parsers;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace SpiceSharpBehavioral.Builders
 {
     /// <summary>
     /// A builder for derivatives.
     /// </summary>
+    /// <remarks>
+    /// If the base <see cref="IBuilder{T}"/> implements functions of the format d...(...), then this
+    /// builder will call them automatically to calculate derivatives. For example, when the base builder
+    /// implements "exp(x)" and "dexp(0)", then this builder will automatically invoke "dexp(0)" to calculate
+    /// the total derivative. Functions with multiple arguments (eg. "pow(x,y)") should implement multiple derivatives
+    /// ("dpow(0)" and "dpow(1)") where the function is differentiated to each argument separately.
+    /// The base builder should also be able to create a number from "0" and "1".
+    /// </remarks>
     /// <typeparam name="T">The base value type.</typeparam>
     /// <seealso cref="IBuilder{T}" />
     /// <seealso cref="Derivatives{T}"/>
-    public class DerivativeBuilder<T> : IBuilder<Derivatives<T>>
+    public class DerivativeBuilder<T> : BaseBuilder<Derivatives<T>>, IBuilder<Derivatives<T>>
     {
-        private readonly ISimulation _simulation;
         private readonly IBuilder<T> _builder;
         private readonly T _zero;
         private readonly T _one;
-        private readonly T _two;
 
         /// <summary>
-        /// Enumerates all common variables of two derivative containers.
+        /// Gets or sets the simulation.
         /// </summary>
-        /// <param name="a">The first derivatives instance.</param>
-        /// <param name="b">The second derivatives instance.</param>
-        /// <returns>The common variables.</returns>
-        private static IEnumerable<Variable> GetVariables(Derivatives<T> a, Derivatives<T> b)
-            => a.Keys.Union(b.Keys).Distinct();
+        /// <value>
+        /// The simulation.
+        /// </value>
+        public ISimulation Simulation { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DerivativeBuilder{T}"/> class.
         /// </summary>
-        /// <param name="simulation">The simulation.</param>
         /// <param name="builder">The builder for the underlying methods.</param>
-        public DerivativeBuilder(ISimulation simulation, IBuilder<T> builder)
+        public DerivativeBuilder(IBuilder<T> builder)
         {
-            _simulation = simulation.ThrowIfNull(nameof(simulation));
             _builder = builder.ThrowIfNull(nameof(builder));
             _zero = _builder.CreateNumber("0");
             _one = _builder.CreateNumber("1");
-            _two = _builder.CreateNumber("2");
+        }
+
+        /// <summary>
+        /// Creates a function call.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>
+        /// The result of the function call.
+        /// </returns>
+        public override Derivatives<T> CreateFunction(string name, IReadOnlyList<Derivatives<T>> arguments)
+        {
+            var argValues = new T[arguments.Count];
+            for (var i = 0; i < arguments.Count; i++)
+                argValues[i] = arguments[i].Value;
+            Derivatives<T> result = new Derivatives<T>() { Value = _builder.CreateFunction(name, argValues) };
+
+            switch (name)
+            {
+                case "min": // x < y ? dx : dy
+                    result.Combine(arguments[0], arguments[1],
+                        (df, dg) => _builder.Conditional(_builder.LessThan(arguments[0].Value, arguments[1].Value), df, dg),
+                        df => _builder.Conditional(_builder.LessThan(arguments[0].Value, arguments[1].Value), df, _zero),
+                        dg => _builder.Conditional(_builder.LessThan(arguments[0].Value, arguments[1].Value), _zero, dg));
+                    break;
+                case "max": // x > y ? dx : dy
+                    result.Combine(arguments[0], arguments[1],
+                        (df, dg) => _builder.Conditional(_builder.GreaterThan(arguments[0].Value, arguments[1].Value), df, dg),
+                        df => _builder.Conditional(_builder.GreaterThan(arguments[0].Value, arguments[1].Value), df, _zero),
+                        dg => _builder.Conditional(_builder.GreaterThan(arguments[0].Value, arguments[1].Value), _zero, dg));
+                    break;
+                default:
+                    // Try finding the methods in the base builder
+                    for (var i = 0; i < arguments.Count; i++)
+                    {
+                        var factor = _builder.CreateFunction("d{0}({1})".FormatString(name, i), argValues);
+                        foreach (var pair in arguments[i])
+                        {
+                            if (result.Contains(pair.Key))
+                                result[pair.Key] = _builder.Add(result[pair.Key], _builder.Multiply(factor, pair.Value));
+                            else
+                                result[pair.Key] = _builder.Multiply(factor, pair.Value);
+                        }
+                    }
+                    break;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Creates the value of a number.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The value of the number.
+        /// </returns>
+        public override Derivatives<T> CreateNumber(string value)
+        {
+            return new Derivatives<T> { Value = _builder.CreateNumber(value) };
+        }
+
+        /// <summary>
+        /// Creates the value of a voltage.
+        /// </summary>
+        /// <param name="node">The name of the node.</param>
+        /// <param name="reference">The name of the reference node.</param>
+        /// <param name="type">The quantity type.</param>
+        /// <returns>
+        /// The value of the voltage.
+        /// </returns>
+        public override Derivatives<T> CreateVoltage(string node, string reference, QuantityTypes type)
+        {
+            if (Simulation != null)
+            {
+                if (type == QuantityTypes.Raw)
+                {
+                    var result = new Derivatives<T> { Value = _builder.CreateVoltage(node, reference, type) };
+                    var v = Simulation.Variables.MapNode(node, VariableType.Voltage);
+                    result[v] = _one;
+                    if (reference != null)
+                    {
+                        v = Simulation.Variables.MapNode(reference, VariableType.Voltage);
+                        result[v] = _builder.Minus(_one);
+                    }
+                    return result;
+                }
+
+                // Cannot derive to a complex quantity
+                throw new Exception("Cannot derive");
+            }
+            else
+                return base.CreateVoltage(node, reference, type);
+        }
+
+        /// <summary>
+        /// Creates the value of a current.
+        /// </summary>
+        /// <param name="name">The name of the node.</param>
+        /// <param name="type">The quantity type.</param>
+        /// <returns>
+        /// The value of the current.
+        /// </returns>
+        public override Derivatives<T> CreateCurrent(string name, QuantityTypes type)
+        {
+            if (Simulation != null)
+            {
+                if (type == QuantityTypes.Raw)
+                {
+                    var behaviors = Simulation.EntityBehaviors[name];
+                    if (behaviors.TryGetValue(out IBranchedBehavior behavior))
+                    {
+                        var result = new Derivatives<T> { Value = _builder.CreateCurrent(name, type) };
+                        result[behavior.Branch] = _one;
+                        return result;
+                    }
+                }
+                throw new Exception("Cannot derive");
+            }
+            else
+                return base.CreateCurrent(name, type);
         }
 
         Derivatives<T> IBuilder<Derivatives<T>>.Plus(Derivatives<T> argument)
@@ -184,119 +304,6 @@ namespace SpiceSharpBehavioral.Builders
         Derivatives<T> IBuilder<Derivatives<T>>.Or(Derivatives<T> left, Derivatives<T> right)
         {
             return new Derivatives<T> { Value = _builder.Or(left.Value, right.Value) };
-        }
-        Derivatives<T> IBuilder<Derivatives<T>>.CreateCurrent(string name, QuantityTypes type)
-        {
-            var result = new Derivatives<T>
-            {
-                Value = _builder.CreateCurrent(name, type)
-            };
-            if (type == QuantityTypes.Raw)
-            {
-                var behaviors = _simulation.EntityBehaviors[name];
-                if (behaviors.TryGetValue(out IBranchedBehavior behavior))
-                    result[behavior.Branch] = _one;
-            }
-            return result;
-        }
-        Derivatives<T> IBuilder<Derivatives<T>>.CreateFunction(string name, IReadOnlyList<Derivatives<T>> arguments)
-        {
-            var argValues = new T[arguments.Count];
-            for (var i = 0; i < arguments.Count; i++)
-                argValues[i] = arguments[i].Value;
-            Derivatives<T> result = new Derivatives<T>() { Value = _builder.CreateFunction(name, argValues) };
-
-            switch (name)
-            {
-                case "abs": result.Combine(arguments[0], df => _builder.Multiply(_builder.CreateFunction("sgn", new[] { arguments[0].Value }), df)); break; // sgn(x)
-                case "sqrt": result.Combine(arguments[0], df => _builder.Divide(df, _builder.Multiply(_two, arguments[0].Value))); break; // 1/(2sqrt(x))
-                case "pwr": break; // To calculate
-                case "min": // x < y ? dx : dy
-                    result.Combine(arguments[0], arguments[1],
-                        (df, dg) => _builder.Conditional(_builder.LessThan(arguments[0].Value, arguments[1].Value), df, dg),
-                        df => _builder.Conditional(_builder.LessThan(arguments[0].Value, arguments[1].Value), df, _zero),
-                        dg => _builder.Conditional(_builder.LessThan(arguments[0].Value, arguments[1].Value), _zero, dg));
-                    break;
-                case "max": // x > y ? dx : dy
-                    result.Combine(arguments[0], arguments[1],
-                        (df, dg) => _builder.Conditional(_builder.GreaterThan(arguments[0].Value, arguments[1].Value), df, dg),
-                        df => _builder.Conditional(_builder.GreaterThan(arguments[0].Value, arguments[1].Value), df, _zero),
-                        dg => _builder.Conditional(_builder.GreaterThan(arguments[0].Value, arguments[1].Value), _zero, dg));
-                    break;
-                case "log": result.Combine(arguments[0], df => _builder.Divide(df, arguments[0].Value)); break; // 1/x
-                case "log10":
-                    result.Combine(arguments[0], df => _builder.Multiply(
-          _builder.CreateFunction("log10", new[] { _builder.CreateFunction("exp", new[] { _one }) }), // log10(exp(1))
-          _builder.Divide(df, arguments[0].Value)));
-                    break; // log10(e)/x
-                case "exp": result.Combine(arguments[0], df => _builder.Multiply(arguments[0].Value, df)); break; // exp(x)
-                case "sin": result.Combine(arguments[0], df => _builder.Multiply(_builder.CreateFunction("cos", new[] { arguments[0].Value }), df)); break; // cos(x)
-                case "cos": result.Combine(arguments[0], df => _builder.Minus(_builder.Multiply(_builder.CreateFunction("sin", new[] { arguments[0].Value }), df))); break; // -sin(x)
-                case "tan":
-                    result.Combine(arguments[0], df => _builder.Divide(df, _builder.CreateFunction("square", new[] {
-                        _builder.CreateFunction("cos", new[] { arguments[0].Value })
-                    }))); break; // 1/cos2(x)
-                case "asin":
-                    result.Combine(arguments[0], df => _builder.Divide(df,
-           _builder.CreateFunction("sqrt", new[] {
-                        _builder.Subtract(_one, _builder.CreateFunction("square", new[] { arguments[0].Value }))
-           }))); break; // 1/sqrt(1-x2)
-                case "acos":
-                    result.Combine(arguments[0], df => _builder.Divide(_builder.Minus(df),
-           _builder.CreateFunction("sqrt", new[] {
-                        _builder.Subtract(_one, _builder.CreateFunction("square", new[] { arguments[0].Value }))
-           }))); break; // -1/sqrt(1-x2)
-                case "atan":
-                    result.Combine(arguments[0], df => _builder.Divide(df,
-           _builder.Add(_one, _builder.CreateFunction("square", new[] { arguments[0].Value })))); break; // 1/(1+x2)
-                case "sinh": result.Combine(arguments[0], df => _builder.Multiply(_builder.CreateFunction("sinh", new[] { arguments[0].Value }), df)); break; // cosh(x)
-                case "cosh": result.Combine(arguments[0], df => _builder.Multiply(_builder.CreateFunction("cosh", new[] { arguments[0].Value }), df)); break; // sinh(x)
-                case "tanh":
-                    result.Combine(arguments[0], df => _builder.Divide(df,
-           _builder.CreateFunction("square", new[] {
-                        _builder.CreateFunction("cosh", new[] { arguments[0].Value })
-           }))); break; // 1/cosh2(x)
-                case "u": break; // 0
-                case "u2": break; // 0
-                case "uramp": result.Combine(arguments[0], df => _builder.Conditional(_builder.GreaterThanOrEqual(arguments[0].Value, _zero), df, _zero)); break; // x > 0 ? 1 : 0
-                case "ceil": break; // 0
-                case "floor": break; // 0
-                case "nint": break; // 0
-                case "round": break; // 0
-                case "square": result.Combine(arguments[0], df => _builder.Multiply(_builder.Multiply(_two, arguments[0].Value), df)); break; // 2x
-                case "pwl": result.Combine(arguments[0], df => _builder.CreateFunction("pwl_derivative", argValues)); break; // pwl_derivative(x)
-            }
-            return result;
-        }
-        Derivatives<T> IBuilder<Derivatives<T>>.CreateNumber(string value)
-        {
-            return new Derivatives<T> { Value = _builder.CreateNumber(value) };
-        }
-        Derivatives<T> IBuilder<Derivatives<T>>.CreateProperty(string name, string property, QuantityTypes type)
-        {
-            return new Derivatives<T> { Value = _builder.CreateProperty(name, property, type) };
-        }
-        Derivatives<T> IBuilder<Derivatives<T>>.CreateVariable(string name)
-        {
-            throw new NotImplementedException();
-        }
-        Derivatives<T> IBuilder<Derivatives<T>>.CreateVoltage(string node, string reference, QuantityTypes type)
-        {
-            var result = new Derivatives<T>
-            {
-                Value = _builder.CreateVoltage(node, reference, type)
-            };
-            if (type == QuantityTypes.Raw)
-            {
-                var variable = _simulation.Variables[node];
-                result[variable] = _one;
-                if (reference != null)
-                {
-                    variable = _simulation.Variables[reference];
-                    result[variable] = _builder.Minus(_one);
-                }
-            }
-            return result;
         }
     }
 }

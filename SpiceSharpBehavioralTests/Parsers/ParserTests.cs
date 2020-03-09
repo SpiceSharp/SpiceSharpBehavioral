@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using SpiceSharpBehavioral.Parsers;
 using System.Collections.Generic;
+using SpiceSharpBehavioralTests.Builders;
 
 namespace SpiceSharpBehavioralTests.Parsers
 {

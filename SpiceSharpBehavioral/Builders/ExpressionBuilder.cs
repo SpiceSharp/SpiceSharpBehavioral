@@ -19,27 +19,18 @@ namespace SpiceSharpBehavioral.Builders
     /// made antisymmetric.
     /// </remarks>
     /// <seealso cref="IBuilder{Expression}" />
-    public class ExpressionBuilder : IBuilder<Expression>
+    public class ExpressionBuilder : BaseBuilder<Expression>, IBuilder<Expression>
     {
-        private struct Point
-        {
-            public double X, Y;
-            public Point(double x, double y)
-            {
-                X = x;
-                Y = y;
-            }
-        }
-
         private readonly static Expression _one = Expression.Constant(1.0);
         private readonly static Expression _zero = Expression.Constant(0.0);
-        private readonly static MethodInfo _divMethod = typeof(ExpressionBuilder).GetTypeInfo().GetMethod("SafeDivide", BindingFlags.Instance | BindingFlags.NonPublic);
+        private readonly static MethodInfo _divMethod = typeof(ExpressionBuilder).GetTypeInfo().GetMethod(nameof(SafeDivide), BindingFlags.Instance | BindingFlags.NonPublic);
         private readonly static MethodInfo _absMethod = new Func<double, double>(Math.Abs).GetMethodInfo();
-        private readonly static MethodInfo _sqrtMethod = new Func<double, double>(Math.Sqrt).GetMethodInfo();
-        private readonly static MethodInfo _powMethod = new Func<double, double, double>(SafePower).GetMethodInfo();
-        private readonly static MethodInfo _pwrMethod = new Func<double, double, double>(SafePower2).GetMethodInfo();
-        private readonly static MethodInfo _logMethod = new Func<double, double>(Math.Log).GetMethodInfo();
-        private readonly static MethodInfo _log10Method = new Func<double, double>(Math.Log10).GetMethodInfo();
+        private readonly static MethodInfo _sgnMethod = new Func<double, double>(Functions.Sign).GetMethodInfo();
+        private readonly static MethodInfo _sqrtMethod = new Func<double, double>(Functions.Sqrt).GetMethodInfo();
+        private readonly static MethodInfo _powMethod = new Func<double, double, double>(Functions.Power).GetMethodInfo();
+        private readonly static MethodInfo _pwrMethod = new Func<double, double, double>(Functions.Power2).GetMethodInfo();
+        private readonly static MethodInfo _logMethod = new Func<double, double>(Functions.Log).GetMethodInfo();
+        private readonly static MethodInfo _log10Method = new Func<double, double>(Functions.Log10).GetMethodInfo();
         private readonly static MethodInfo _expMethod = new Func<double, double>(Math.Exp).GetMethodInfo();
         private readonly static MethodInfo _minMethod = new Func<double, double, double>(Math.Min).GetMethodInfo();
         private readonly static MethodInfo _maxMethod = new Func<double, double, double>(Math.Max).GetMethodInfo();
@@ -52,18 +43,36 @@ namespace SpiceSharpBehavioral.Builders
         private readonly static MethodInfo _asinMethod = new Func<double, double>(Math.Asin).GetMethodInfo();
         private readonly static MethodInfo _acosMethod = new Func<double, double>(Math.Acos).GetMethodInfo();
         private readonly static MethodInfo _atanMethod = new Func<double, double>(Math.Atan).GetMethodInfo();
-        private readonly static MethodInfo _ustepMethod = new Func<double, double>(Step).GetMethodInfo();
-        private readonly static MethodInfo _ustep2Method = new Func<double, double>(Step2).GetMethodInfo();
-        private readonly static MethodInfo _urampMethod = new Func<double, double>(Ramp).GetMethodInfo();
+        private readonly static MethodInfo _ustepMethod = new Func<double, double>(Functions.Step).GetMethodInfo();
+        private readonly static MethodInfo _ustep2Method = new Func<double, double>(Functions.Step2).GetMethodInfo();
+        private readonly static MethodInfo _ustep2DerivativeMethod = new Func<double, double>(Functions.Step2Derivative).GetMethodInfo();
+        private readonly static MethodInfo _urampMethod = new Func<double, double>(Functions.Ramp).GetMethodInfo();
+        private readonly static MethodInfo _urampDerivativeMethod = new Func<double, double>(Functions.RampDerivative).GetMethodInfo();
         private readonly static MethodInfo _ceilMethod = new Func<double, double>(Math.Ceiling).GetMethodInfo();
         private readonly static MethodInfo _floorMethod = new Func<double, double>(Math.Floor).GetMethodInfo();
         private readonly static MethodInfo _roundMethod = new Func<double, int, double>(Math.Round).GetMethodInfo();
-        private readonly static MethodInfo _pwlMethod = new Func<double, Point[], double>(Pwl).GetMethodInfo();
-        private readonly static MethodInfo _pwlDerivativeMethod = new Func<double, Point[], double>(PwlDerivative).GetMethodInfo();
-        private readonly static MethodInfo _squareMethod = new Func<double, double>(Square).GetMethodInfo();
+        private readonly static MethodInfo _pwlMethod = new Func<double, Point[], double>(Functions.Pwl).GetMethodInfo();
+        private readonly static MethodInfo _pwlDerivativeMethod = new Func<double, Point[], double>(Functions.PwlDerivative).GetMethodInfo();
+        private readonly static MethodInfo _squareMethod = new Func<double, double>(Functions.Square).GetMethodInfo();
         private readonly static ConstructorInfo _ptConstructor = typeof(Point).GetTypeInfo().GetConstructor(new[] { typeof(double), typeof(double) });
 
-        private readonly ISimulation _simulation;
+        /// <summary>
+        /// Gets or sets the simulation that the builder should use.
+        /// </summary>
+        /// <value>
+        /// The simulation.
+        /// </value>
+        public ISimulation Simulation { get; set; }
+
+        /// <summary>
+        /// Creates an expression from the specified function.
+        /// </summary>
+        /// <param name="func">The function.</param>
+        /// <returns>The result.</returns>
+        public static Expression From(Func<double> func)
+        {
+            return Expression.Call(Expression.Constant(func.Target), func.GetMethodInfo());
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether operations on constants should be simplified.
@@ -96,85 +105,6 @@ namespace SpiceSharpBehavioral.Builders
             if (right.Equals(0.0))
                 return double.PositiveInfinity;
             return left / right;
-        }
-
-        private static double SafePower(double left, double right) => Math.Pow(Math.Abs(left), right);
-        private static double SafePower2(double left, double right)
-        {
-            if (left < 0)
-                return -Math.Pow(-left, right);
-            else
-                return Math.Pow(left, right);
-        }
-        private static double Step(double arg)
-        {
-            if (arg < 0.0)
-                return 0.0;
-            else if (arg > 0.0)
-                return 1.0;
-            else
-                return 0.5; /* Ick! */
-        }
-        private static double Step2(double arg)
-        {
-            if (arg <= 0.0)
-                return 0.0;
-            else if (arg <= 1.0)
-                return arg;
-            else /* if (arg > 1.0) */
-                return 1.0;
-        }
-        private static double Ramp(double arg)
-        {
-            if (arg < 0)
-                return 0.0;
-            return arg;
-        }
-        private static double Pwl(double arg, Point[] data)
-        {
-            // Narrow in on the index for the piece-wise linear function
-            int k0 = 0, k1 = data.Length;
-            while (k1 - k0 > 1)
-            {
-                int k = (k0 + k1) / 2;
-                if (data[k].X > arg)
-                    k1 = k;
-                else
-                    k0 = k;
-            }
-            return data[k0].Y + (arg - data[k0].X) * (data[k1].Y - data[k0].Y) / (data[k1].X - data[k0].X);
-        }
-        private static double PwlDerivative(double arg, Point[] data)
-        {
-            // Narrow in on the index for the piece-wise linear function
-            int k0 = 0, k1 = data.Length;
-            while (k1 - k0 > 1)
-            {
-                int k = (k0 + k1) / 2;
-                if (data[k].X > arg)
-                    k1 = k;
-                else
-                    k0 = k;
-            }
-            return (data[k1].Y - data[k0].Y) / (data[k1].X - data[k0].X);
-        }
-        private static double Square(double arg) => arg * arg;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ExpressionBuilder"/> class.
-        /// </summary>
-        public ExpressionBuilder()
-        {
-            _simulation = null;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ExpressionBuilder"/> class.
-        /// </summary>
-        /// <param name="simulation">The simulation.</param>
-        public ExpressionBuilder(ISimulation simulation)
-        {
-            _simulation = simulation;
         }
 
         Expression IBuilder<Expression>.Plus(Expression argument) => argument;
@@ -298,7 +228,7 @@ namespace SpiceSharpBehavioral.Builders
                     if (left is ConstantExpression ceLeft)
                     {
                         double lv = (double)ceLeft.Value;
-                        return Expression.Constant(SafePower(lv, rv));
+                        return Expression.Constant(Functions.Power(lv, rv));
                     }
                     if (rv.Equals(0.0))
                         return Expression.Constant(1.0);
@@ -471,48 +401,83 @@ namespace SpiceSharpBehavioral.Builders
             }
             return Expression.Condition(Expression.LessThan(left, right), _one, _zero);
         }
-        Expression IBuilder<Expression>.CreateFunction(string name, IReadOnlyList<Expression> arguments)
+
+        /// <summary>
+        /// Creates the value of a function.
+        /// </summary>
+        /// <param name="name">The name of the function.</param>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>
+        /// The value of the function.
+        /// </returns>
+        public override Expression CreateFunction(string name, IReadOnlyList<Expression> arguments)
         {
             // Check the number of arguments
             switch (name)
             {
                 case "abs":
+                case "sgn":
+                case "dabs(0)":
                 case "sqrt":
+                case "dsqrt(0)":
                 case "log":
+                case "dlog(0)":
                 case "log10":
+                case "dlog10(0)":
                 case "exp":
+                case "dexp(0)":
                 case "sin":
+                case "dsin(0)":
                 case "cos":
+                case "dcos(0)":
                 case "tan":
+                case "dtan(0)":
                 case "asin":
+                case "dasin(0)":
                 case "acos":
+                case "dacos(0)":
                 case "atan":
+                case "datan(0)":
                 case "sinh":
+                case "dsinh(0)":
                 case "cosh":
+                case "dcosh(0)":
                 case "tanh":
+                case "dtanh(0)":
                 case "u":
+                case "du(0)":
                 case "u2":
+                case "du2(0)":
                 case "uramp":
+                case "duramp(0)":
                 case "ceil":
+                case "dceil(0)":
                 case "floor":
+                case "dfloor(0)":
                 case "nint":
+                case "dnint(0)":
                 case "square":
+                case "dsquare(0)":
                     if (arguments.Count != 1)
                         throw new Exception("Invalid number of arguments for {0}()".FormatString(name));
                     break;
                 case "pwr":
+                case "dpwr(0)":
+                case "dpwr(1)":
                 case "min":
                 case "max":
                 case "round":
+                case "dround(0)":
+                case "dround(1)":
                     if (arguments.Count != 2)
                         throw new Exception("Invalid number of arguments for {0}()".FormatString(name));
                     break;
                 case "pwl":
+                case "dpwl(0)":
                     if (arguments.Count < 3 || arguments.Count % 2 != 1)
                         throw new Exception("Invalid number of arguments for pwl()");
                     break;
             }
-
             if (SimplifyConstants)
             {
                 bool isConstant = true;
@@ -529,76 +494,134 @@ namespace SpiceSharpBehavioral.Builders
                 }
                 if (isConstant)
                 {
+                    double v = (double)ces[0].Value, v2;
                     switch (name)
                     {
-                        case "abs": return Expression.Constant(Math.Abs((double)ces[0].Value));
-                        case "sqrt": return Expression.Constant(Math.Sqrt((double)ces[0].Value));
-                        case "pwr": return Expression.Constant(SafePower2((double)ces[0].Value, (double)ces[1].Value));
-                        case "min": return Expression.Constant(Math.Min((double)ces[0].Value, (double)ces[1].Value));
-                        case "max": return Expression.Constant(Math.Max((double)ces[0].Value, (double)ces[1].Value));
-                        case "log": return Expression.Constant(Math.Log((double)ces[0].Value));
-                        case "log10": return Expression.Constant(Math.Log10((double)ces[0].Value));
-                        case "exp": return Expression.Constant(Math.Exp((double)ces[0].Value));
-                        case "sin": return Expression.Constant(Math.Sin((double)ces[0].Value));
-                        case "cos": return Expression.Constant(Math.Cos((double)ces[0].Value));
-                        case "tan": return Expression.Constant(Math.Tan((double)ces[0].Value));
-                        case "asin": return Expression.Constant(Math.Asin((double)ces[0].Value));
-                        case "acos": return Expression.Constant(Math.Acos((double)ces[0].Value));
-                        case "atan": return Expression.Constant(Math.Atan((double)ces[0].Value));
-                        case "sinh": return Expression.Constant(Math.Sinh((double)ces[0].Value));
-                        case "cosh": return Expression.Constant(Math.Cosh((double)ces[0].Value));
-                        case "tanh": return Expression.Constant(Math.Tanh((double)ces[0].Value));
-                        case "u": return Expression.Constant(Step((double)ces[0].Value));
-                        case "u2": return Expression.Constant(Step2((double)ces[0].Value));
-                        case "uramp": return Expression.Constant(Ramp((double)ces[0].Value));
-                        case "ceil": return Expression.Constant(Math.Ceiling((double)ces[0].Value));
-                        case "floor": return Expression.Constant(Math.Floor((double)ces[0].Value));
-                        case "nint": return Expression.Constant(Math.Round((double)ces[0].Value, 0));
-                        case "round": return Expression.Constant(Math.Round((double)ces[0].Value, (int)(double)ces[1].Value));
-                        case "square": return Expression.Constant(Square((double)ces[0].Value));
+                        case "abs": return Expression.Constant(Math.Abs(v));
+                        case "sgn":
+                        case "dabs(0)": return Expression.Constant(Functions.Sign(v)); // abs(x)' = sgn(x)
+                        case "sqrt": return Expression.Constant(Functions.Sqrt(v));
+                        case "dsqrt(0)": return Expression.Constant(SafeDivide(0.5, Functions.Sqrt(v))); // sqrt(x)' = 1/(2*sqrt(x))
+                        case "pwr": return Expression.Constant(Functions.Power2(v, (double)ces[1].Value));
+                        case "dpwr(0)":
+                            v2 = (double)ces[1].Value;
+                            return Expression.Constant(v2 * Functions.Power2(v, v2 - 1.0)); // (x^n)' = n*x^(n-1)
+                        case "dpwr(1)":
+                            v2 = (double)ces[1].Value;
+                            return Expression.Constant(Functions.Power2(v, v2) * Functions.Log(v)); // (a^x)' = a^x*ln(a)
+                        case "min": return Expression.Constant(Math.Min(v, (double)ces[1].Value));
+                        case "max": return Expression.Constant(Math.Max(v, (double)ces[1].Value));
+                        case "log": return Expression.Constant(Functions.Log(v));
+                        case "dlog(0)": return Expression.Constant(SafeDivide(1.0, v));
+                        case "log10": return Expression.Constant(Functions.Log10(v));
+                        case "dlog10(0)": return Expression.Constant(SafeDivide(1.0 / Functions.Log(10.0), v));
+                        case "exp":
+                        case "dexp(0)": return Expression.Constant(Math.Exp(v));
+                        case "sin": return Expression.Constant(Math.Sin(v));
+                        case "dsin(0)":
+                        case "cos": return Expression.Constant(Math.Cos(v));
+                        case "dcos(0)": return Expression.Constant(-Math.Sin(v));
+                        case "tan": return Expression.Constant(Math.Tan(v));
+                        case "dtan(0)": return Expression.Constant(SafeDivide(1.0, Functions.Square(Math.Cos(v))));
+                        case "asin": return Expression.Constant(Math.Asin(v));
+                        case "dasin(0)": return Expression.Constant(SafeDivide(1.0, Functions.Sqrt(1 - v * v)));
+                        case "acos": return Expression.Constant(Math.Acos(v));
+                        case "dacos(0)": return Expression.Constant(SafeDivide(-1.0, Functions.Sqrt(1 - v * v)));
+                        case "atan": return Expression.Constant(Math.Atan(v));
+                        case "datan(0)": return Expression.Constant(SafeDivide(1.0, (1 + v * v)));
+                        case "sinh":
+                        case "dcosh(0)": return Expression.Constant(Math.Sinh(v));
+                        case "cosh":
+                        case "dsinh(0)": return Expression.Constant(Math.Cosh(v));
+                        case "tanh": return Expression.Constant(Math.Tanh(v));
+                        case "dtanh(0)": return Expression.Constant(SafeDivide(1, Functions.Square(Math.Cosh(v))));
+                        case "u": return Expression.Constant(Functions.Step(v));
+                        case "u2": return Expression.Constant(Functions.Step2(v));
+                        case "du2(0)": return Expression.Constant(Functions.Step2Derivative(v));
+                        case "uramp": return Expression.Constant(Functions.Ramp(v));
+                        case "duramp(0)": return Expression.Constant(Functions.RampDerivative(v));
+                        case "ceil": return Expression.Constant(Math.Ceiling(v));
+                        case "floor": return Expression.Constant(Math.Floor(v));
+                        case "nint": return Expression.Constant(Math.Round(v, 0));
+                        case "round": return Expression.Constant(Math.Round(v, (int)(double)ces[1].Value));
+                        case "square": return Expression.Constant(Functions.Square(v));
+                        case "dsquare(0)": return Expression.Constant(2 * v);
                         case "pwl":
-                        case "pwl_derivative":
+                        case "dpwl(0)":
                             int points = (arguments.Count - 1) / 2;
                             var initArguments = new Point[points];
                             for (var i = 0; i < points; i++)
                                 initArguments[i] = new Point((double)ces[2 * i + 1].Value, (double)ces[2 * i + 2].Value);
                             if (name == "pwl")
-                                return Expression.Constant(Pwl((double)ces[0].Value, initArguments));
+                                return Expression.Constant(Functions.Pwl(v, initArguments));
                             else
-                                return Expression.Constant(PwlDerivative((double)ces[0].Value, initArguments));
+                                return Expression.Constant(Functions.PwlDerivative(v, initArguments));
+
+                        case "du(0)":
+                        case "dceil(0)":
+                        case "dfloor(0)":
+                        case "dnint(0)":
+                        case "dround(0)":
+                        case "dround(1)":
+                            return Expression.Constant(0.0);
                     }
                 }
             }
 
+            var builder = (IBuilder<Expression>)this;
             switch (name)
             {
                 case "abs": return Expression.Call(_absMethod, arguments[0]);
+                case "sgn":
+                case "dabs(0)": return Expression.Call(_sgnMethod, arguments[0]);
                 case "sqrt": return Expression.Call(_sqrtMethod, arguments[0]);
+                case "dsqrt(0)": return builder.Divide(Expression.Constant(0.5), Expression.Call(_sqrtMethod, arguments[0]));
                 case "pwr": return Expression.Call(_pwrMethod, arguments[0], arguments[1]);
+                case "dpwr(0)": return Expression.Multiply(arguments[1], Expression.Call(_pwrMethod, arguments[0], builder.Subtract(arguments[1], _one)));
+                case "dpwr(1)": return Expression.Multiply(Expression.Call(_pwrMethod, arguments[0], arguments[1]), Expression.Call(_logMethod, arguments[0]));
                 case "min": return Expression.Call(_minMethod, arguments[0], arguments[1]);
                 case "max": return Expression.Call(_maxMethod, arguments[0], arguments[1]);
                 case "log": return Expression.Call(_logMethod, arguments[0]);
+                case "dlog(0)": return builder.Divide(_one, arguments[0]);
                 case "log10": return Expression.Call(_log10Method, arguments[0]);
-                case "exp": return Expression.Call(_expMethod, arguments[0]);
+                case "dlog10(0)": return builder.Divide(Expression.Constant(1.0 / Functions.Log(10.0)), arguments[0]);
+                case "exp":
+                case "dexp(0)": return Expression.Call(_expMethod, arguments[0]);
                 case "sin": return Expression.Call(_sinMethod, arguments[0]);
+                case "dsin(0)":
                 case "cos": return Expression.Call(_cosMethod, arguments[0]);
+                case "dcos(0)": return Expression.Negate(Expression.Call(_sinMethod, arguments[0]));
                 case "tan": return Expression.Call(_tanMethod, arguments[0]);
+                case "dtan(0)": return builder.Divide(_one, Expression.Call(_squareMethod, new[] { Expression.Call(_cosMethod, arguments[0]) }));
                 case "asin": return Expression.Call(_asinMethod, arguments[0]);
+                case "dasin(0)": return builder.Divide(
+                    _one, 
+                    Expression.Call(_sqrtMethod, new[] { Expression.Subtract(_one, Expression.Call(_squareMethod, new[] { arguments[0] })) }));
                 case "acos": return Expression.Call(_acosMethod, arguments[0]);
+                case "dacos(0)": return builder.Divide(
+                    Expression.Constant(-1.0), 
+                    Expression.Call(_sqrtMethod, new[] { Expression.Subtract(_one, Expression.Call(_squareMethod, new[] { arguments[0] })) }));
                 case "atan": return Expression.Call(_atanMethod, arguments[0]);
+                case "datan(0)": return builder.Divide(_one, Expression.Add(_one, Expression.Call(_squareMethod, new[] { arguments[0] })));
+                case "dcosh(0)":
                 case "sinh": return Expression.Call(_sinhMethod, arguments[0]);
+                case "dsinh(0)":
                 case "cosh": return Expression.Call(_coshMethod, arguments[0]);
                 case "tanh": return Expression.Call(_tanhMethod, arguments[0]);
+                case "dtanh(0)": return builder.Divide(_one, Expression.Call(_squareMethod, new[] { Expression.Call(_coshMethod, new[] { arguments[0] }) }));
                 case "u": return Expression.Call(_ustepMethod, arguments[0]);
                 case "u2": return Expression.Call(_ustep2Method, arguments[0]);
+                case "du2(0)": return Expression.Call(_ustep2DerivativeMethod, arguments[0]);
                 case "uramp": return Expression.Call(_urampMethod, arguments[0]);
+                case "duramp(0)": return Expression.Call(_urampDerivativeMethod, arguments[0]);
                 case "ceil": return Expression.Call(_ceilMethod, arguments[0]);
                 case "floor": return Expression.Call(_floorMethod, arguments[0]);
                 case "nint": return Expression.Call(_roundMethod, arguments[0], Expression.Constant(0));
                 case "round": return Expression.Call(_roundMethod, arguments[0], Expression.Convert(arguments[1], typeof(int)));
                 case "square": return Expression.Call(_squareMethod, arguments[0]);
+                case "dsquare(0)": return Expression.Multiply(Expression.Constant(2.0), arguments[0]);
                 case "pwl":
-                case "pwl_derivative":
+                case "dpwl(0)":
                     int points = (arguments.Count - 1) / 2;
                     var initArguments = new Expression[points];
                     for (var i = 0; i < points; i++)
@@ -607,11 +630,26 @@ namespace SpiceSharpBehavioral.Builders
                     if (name == "pwl")
                         return Expression.Call(_pwlMethod, arguments[0], arr);
                     return Expression.Call(_pwlDerivativeMethod, arguments[0], arr);
+                case "du(0)":
+                case "dceil(0)":
+                case "dfloor(0)":
+                case "dnint(0)":
+                case "dround(0)":
+                case "dround(1)":
+                    return _zero;
                 default:
-                    throw new Exception("Unrecognized function {0}".FormatString(name));
+                    return base.CreateFunction(name, arguments);
             }
         }
-        Expression IBuilder<Expression>.CreateNumber(string input)
+
+        /// <summary>
+        /// Creates the value of a number.
+        /// </summary>
+        /// <param name="input">The number.</param>
+        /// <returns>
+        /// The value of the number.
+        /// </returns>
+        public override Expression CreateNumber(string input)
         {
             double value = 0.0;
             int index = 0;
@@ -726,249 +764,156 @@ namespace SpiceSharpBehavioral.Builders
 
             return Expression.Constant(value);
         }
-        Expression IBuilder<Expression>.CreateVariable(string name)
-        {
-            throw new NotImplementedException();
-        }
-        Expression IBuilder<Expression>.CreateVoltage(string node, string reference, QuantityTypes type)
-        {
-            if (_simulation == null)
-                throw new Exception("No simulation specified");
-            node.ThrowIfNull(nameof(node));
-            Func<double> result;
-            switch (type)
-            {
-                case QuantityTypes.Raw:
-                    var state = _simulation.GetState<IBiasingSimulationState>();
-                    var variable = _simulation.Variables.MapNode(node, VariableType.Voltage);
-                    var index = state.Map[variable];
-                    if (reference == null)
-                        result = new Func<double>(() => state.Solution[index]);
-                    else
-                    {
-                        variable = _simulation.Variables.MapNode(reference, VariableType.Voltage);
-                        var refIndex = state.Map[variable];
-                        result = new Func<double>(() => state.Solution[index] - state.Solution[refIndex]);
-                    }
-                    break;
-                case QuantityTypes.Real:
-                    var cstate = _simulation.GetState<IComplexSimulationState>();
-                    variable = _simulation.Variables.MapNode(node, VariableType.Voltage);
-                    index = cstate.Map[variable];
-                    if (reference == null)
-                        result = new Func<double>(() => cstate.Solution[index].Real);
-                    else
-                    {
-                        variable = _simulation.Variables.MapNode(reference, VariableType.Voltage);
-                        var refIndex = cstate.Map[variable];
-                        result = new Func<double>(() => cstate.Solution[index].Real - cstate.Solution[refIndex].Real);
-                    }
-                    break;
-                case QuantityTypes.Imaginary:
-                    cstate = _simulation.GetState<IComplexSimulationState>();
-                    variable = _simulation.Variables.MapNode(node, VariableType.Voltage);
-                    index = cstate.Map[variable];
-                    if (reference == null)
-                        result = new Func<double>(() => cstate.Solution[index].Imaginary);
-                    else
-                    {
-                        variable = _simulation.Variables.MapNode(reference, VariableType.Voltage);
-                        var refIndex = cstate.Map[variable];
-                        result = new Func<double>(() => cstate.Solution[index].Imaginary - cstate.Solution[refIndex].Imaginary);
-                    }
-                    break;
-                case QuantityTypes.Magnitude:
-                    cstate = _simulation.GetState<IComplexSimulationState>();
-                    variable = _simulation.Variables.MapNode(node, VariableType.Voltage);
-                    index = cstate.Map[variable];
-                    if (reference == null)
-                        result = new Func<double>(() => cstate.Solution[index].Magnitude);
-                    else
-                    {
-                        variable = _simulation.Variables.MapNode(reference, VariableType.Voltage);
-                        var refIndex = cstate.Map[variable];
-                        result = new Func<double>(() => (cstate.Solution[index] - cstate.Solution[refIndex]).Magnitude);
-                    }
-                    break;
-                case QuantityTypes.Phase:
-                    cstate = _simulation.GetState<IComplexSimulationState>();
-                    variable = _simulation.Variables.MapNode(node, VariableType.Voltage);
-                    index = cstate.Map[variable];
-                    if (reference == null)
-                        result = new Func<double>(() => cstate.Solution[index].Phase);
-                    else
-                    {
-                        variable = _simulation.Variables.MapNode(reference, VariableType.Voltage);
-                        var refIndex = cstate.Map[variable];
-                        result = new Func<double>(() => (cstate.Solution[index] - cstate.Solution[refIndex]).Phase);
-                    }
-                    break;
-                case QuantityTypes.Decibels:
-                    cstate = _simulation.GetState<IComplexSimulationState>();
-                    variable = _simulation.Variables.MapNode(node, VariableType.Voltage);
-                    index = cstate.Map[variable];
-                    if (reference == null)
-                        result = new Func<double>(() =>
-                        {
-                            var c = cstate.Solution[index];
-                            return 10.0 * Math.Log10(c.Real * c.Real + c.Imaginary * c.Imaginary);
-                        });
-                    else
-                    {
-                        variable = _simulation.Variables.MapNode(reference, VariableType.Voltage);
-                        var refIndex = cstate.Map[variable];
-                        result = new Func<double>(() =>
-                        {
-                            var c = cstate.Solution[index] - cstate.Solution[refIndex];
-                            return 10.0 * Math.Log10(c.Real * c.Real + c.Imaginary * c.Imaginary);
-                        });
-                    }
-                    break;
-                default:
-                    throw new Exception("Unrecognized voltage quantity type");
-            }
-            return Expression.Call(Expression.Constant(result.Target), result.GetMethodInfo());
-        }
-        Expression IBuilder<Expression>.CreateCurrent(string name, QuantityTypes type)
-        {
-            if (_simulation == null)
-                throw new Exception("No simulation specified");
-            name.ThrowIfNull(nameof(name));
-            var behaviors = _simulation.EntityBehaviors[name];
-            Func<double> result;
-            switch (type)
-            {
-                case QuantityTypes.Raw:
-                    if (behaviors.TryGetValue(out IBranchedBehavior behavior))
-                    {
-                        var state = _simulation.GetState<IBiasingSimulationState>();
-                        var index = state.Map[behavior.Branch];
-                        result = () => state.Solution[index];
-                    }
-                    else
-                        result = behaviors.CreatePropertyGetter<double>("i");
-                    break;
-                case QuantityTypes.Real:
-                    if (behaviors.TryGetValue(out behavior))
-                    {
-                        var cstate = _simulation.GetState<IComplexSimulationState>();
-                        var index = cstate.Map[behavior.Branch];
-                        result = () => cstate.Solution[index].Real;
-                    }
-                    else
-                    {
-                        var getter = behaviors.CreatePropertyGetter<Complex>("i");
-                        result = () => getter().Real;
-                    }
-                    break;
-                case QuantityTypes.Imaginary:
-                    if (behaviors.TryGetValue(out behavior))
-                    {
-                        var cstate = _simulation.GetState<IComplexSimulationState>();
-                        var index = cstate.Map[behavior.Branch];
-                        result = () => cstate.Solution[index].Imaginary;
-                    }
-                    else
-                    {
-                        var getter = behaviors.CreatePropertyGetter<Complex>("i");
-                        result = () => getter().Imaginary;
-                    }
-                    break;
-                case QuantityTypes.Magnitude:
-                    if (behaviors.TryGetValue(out behavior))
-                    {
-                        var cstate = _simulation.GetState<IComplexSimulationState>();
-                        var index = cstate.Map[behavior.Branch];
-                        result = () => cstate.Solution[index].Magnitude;
-                    }
-                    else
-                    {
-                        var getter = behaviors.CreatePropertyGetter<Complex>("i");
-                        result = () => getter().Magnitude;
-                    }
-                    break;
-                case QuantityTypes.Phase:
-                    if (behaviors.TryGetValue(out behavior))
-                    {
-                        var cstate = _simulation.GetState<IComplexSimulationState>();
-                        var index = cstate.Map[behavior.Branch];
-                        result = () => cstate.Solution[index].Phase;
-                    }
-                    else
-                    {
-                        var getter = behaviors.CreatePropertyGetter<Complex>("i");
-                        result = () => getter().Phase;
-                    }
-                    break;
-                case QuantityTypes.Decibels:
-                    if (behaviors.TryGetValue(out behavior))
-                    {
-                        var cstate = _simulation.GetState<IComplexSimulationState>();
-                        var index = cstate.Map[behavior.Branch];
-                        result = () =>
-                        {
-                            var c = cstate.Solution[index];
-                            return 10.0 * Math.Log10(c.Real * c.Real + c.Imaginary * c.Imaginary);
-                        };
-                    }
-                    else
-                    {
-                        var getter = behaviors.CreatePropertyGetter<Complex>("i");
-                        result = () =>
-                        {
-                            var c = getter();
-                            return 10.0 * Math.Log10(c.Real * c.Real + c.Imaginary * c.Imaginary);
-                        };
-                    }
-                    break;
-                default:
-                    throw new Exception("Unrecognized current quantity type");
-            }
-            return Expression.Call(Expression.Constant(result.Target), result.GetMethodInfo());
-        }
-        Expression IBuilder<Expression>.CreateProperty(string name, string property, QuantityTypes type)
-        {
-            if (_simulation == null)
-                throw new Exception("No simulation specified");
-            name.ThrowIfNull(nameof(name));
-            property.ThrowIfNull(nameof(property));
 
-            var behaviors = _simulation.EntityBehaviors[name];
-            if (type == QuantityTypes.Raw)
+        /// <summary>
+        /// Creates the value of a voltage.
+        /// </summary>
+        /// <param name="node">The name of the node.</param>
+        /// <param name="reference">The name of the reference node.</param>
+        /// <param name="type">The quantity type.</param>
+        /// <returns>
+        /// The value of the voltage.
+        /// </returns>
+        public override Expression CreateVoltage(string node, string reference, QuantityTypes type)
+        {
+            if (Simulation != null)
             {
-                var getter = behaviors.CreatePropertyGetter<double>(property).ThrowIfNull("property");
-                return Expression.Call(Expression.Constant(getter.Target), getter.GetMethodInfo());
+                var nodeVariable = Simulation.Variables.MapNode(node, VariableType.Voltage);
+                var refVariable = reference != null ? Simulation.Variables.MapNode(reference, VariableType.Voltage) : null;
+
+                if (type == QuantityTypes.Raw)
+                {
+                    var state = Simulation.GetState<IBiasingSimulationState>();
+                    var nodeIndex = state.Map[nodeVariable];
+                    var refIndex = refVariable != null ? state.Map[refVariable] : 0;
+                    return refIndex > 0 ?
+                        From(() => state.Solution[nodeIndex] - state.Solution[refIndex]) :
+                        From(() => state.Solution[nodeIndex]);
+                }
+                else
+                {
+                    // Complex voltages
+                    var state = Simulation.GetState<IComplexSimulationState>();
+                    var nodeIndex = state.Map[nodeVariable];
+                    var refIndex = refVariable != null ? state.Map[refVariable] : 0;
+                    switch (type)
+                    {
+                        case QuantityTypes.Real:
+                            return refIndex > 0 ?
+                                From(() => state.Solution[nodeIndex].Real - state.Solution[refIndex].Real) :
+                                From(() => state.Solution[nodeIndex].Real);
+                        case QuantityTypes.Imaginary:
+                            return refIndex > 0 ?
+                                From(() => state.Solution[nodeIndex].Imaginary - state.Solution[refIndex].Imaginary) :
+                                From(() => state.Solution[nodeIndex].Imaginary);
+                        case QuantityTypes.Magnitude:
+                            return refIndex > 0 ?
+                                From(() => (state.Solution[nodeIndex] - state.Solution[refIndex]).Magnitude) :
+                                From(() => state.Solution[nodeIndex].Magnitude);
+                        case QuantityTypes.Phase:
+                            return refIndex > 0 ?
+                                From(() => (state.Solution[nodeIndex] - state.Solution[refIndex]).Phase) :
+                                From(() => state.Solution[nodeIndex].Phase);
+                        case QuantityTypes.Decibels:
+                            return refIndex > 0 ?
+                                From(() =>
+                                {
+                                    var c = state.Solution[nodeIndex] - state.Solution[refIndex];
+                                    return 10.0 * Math.Log10(c.Real * c.Real + c.Imaginary * c.Imaginary);
+                                }) :
+                                From(() =>
+                                {
+                                    var c = state.Solution[nodeIndex];
+                                    return 10.0 * Math.Log10(c.Real * c.Real + c.Imaginary * c.Imaginary);
+                                });
+                        default:
+                            throw new Exception("Unknown quantity type");
+                    }
+                }
             }
             else
+                return base.CreateVoltage(node, reference, type);
+        }
+
+        /// <summary>
+        /// Creates the value of a current.
+        /// </summary>
+        /// <param name="name">The name of the node.</param>
+        /// <param name="type">The quantity type.</param>
+        /// <returns>
+        /// The value of the current.
+        /// </returns>
+        public override Expression CreateCurrent(string name, QuantityTypes type)
+        {
+            if (Simulation != null)
             {
-                var getter = behaviors.CreatePropertyGetter<Complex>(property).ThrowIfNull("property");
-                Func<double> result = null;
-                switch (type)
+                var eb = Simulation.EntityBehaviors[name];
+                if (type == QuantityTypes.Raw)
                 {
-                    case QuantityTypes.Real:
-                        result = () => getter().Real;
-                        break;
-                    case QuantityTypes.Imaginary:
-                        result = () => getter().Imaginary;
-                        break;
-                    case QuantityTypes.Magnitude:
-                        result = () => getter().Magnitude;
-                        break;
-                    case QuantityTypes.Phase:
-                        result = () => getter().Phase;
-                        break;
-                    case QuantityTypes.Decibels:
-                        result = () =>
-                        {
-                            var c = getter();
-                            return 10.0 * Math.Log10(c.Real * c.Real + c.Imaginary * c.Imaginary);
-                        };
-                        break;
-                    default:
-                        throw new Exception("Unrecognized quantity");
+                    var state = Simulation.GetState<IBiasingSimulationState>();
+                    if (eb.TryGetValue(out IBranchedBehavior behavior))
+                    {
+                        var index = state.Map[behavior.Branch];
+                        return From(() => state.Solution[index]);
+                    }
+                    else
+                    {
+                        var getter = eb.CreatePropertyGetter<double>("i");
+                        return base.CreateCurrent(name, type);
+                    }
                 }
-                return Expression.Call(Expression.Constant(result.Target), result.GetMethodInfo());
+                else
+                {
+                    var state = Simulation.GetState<IComplexSimulationState>();
+                    if (eb.TryGetValue(out IBranchedBehavior behavior))
+                    {
+                        var index = state.Map[behavior.Branch];
+                        switch (type)
+                        {
+                            case QuantityTypes.Real:
+                                return From(() => state.Solution[index].Real);
+                            case QuantityTypes.Imaginary:
+                                return From(() => state.Solution[index].Imaginary);
+                            case QuantityTypes.Magnitude:
+                                return From(() => state.Solution[index].Magnitude);
+                            case QuantityTypes.Phase:
+                                return From(() => state.Solution[index].Phase);
+                            case QuantityTypes.Decibels:
+                                return From(() =>
+                                {
+                                    var c = state.Solution[index];
+                                    return 10.0 * Math.Log10(c.Real * c.Real + c.Imaginary * c.Imaginary);
+                                });
+                        }
+                    }
+                    else
+                    {
+                        var getter = eb.CreatePropertyGetter<Complex>("i");
+                        if (getter != null)
+                        {
+                            switch (type)
+                            {
+                                case QuantityTypes.Real:
+                                    return From(() => getter().Real);
+                                case QuantityTypes.Imaginary:
+                                    return From(() => getter().Imaginary);
+                                case QuantityTypes.Magnitude:
+                                    return From(() => getter().Magnitude);
+                                case QuantityTypes.Phase:
+                                    return From(() => getter().Phase);
+                                case QuantityTypes.Decibels:
+                                    return From(() =>
+                                    {
+                                        var c = getter();
+                                        return 10.0 * Math.Log10(c.Real * c.Real + c.Imaginary * c.Imaginary);
+                                    });
+                            }
+                        }
+                    }
+                }
             }
+            
+            return base.CreateCurrent(name, type);
         }
     }
 }

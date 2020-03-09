@@ -42,5 +42,10 @@ namespace SpiceSharpBehavioral.Parsers
         /// Reads a node.
         /// </summary>
         void ReadNode();
+
+        /// <summary>
+        /// Resets the lexer to the start of the input.
+        /// </summary>
+        void Reset();
     }
 }

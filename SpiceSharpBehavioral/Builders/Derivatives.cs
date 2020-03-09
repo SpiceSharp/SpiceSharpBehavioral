@@ -129,5 +129,14 @@ namespace SpiceSharpBehavioral.Builders
                     _derivatives[key] = rightFunc(rightValue);
             }
         }
+
+        /// <summary>
+        /// Performs an implicit conversion from the value type to a <see cref="Derivatives{T}"/>.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <returns>
+        /// The result of the conversion.
+        /// </returns>
+        public static implicit operator Derivatives<T>(T value) => new Derivatives<T> { Value = value };
     }
 }

@@ -77,172 +77,89 @@ namespace SpiceSharpBehavioralTests.Builders
             Assert.AreEqual(a <= b ? 1.0 : 0.0, Compile(builder.LessThanOrEqual(ca, cb)).Invoke(), 1e-20);
         }
 
-        [TestCaseSource(typeof(ExpressionBuilderTestData), nameof(ExpressionBuilderTestData.Combinations))]
-        public void When_Functions_Expect_Reference(double a, double b)
+        [TestCaseSource(typeof(ExpressionBuilderTestData), nameof(ExpressionBuilderTestData.Functions1D))]
+        public void When_Functions1D_Expect_Reference(string function, double argument, double expected)
         {
-            var ca = Expression.Constant(a);
-            var cb = Expression.Constant(b);
-            IBuilder<Expression> builder = new ExpressionBuilder() { SimplifyConstants = false };
-            Assert.AreEqual(Math.Abs(a), Compile(builder.CreateFunction("abs", new[] { ca })).Invoke(), 1e-20);
-            Assert.AreEqual(Math.Sqrt(a), Compile(builder.CreateFunction("sqrt", new[] { ca })).Invoke(), 1e-20);
-            Assert.AreEqual(a < 0 ? -Math.Pow(-a, b) : Math.Pow(a, b), Compile(builder.CreateFunction("pwr", new[] { ca, cb })).Invoke(), 1e-20);
-            Assert.AreEqual(Math.Min(a, b), Compile(builder.CreateFunction("min", new[] { ca, cb })).Invoke(), 1e-20);
-            Assert.AreEqual(Math.Max(a, b), Compile(builder.CreateFunction("max", new[] { ca, cb })).Invoke(), 1e-20);
-            Assert.AreEqual(Math.Log(a), Compile(builder.CreateFunction("log", new[] { ca })).Invoke(), 1e-20);
-            Assert.AreEqual(Math.Log10(a), Compile(builder.CreateFunction("log10", new[] { ca })).Invoke(), 1e-20);
-            Assert.AreEqual(Math.Exp(a), Compile(builder.CreateFunction("exp", new[] { ca })).Invoke(), 1e-20);
-            Assert.AreEqual(Math.Sin(a), Compile(builder.CreateFunction("sin", new[] { ca })).Invoke(), 1e-20);
-            Assert.AreEqual(Math.Cos(a), Compile(builder.CreateFunction("cos", new[] { ca })).Invoke(), 1e-20);
-            Assert.AreEqual(Math.Tan(a), Compile(builder.CreateFunction("tan", new[] { ca })).Invoke(), 1e-20);
-            Assert.AreEqual(Math.Asin(a), Compile(builder.CreateFunction("asin", new[] { ca })).Invoke(), 1e-20);
-            Assert.AreEqual(Math.Acos(a), Compile(builder.CreateFunction("acos", new[] { ca })).Invoke(), 1e-20);
-            Assert.AreEqual(Math.Atan(a), Compile(builder.CreateFunction("atan", new[] { ca })).Invoke(), 1e-20);
-            Assert.AreEqual(Math.Sinh(a), Compile(builder.CreateFunction("sinh", new[] { ca })).Invoke(), 1e-20);
-            Assert.AreEqual(Math.Cosh(a), Compile(builder.CreateFunction("cosh", new[] { ca })).Invoke(), 1e-20);
-            Assert.AreEqual(Math.Tanh(a), Compile(builder.CreateFunction("tanh", new[] { ca })).Invoke(), 1e-20);
-            Assert.AreEqual(a > 0 ? 1.0 : a == 0.0 ? 0.5 : 0, Compile(builder.CreateFunction("u", new[] { ca })).Invoke(), 1e-20);
-            Assert.AreEqual(a > 0 ? a < 1 ? a : 1 : 0.0, Compile(builder.CreateFunction("u2", new[] { ca })).Invoke(), 1e-20);
-            Assert.AreEqual(a > 0 ? a : 0, Compile(builder.CreateFunction("uramp", new[] { ca })).Invoke(), 1e-20);
-            Assert.AreEqual(Math.Ceiling(a), Compile(builder.CreateFunction("ceil", new[] { ca })).Invoke(), 1e-20);
-            Assert.AreEqual(Math.Floor(a), Compile(builder.CreateFunction("floor", new[] { ca })).Invoke(), 1e-20);
-            Assert.AreEqual(Math.Round(a, 0), Compile(builder.CreateFunction("nint", new[] { ca })).Invoke(), 1e-20);
-            if (b >= 0)
-                Assert.AreEqual(Math.Round(a, (int)b), Compile(builder.CreateFunction("round", new[] { ca, cb })).Invoke(), 1e-20);
-            Assert.AreEqual(a * a, Compile(builder.CreateFunction("square", new[] { ca })).Invoke(), 1e-20);
+            IBuilder<Expression> builder = new ExpressionBuilder { SimplifyConstants = false };
+            Assert.AreEqual(expected, Compile(builder.CreateFunction(function, new[] { Expression.Constant(argument) })).Invoke(), 1e-12);
         }
 
-        [Test]
-        public void When_Voltage_Expect_Reference()
+        [TestCaseSource(typeof(ExpressionBuilderTestData), nameof(ExpressionBuilderTestData.Functions2D))]
+        public void When_Functions2D_Expect_Reference(string function, double arg1, double arg2, double expected)
         {
-            var op = new OP("op");
-            IBuilder<Expression> builder = new ExpressionBuilder(op);
-            var ckt = new Circuit(
-                new VoltageSource("V1", "in", "0", 2.0),
-                new Resistor("R1", "in", "out", 1e3),
-                new Resistor("R2", "out", "0", 2e3));
-            Func<double> func = null, func2 = null;
-            op.AfterSetup += (sender, args) =>
-            {
-                func = Compile(builder.CreateVoltage("out", null, QuantityTypes.Raw));
-                func2 = Compile(builder.CreateVoltage("in", "out", QuantityTypes.Raw));
-            };
-            op.ExportSimulationData += (sender, args) =>
-            {
-                Assert.AreEqual(4.0 / 3.0, func(), 1e-12);
-                Assert.AreEqual(2.0 / 3.0, func2(), 1e-12);
-            };
-            op.Run(ckt);
+            IBuilder<Expression> builder = new ExpressionBuilder { SimplifyConstants = false };
+            Assert.AreEqual(expected, Compile(builder.CreateFunction(function, new[] { Expression.Constant(arg1), Expression.Constant(arg2) })).Invoke(), 1e-12);
         }
 
-        [Test]
-        public void When_ComplexVoltage_Expect_Reference()
+        [TestCaseSource(typeof(ExpressionBuilderTestData), nameof(ExpressionBuilderTestData.Functions1D))]
+        public void When_Functions1DSimplified_Expect_Reference(string function, double argument, double expected)
         {
-            var ac = new AC("ac", new DecadeSweep(1.0, 1e9, 4));
-            IBuilder<Expression> builder = new ExpressionBuilder(ac);
-
-            var ckt = new Circuit(
-                new VoltageSource("V1", "in", "0", 2.0).SetParameter("acmag", 1.0),
-                new Resistor("R1", "in", "out", 1e3),
-                new Capacitor("C1", "out", "0", 1e-6));
-            Func<double> func = null, func2 = null, func3 = null, func4 = null, func5 = null;
-            ac.AfterSetup += (sender, args) =>
-            {
-                func = Compile(builder.CreateVoltage("out", null, QuantityTypes.Real));
-                func2 = Compile(builder.CreateVoltage("out", null, QuantityTypes.Imaginary));
-                func3 = Compile(builder.CreateVoltage("out", null, QuantityTypes.Magnitude));
-                func4 = Compile(builder.CreateVoltage("out", null, QuantityTypes.Phase));
-                func5 = Compile(builder.CreateVoltage("out", null, QuantityTypes.Decibels));
-            };
-            ac.ExportSimulationData += (sender, args) =>
-            {
-                var c = 1.0 / (1.0 + 1e-3 * args.Laplace);
-                Assert.AreEqual(c.Real, func(), 1e-12);
-                Assert.AreEqual(c.Imaginary, func2(), 1e-12);
-                Assert.AreEqual(c.Magnitude, func3(), 1e-12);
-                Assert.AreEqual(c.Phase, func4(), 1e-12);
-                Assert.AreEqual(10.0 * Math.Log10(c.Real * c.Real + c.Imaginary * c.Imaginary), func5(), 1e-12);
-            };
-            ac.Run(ckt);
+            IBuilder<Expression> builder = new ExpressionBuilder { SimplifyConstants = true };
+            Assert.AreEqual(expected, Compile(builder.CreateFunction(function, new[] { Expression.Constant(argument) })).Invoke(), 1e-12);
         }
 
-        [Test]
-        public void When_Current_Expect_Reference()
+        [TestCaseSource(typeof(ExpressionBuilderTestData), nameof(ExpressionBuilderTestData.Functions2D))]
+        public void When_Functions2DSimplified_Expect_Reference(string function, double arg1, double arg2, double expected)
         {
-            var op = new OP("op");
-            IBuilder<Expression> builder = new ExpressionBuilder(op);
-            var ckt = new Circuit(
-                new VoltageSource("V1", "in", "0", 2.0),
-                new Resistor("R1", "in", "out", 1e3),
-                new Resistor("R2", "out", "0", 2e3));
-            Func<double> func = null, func2 = null;
-            op.AfterSetup += (sender, args) =>
-            {
-                func = Compile(builder.CreateCurrent("V1", QuantityTypes.Raw)); // From a branched entity
-                func2 = Compile(builder.CreateCurrent("R1", QuantityTypes.Raw)); // From a non-branched entity
-            };
-            op.ExportSimulationData += (sender, args) =>
-            {
-                Assert.AreEqual(-2.0 / 3.0e3, func(), 1e-12);
-                Assert.AreEqual(2.0 / 3.0e3, func2(), 1e-12);
-            };
-            op.Run(ckt);
+            IBuilder<Expression> builder = new ExpressionBuilder { SimplifyConstants = true };
+            Assert.AreEqual(expected, Compile(builder.CreateFunction(function, new[] { Expression.Constant(arg1), Expression.Constant(arg2) })).Invoke(), 1e-12);
         }
 
-        [Test]
-        public void When_ComplexCurrent_Expect_Reference()
+        [TestCaseSource(typeof(ExpressionBuilderTestData), nameof(ExpressionBuilderTestData.Voltages))]
+        public void When_Voltage_Expect_Reference(string node, string reference, QuantityTypes type, double value)
         {
-            var ac = new AC("ac", new DecadeSweep(1.0, 1e9, 4));
-            IBuilder<Expression> builder = new ExpressionBuilder(ac);
-            var ckt = new Circuit(
-                new VoltageSource("V1", "in", "0", 2.0).SetParameter("acmag", 1.0),
-                new Resistor("R1", "in", "out", 1e3),
-                new Capacitor("C1", "out", "0", 1e-6));
-            Func<double> func = null, func2 = null, func3 = null, func4 = null, func5 = null;
-            ac.AfterSetup += (sender, args) =>
+            var builder = new ExpressionBuilder();
+            builder.VoltageFound += (sender, args) =>
             {
-                func = Compile(builder.CreateCurrent("V1", QuantityTypes.Real));
-                func2 = Compile(builder.CreateCurrent("V1", QuantityTypes.Imaginary));
-                func3 = Compile(builder.CreateCurrent("V1", QuantityTypes.Magnitude));
-                func4 = Compile(builder.CreateCurrent("V1", QuantityTypes.Phase));
-                func5 = Compile(builder.CreateCurrent("V1", QuantityTypes.Decibels));
+                Assert.AreEqual(args.Node, node);
+                Assert.AreEqual(args.Reference, reference);
+                Assert.AreEqual(args.QuantityType, type);
+                args.Result = Expression.Constant(value);
             };
-            ac.ExportSimulationData += (sender, args) =>
-            {
-                var v = 1.0 / (1.0 + 1e-3 * args.Laplace);
-                var c = -v * 1e-6 * args.Laplace;
-                Assert.AreEqual(c.Real, func(), 1e-12);
-                Assert.AreEqual(c.Imaginary, func2(), 1e-12);
-                Assert.AreEqual(c.Magnitude, func3(), 1e-12);
-                Assert.AreEqual(c.Phase, func4(), 1e-12);
-                Assert.AreEqual(10.0 * Math.Log10(c.Real * c.Real + c.Imaginary * c.Imaginary), func5(), 1e-12);
-            };
-            ac.Run(ckt);
+            Assert.AreEqual(value, Compile(builder.CreateVoltage(node, reference, type)).Invoke(), 1e-12);
         }
 
-        [Test]
-        public void When_Property_Expect_Reference()
+        [TestCaseSource(typeof(ExpressionBuilderTestData), nameof(ExpressionBuilderTestData.Currents))]
+        public void When_Current_Expect_Reference(string name, QuantityTypes type, double value)
         {
-            var op = new OP("op");
-            IBuilder<Expression> builder = new ExpressionBuilder(op);
-            var ckt = new Circuit(
-                new VoltageSource("V1", "in", "0", 2.0),
-                new Resistor("R1", "in", "out", 1e3),
-                new Resistor("R2", "out", "0", 2e3));
-            Func<double> func = null;
-            op.AfterSetup += (sender, args) =>
+            var builder = new ExpressionBuilder();
+            builder.CurrentFound += (sender, args) =>
             {
-                func = Compile(builder.CreateProperty("R1", "resistance", QuantityTypes.Raw));
+                Assert.AreEqual(args.Name, name);
+                Assert.AreEqual(args.QuantityType, type);
+                args.Result = Expression.Constant(value);
             };
-            op.ExportSimulationData += (sender, args) =>
+            Assert.AreEqual(value, Compile(builder.CreateCurrent(name, type)).Invoke(), 1e-12);
+        }
+
+        [TestCaseSource(typeof(ExpressionBuilderTestData), nameof(ExpressionBuilderTestData.Properties))]
+        public void When_Property_Expect_Reference(string source, string property, QuantityTypes type, double value)
+        {
+            var builder = new ExpressionBuilder();
+            builder.PropertyFound += (sender, args) =>
             {
-                Assert.AreEqual(1.0e3, func(), 1e-12);
+                Assert.AreEqual(args.Source, source);
+                Assert.AreEqual(args.Property, property);
+                Assert.AreEqual(args.QuantityType, type);
+                args.Result = Expression.Constant(value);
             };
-            op.Run(ckt);
+            Assert.AreEqual(value, Compile(builder.CreateProperty(source, property, type)).Invoke(), 1e-12);
         }
     }
 
     public class ExpressionBuilderTestData
     {
+        public static double FudgeFactor = 1e-20;
+        private static double SafeDivide(double left, double right)
+        {
+            if (right < 0)
+                right -= FudgeFactor;
+            else
+                right += FudgeFactor;
+            if (right.Equals(0.0))
+                return double.PositiveInfinity;
+            return left / right;
+        }
         public static IEnumerable<TestCaseData> SpiceNumbers
         {
             get
@@ -261,6 +178,30 @@ namespace SpiceSharpBehavioralTests.Builders
                 yield return new TestCaseData("3mil", 3 * 25.4e-6); // Mil
             }
         }
+        public static IEnumerable<TestCaseData> Voltages
+        {
+            get
+            {
+                yield return new TestCaseData("in", null, QuantityTypes.Raw, 1.0);
+                yield return new TestCaseData("in", "0", QuantityTypes.Real, 0.5);
+            }
+        }
+        public static IEnumerable<TestCaseData> Currents
+        {
+            get
+            {
+                yield return new TestCaseData("V1", QuantityTypes.Raw, 1.0);
+                yield return new TestCaseData("R1", QuantityTypes.Phase, -1.0);
+            }
+        }
+        public static IEnumerable<TestCaseData> Properties
+        {
+            get
+            {
+                yield return new TestCaseData("V1", "acmag", QuantityTypes.Raw, 1.0);
+                yield return new TestCaseData("R1", "resistance", QuantityTypes.Real, 0.5);
+            }
+        }
         public static IEnumerable<TestCaseData> Combinations
         {
             get
@@ -270,6 +211,83 @@ namespace SpiceSharpBehavioralTests.Builders
                 yield return new TestCaseData(0.0, 3.0);
                 yield return new TestCaseData(3.0, 0.0);
                 yield return new TestCaseData(0.0, 0.0);
+            }
+        }
+        public static IEnumerable<TestCaseData> Single
+        {
+            get
+            {
+                yield return new TestCaseData(2.5);
+                yield return new TestCaseData(0.0);
+                yield return new TestCaseData(-3.9);
+            }
+        }
+        public static IEnumerable<TestCaseData> Functions1D
+        {
+            get
+            {
+                foreach (var data in Single)
+                {
+                    var arg = (double)data.Arguments[0];
+                    yield return new TestCaseData("abs", arg, Math.Abs(arg));
+                    yield return new TestCaseData("dabs(0)", arg, (double)Math.Sign(arg));
+                    yield return new TestCaseData("sqrt", arg, arg < 0 ? double.PositiveInfinity : Math.Sqrt(arg));
+                    yield return new TestCaseData("log", arg, arg < 0.0 ? double.PositiveInfinity : Math.Log(arg));
+                    yield return new TestCaseData("dlog(0)", arg, SafeDivide(1, arg));
+                    yield return new TestCaseData("log10", arg, arg < 0 ? double.PositiveInfinity : Math.Log10(arg));
+                    yield return new TestCaseData("dlog10(0)", arg, SafeDivide(1.0 / Math.Log(10.0), arg));
+                    yield return new TestCaseData("exp", arg, Math.Exp(arg));
+                    yield return new TestCaseData("dexp(0)", arg, Math.Exp(arg));
+                    yield return new TestCaseData("sin", arg, Math.Sin(arg));
+                    yield return new TestCaseData("dsin(0)", arg, Math.Cos(arg));
+                    yield return new TestCaseData("cos", arg, Math.Cos(arg));
+                    yield return new TestCaseData("dcos(0)", arg, -Math.Sin(arg));
+                    yield return new TestCaseData("tan", arg, Math.Tan(arg));
+                    yield return new TestCaseData("dtan(0)", arg, SafeDivide(1.0, Math.Cos(arg) * Math.Cos(arg)));
+                    yield return new TestCaseData("asin", arg, Math.Asin(arg));
+                    yield return new TestCaseData("dasin(0)", arg, arg < 0 || arg > 1 ? 0.0 : SafeDivide(1.0, Math.Sqrt(1 - arg * arg)));
+                    yield return new TestCaseData("acos", arg, Math.Acos(arg));
+                    yield return new TestCaseData("dacos(0)", arg, arg < 0 || arg > 1 ? 0.0 : SafeDivide(-1.0, Math.Sqrt(1 - arg * arg)));
+                    yield return new TestCaseData("atan", arg, Math.Atan(arg));
+                    yield return new TestCaseData("datan(0)", arg, 1.0 / (1.0 + arg * arg));
+                    yield return new TestCaseData("sinh", arg, Math.Sinh(arg));
+                    yield return new TestCaseData("dsinh(0)", arg, Math.Cosh(arg));
+                    yield return new TestCaseData("cosh", arg, Math.Cosh(arg));
+                    yield return new TestCaseData("dcosh(0)", arg, Math.Sinh(arg));
+                    yield return new TestCaseData("tanh", arg, Math.Tanh(arg));
+                    yield return new TestCaseData("dtanh(0)", arg, SafeDivide(1, Math.Cosh(arg) * Math.Cosh(arg)));
+                    yield return new TestCaseData("u", arg, Functions.Step(arg));
+                    yield return new TestCaseData("du(0)", arg, 0.0);
+                    yield return new TestCaseData("u2", arg, Functions.Step2(arg));
+                    yield return new TestCaseData("du2(0)", arg, Functions.Step2Derivative(arg));
+                    yield return new TestCaseData("uramp", arg, Functions.Ramp(arg));
+                    yield return new TestCaseData("duramp(0)", arg, Functions.RampDerivative(arg));
+                    yield return new TestCaseData("ceil", arg, Math.Ceiling(arg));
+                    yield return new TestCaseData("dceil(0)", arg, 0.0);
+                    yield return new TestCaseData("floor", arg, Math.Floor(arg));
+                    yield return new TestCaseData("dfloor(0)", arg, 0.0);
+                    yield return new TestCaseData("nint", arg, Math.Round(arg, 0));
+                    yield return new TestCaseData("square", arg, arg * arg);
+                    yield return new TestCaseData("dsquare(0)", arg, 2 * arg);
+                }
+            }
+        }
+        public static IEnumerable<TestCaseData> Functions2D
+        {
+            get
+            {
+                foreach (var data in Combinations)
+                {
+                    var arg1 = (double)data.Arguments[0];
+                    var arg2 = (double)data.Arguments[1];
+                    yield return new TestCaseData("pwr", arg1, arg2, Functions.Power2(arg1, arg2));
+                    yield return new TestCaseData("dpwr(0)", arg1, arg2, arg2 * Functions.Power2(arg1, arg2 - 1.0));
+                    yield return new TestCaseData("dpwr(1)", arg1, arg2, Functions.Power2(arg1, arg2) * Math.Log(arg1));
+                    yield return new TestCaseData("min", arg1, arg2, arg1 < arg2 ? arg1 : arg2);
+                    yield return new TestCaseData("max", arg1, arg2, arg1 > arg2 ? arg1 : arg2);
+                    if (arg2 >= 0)
+                        yield return new TestCaseData("round", arg1, arg2, Math.Round(arg1, (int)arg2));
+                }
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using SpiceSharp.Simulations;
+using System.Collections.Generic;
 
 namespace SpiceSharpBehavioral.Parsers
 {
@@ -151,44 +152,55 @@ namespace SpiceSharpBehavioral.Parsers
         T CreateNumber(string value);
 
         /// <summary>
-        /// Creates a variable.
+        /// Creates the function.
         /// </summary>
-        /// <param name="name">The name.</param>
-        /// <returns>The variable value.</returns>
-        T CreateVariable(string name);
-
-        /// <summary>
-        /// Creates a function call.
-        /// </summary>
-        /// <param name="name">The name.</param>
+        /// <param name="name">The name of the function.</param>
         /// <param name="arguments">The arguments.</param>
-        /// <returns>The result of the function call.</returns>
+        /// <returns>
+        /// The function value.
+        /// </returns>
         T CreateFunction(string name, IReadOnlyList<T> arguments);
 
         /// <summary>
-        /// Creates a voltage reference.
+        /// Creates the value of a variable.
         /// </summary>
-        /// <param name="node">The node.</param>
-        /// <param name="reference">The reference.</param>
-        /// <param name="type">The type.</param>
-        /// <returns>The value of the voltage.</returns>
-        T CreateVoltage(string node, string reference, QuantityTypes type);
+        /// <param name="name">The name of the variable.</param>
+        /// <param name="type">The type of the variable.</param>
+        /// <returns>
+        /// The variable value.
+        /// </returns>
+        T CreateVariable(string name, QuantityTypes type = QuantityTypes.Raw);
 
         /// <summary>
-        /// Creates a current reference.
+        /// Creates the value of a voltage.
         /// </summary>
-        /// <param name="name">The name.</param>
-        /// <param name="type">The type.</param>
-        /// <returns>The value of the current.</returns>
-        T CreateCurrent(string name, QuantityTypes type);
+        /// <param name="node">The name of the node.</param>
+        /// <param name="reference">The name of the reference node.</param>
+        /// <param name="type">The type of voltage.</param>
+        /// <returns>
+        /// The value of the voltage.
+        /// </returns>
+        T CreateVoltage(string node, string reference = null, QuantityTypes type = QuantityTypes.Raw);
 
         /// <summary>
-        /// Creates a property reference.
+        /// Creates the value of a current.
         /// </summary>
-        /// <param name="name">The name.</param>
-        /// <param name="property">The property.</param>
-        /// <param name="type">The type.</param>
-        /// <returns>The value of the property.</returns>
-        T CreateProperty(string name, string property, QuantityTypes type);
+        /// <param name="name">The name of the entity.</param>
+        /// <param name="type">The type of current.</param>
+        /// <returns>
+        /// The value of the current.
+        /// </returns>
+        T CreateCurrent(string name, QuantityTypes type = QuantityTypes.Raw);
+
+        /// <summary>
+        /// Creates the value of a property
+        /// </summary>
+        /// <param name="name">The name of the entity.</param>
+        /// <param name="property">The name of the property.</param>
+        /// <param name="type">The type of property.</param>
+        /// <returns>
+        /// The value of the property.
+        /// </returns>
+        T CreateProperty(string name, string property, QuantityTypes type = QuantityTypes.Raw);
     }
 }

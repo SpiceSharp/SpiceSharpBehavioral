@@ -20,7 +20,13 @@ namespace SpiceSharpBehavioral.Parsers
         /// <value>
         /// The current character.
         /// </value>
-        private char Current => _index < _expression.Length ? _expression[_index] : '\0';
+        private char Current
+        {
+            get
+            {
+                return _index < _expression.Length ? _expression[_index] : '\0';
+            }
+        }
 
         /// <summary>
         /// Gets the token.
@@ -243,6 +249,16 @@ namespace SpiceSharpBehavioral.Parsers
         {
             _builder.Append(Current);
             _index++;
+        }
+
+        /// <summary>
+        /// Resets the lexer to the start of the input.
+        /// </summary>
+        public void Reset()
+        {
+            _index = 0;
+            _builder.Clear();
+
         }
     }
 

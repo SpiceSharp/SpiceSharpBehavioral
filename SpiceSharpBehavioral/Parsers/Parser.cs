@@ -282,7 +282,8 @@ namespace SpiceSharpBehavioral.Parsers
                                 if (lexer.Token != TokenType.RightParenthesis)
                                     throw new Exception("Invalid voltage specifier");
                                 lexer.ReadToken();
-                                return Builder.CreateVoltage(a, b, type);
+                                result = Builder.CreateVoltage(a, b, type);
+                                break;
 
                             case "ir":
                                 type = QuantityTypes.Real; goto case "i";
