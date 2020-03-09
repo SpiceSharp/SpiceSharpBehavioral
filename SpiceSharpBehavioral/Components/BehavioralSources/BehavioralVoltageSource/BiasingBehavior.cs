@@ -1,4 +1,5 @@
 ﻿using SpiceSharp.Algebra;
+using SpiceSharp.Attributes;
 using SpiceSharp.Behaviors;
 using SpiceSharp.Components.BehavioralComponents;
 using SpiceSharp.Simulations;
@@ -26,7 +27,17 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         /// <value>
         /// The voltage.
         /// </value>
+        [ParameterName("v"), ParameterInfo("The instantaneous voltage")]
         public double Voltage { get; private set; }
+
+        /// <summary>
+        /// Gets the current.
+        /// </summary>
+        /// <value>
+        /// The current.
+        /// </value>
+        [ParameterName("i"), ParameterName("c"), ParameterInfo("The instantaneous current")]
+        public double Current => _biasing.Solution[_branch];
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BiasingBehavior"/> class.

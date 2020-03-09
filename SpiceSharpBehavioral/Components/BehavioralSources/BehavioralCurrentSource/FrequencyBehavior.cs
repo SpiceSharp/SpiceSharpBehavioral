@@ -67,7 +67,6 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
         void IFrequencyBehavior.Load()
         {
             Complex[] values = new Complex[_funcs.Length * 2];
-
             Complex total = new Complex();
             for (var i = 0; i < _funcs.Length; i++)
             {

@@ -2,10 +2,9 @@
 using SpiceSharp.Behaviors;
 using SpiceSharp.Simulations;
 using System;
-using System.Collections.Generic;
 using System.Numerics;
-using System.Text;
 using SpiceSharp.Components.BehavioralComponents;
+using SpiceSharp.Attributes;
 
 namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
 {
@@ -18,7 +17,6 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
     {
         private readonly int _posNode, _negNode, _branch;
         private readonly ElementSet<Complex> _elements, _coreElements;
-        private readonly Func<double> _value;
         private readonly Func<double>[] _funcs;
         private readonly int[] _nodes;
         private readonly IComplexSimulationState _complex;
@@ -29,7 +27,17 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         /// <value>
         /// The complex voltage.
         /// </value>
+        [ParameterName("v"), ParameterName("v_c"), ParameterInfo("The complex voltage")]
         public Complex ComplexVoltage { get; private set; }
+
+        /// <summary>
+        /// Gets the complex current.
+        /// </summary>
+        /// <value>
+        /// The complex current.
+        /// </value>
+        [ParameterName("i"), ParameterName("i_c"), ParameterInfo("The complex current")]
+        public Complex ComplexCurrent => _complex.Solution[_branch];
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FrequencyBehavior"/> class.
@@ -51,7 +59,6 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
             int index = 0;
             var locs = new MatrixLocation[context.ModelDescription.Count];
             _funcs = new Func<double>[context.ModelDescription.Count];
-            _value = context.ModelDescription.Value;
             _nodes = new int[context.ModelDescription.Count];
             foreach (var pair in context.ModelDescription)
             {
