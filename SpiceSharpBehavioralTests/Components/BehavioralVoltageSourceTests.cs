@@ -9,16 +9,15 @@ using System.Numerics;
 namespace SpiceSharpBehavioralTests.Components
 {
     [TestFixture]
-    public class BehavioralCurrentSourceTests
+    public class BehavioralVoltageSourceTests
     {
-        [TestCaseSource(typeof(BehavioralCurrentSourceTestData), nameof(BehavioralCurrentSourceTestData.Op))]
+        [TestCaseSource(typeof(BehavioralVoltageSourceTestData), nameof(BehavioralVoltageSourceTestData.Op))]
         public void When_DirectOutputOp_Expect_Reference(string expression, double dcVoltage, double dcCurrent, double expected)
         {
             var ckt = new Circuit(
                 new VoltageSource("V1", "in", "0", dcVoltage),
                 new CurrentSource("I1", "in", "0", dcCurrent),
-                new BehavioralCurrentSource("B1", "0", "out", expression),
-                new Resistor("Rload", "out", "0", 1.0));
+                new BehavioralVoltageSource("B1", "out", "0", expression));
             var op = new OP("op");
 
             op.ExportSimulationData += (sender, args) =>
@@ -28,14 +27,13 @@ namespace SpiceSharpBehavioralTests.Components
             op.Run(ckt);
         }
 
-        [TestCaseSource(typeof(BehavioralCurrentSourceTestData), nameof(BehavioralCurrentSourceTestData.Ac))]
+        [TestCaseSource(typeof(BehavioralVoltageSourceTestData), nameof(BehavioralVoltageSourceTestData.Ac))]
         public void When_Ac_Expect_Reference(string expression, double dcVoltage, double acVoltage, double dcCurrent, double acCurrent, Func<Complex, Complex> expected)
         {
             var ckt = new Circuit(
                 new VoltageSource("V1", "in", "0", dcVoltage).SetParameter("acmag", acVoltage),
                 new CurrentSource("I1", "in", "0", dcCurrent).SetParameter("acmag", acCurrent),
-                new BehavioralCurrentSource("B1", "0", "out", expression),
-                new Resistor("Rload", "out", "0", 1.0));
+                new BehavioralVoltageSource("B1", "out", "0", expression));
             var ac = new AC("op", new DecadeSweep(1, 1e3, 2));
 
             ac.ExportSimulationData += (sender, args) =>
@@ -48,14 +46,14 @@ namespace SpiceSharpBehavioralTests.Components
             ac.Run(ckt);
         }
 
-        [TestCaseSource(typeof(BehavioralCurrentSourceTestData), nameof(BehavioralCurrentSourceTestData.ImpedanceOp))]
-        public void When_UsedAsImpedanceOp_Expect_Reference(string expression, double dcVoltage, double resistance, double expected)
+        [TestCaseSource(typeof(BehavioralVoltageSourceTestData), nameof(BehavioralVoltageSourceTestData.AdmittanceOp))]
+        public void When_UsedAsAdmittanceOp_Expect_Reference(string expression, double dcVoltage, double resistance, double expected)
         {
             // Use the behavioral current source as an impedance description
             var ckt = new Circuit(
                 new VoltageSource("V1", "in", "0", dcVoltage),
                 new Resistor("R1", "in", "out", resistance),
-                new BehavioralCurrentSource("B1", "out", "0", expression)
+                new BehavioralVoltageSource("B1", "out", "0", expression)
                 );
             var op = new OP("op");
 
@@ -67,7 +65,7 @@ namespace SpiceSharpBehavioralTests.Components
         }
     }
 
-    public class BehavioralCurrentSourceTestData
+    public class BehavioralVoltageSourceTestData
     {
         public static IEnumerable<TestCaseData> Op
         {
@@ -91,12 +89,12 @@ namespace SpiceSharpBehavioralTests.Components
                 yield return new TestCaseData("v(in)*i(V1)", 1.0, 2.0, 3.0, 4.0, new Func<Complex, Complex>(s => -10.0)); // Gain is (3.0
             }
         }
-        public static IEnumerable<TestCaseData> ImpedanceOp
+        public static IEnumerable<TestCaseData> AdmittanceOp
         {
             get
             {
-                yield return new TestCaseData("v(out)/1k", 1.0, 1.0e3, 0.5);
-                yield return new TestCaseData("sin(v(out))", 1.0, 1.0, 0.51097342938856910952);
+                yield return new TestCaseData("i(B1)*1k", 1.0, 1.0e3, 0.5);
+                yield return new TestCaseData("asin(i(B1))", 1.0, 1.0, 0.51097342938856910952);
             }
         }
     }

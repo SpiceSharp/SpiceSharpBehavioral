@@ -1,4 +1,5 @@
-﻿using SpiceSharp.Simulations;
+﻿using SpiceSharp.Behaviors;
+using SpiceSharp.Simulations;
 using SpiceSharpBehavioral.Builders;
 using System;
 
@@ -19,6 +20,14 @@ namespace SpiceSharp.Components.BehavioralComponents
         public Derivatives<Func<double>> ModelDescription { get; }
 
         /// <summary>
+        /// Gets the behaviors already created by the component.
+        /// </summary>
+        /// <value>
+        /// The behaviors.
+        /// </value>
+        public IBehaviorContainer Behaviors { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="BehavioralComponentContext"/> class.
         /// </summary>
         /// <param name="component">The component creating the behavior.</param>
@@ -28,6 +37,7 @@ namespace SpiceSharp.Components.BehavioralComponents
         public BehavioralComponentContext(IComponent component, ISimulation simulation, bool linkParameters, Derivatives<Func<double>> modelDescription) 
             : base(component, simulation, linkParameters)
         {
+            Behaviors = simulation.EntityBehaviors[component.Name];
             ModelDescription = modelDescription.ThrowIfNull(nameof(modelDescription));
         }
     }

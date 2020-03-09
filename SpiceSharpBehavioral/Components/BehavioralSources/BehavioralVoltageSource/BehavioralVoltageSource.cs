@@ -1,40 +1,38 @@
-﻿using SpiceSharp.Components.BehavioralComponents;
+﻿using SpiceSharp.Behaviors;
+using SpiceSharp.Components.BehavioralComponents;
+using SpiceSharp.Components.BehavioralVoltageSourceBehaviors;
 using SpiceSharp.Simulations;
-using SpiceSharp.Behaviors;
-using SpiceSharp.Components.BehavioralCurrentSourceBehaviors;
-using SpiceSharp.Attributes;
 
 namespace SpiceSharp.Components
 {
     /// <summary>
-    /// A behavioral current source.
+    /// A behavioral voltage source.
     /// </summary>
     /// <seealso cref="BehavioralComponent" />
-    [Pin(0, "I+"), Pin(1, "I-"), Connected]
-    public class BehavioralCurrentSource : BehavioralComponent
+    public class BehavioralVoltageSource : BehavioralComponent
     {
         /// <summary>
-        /// The behavioral current source base pin count
+        /// The behavioral voltage source base pin count
         /// </summary>
-        public const int BehavioralCurrentSourceBasePinCount = 2;
+        public const int BehavioralVoltageSourceBasePinCount = 2;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BehavioralCurrentSource"/> class.
+        /// Initializes a new instance of the <see cref="BehavioralVoltageSource"/> class.
         /// </summary>
         /// <param name="name">The name of the entity.</param>
-        public BehavioralCurrentSource(string name)
-            : base(name, BehavioralCurrentSourceBasePinCount)
+        public BehavioralVoltageSource(string name)
+            : base(name, BehavioralVoltageSourceBasePinCount)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BehavioralCurrentSource"/> class.
+        /// Initializes a new instance of the <see cref="BehavioralVoltageSource"/> class.
         /// </summary>
         /// <param name="name">The name.</param>
         /// <param name="pos">The positive node.</param>
         /// <param name="neg">The negative node.</param>
         /// <param name="expression">The expression.</param>
-        public BehavioralCurrentSource(string name, string pos, string neg, string expression)
+        public BehavioralVoltageSource(string name, string pos, string neg, string expression)
             : this(name)
         {
             Connect(pos, neg);
@@ -42,13 +40,14 @@ namespace SpiceSharp.Components
         }
 
         /// <summary>
-        /// Creates the behaviors for the specified simulation and registers them with the simulation.
+        /// Creates the behaviors.
         /// </summary>
         /// <param name="simulation">The simulation.</param>
         public override void CreateBehaviors(ISimulation simulation)
         {
-            
+            // We have to add the behavior container immediately to allow self-referencing
             var behaviors = new BehaviorContainer(Name);
+            behaviors.Add<IBranchedBehavior>(new BranchedBehavior(Name, simulation.Variables));
             simulation.EntityBehaviors.Add(behaviors);
 
             // Parse the expression to be used

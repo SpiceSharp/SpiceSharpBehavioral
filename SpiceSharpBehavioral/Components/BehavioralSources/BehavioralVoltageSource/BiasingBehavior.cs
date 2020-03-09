@@ -1,51 +1,52 @@
-﻿using SpiceSharp.Behaviors;
-using System;
+﻿using SpiceSharp.Algebra;
+using SpiceSharp.Behaviors;
 using SpiceSharp.Components.BehavioralComponents;
-using SpiceSharp.Algebra;
 using SpiceSharp.Simulations;
-using SpiceSharp.Attributes;
+using System;
 
-namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
+namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
 {
     /// <summary>
-    /// Biasing behavior for a <see cref="BehavioralCurrentSource"/>.
+    /// Biasing behavior for a <see cref="BehavioralVoltageSource"/>.
     /// </summary>
     /// <seealso cref="Behavior" />
     /// <seealso cref="IBiasingBehavior" />
     public class BiasingBehavior : Behavior, IBiasingBehavior
     {
-        private readonly int _posNode, _negNode;
-        private readonly ElementSet<double> _elements;
+        private readonly int _posNode, _negNode, _branch;
+        private readonly ElementSet<double> _elements, _coreElements;
         private readonly Func<double> _value;
         private readonly Func<double>[] _funcs;
         private readonly int[] _nodes;
         private readonly IBiasingSimulationState _biasing;
 
         /// <summary>
-        /// Gets the current.
+        /// Gets the voltage.
         /// </summary>
         /// <value>
-        /// The current.
+        /// The voltage.
         /// </value>
-        [ParameterName("i"), ParameterName("c"), ParameterInfo("The current")]
-        public double Current { get; private set; }
+        public double Voltage { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BiasingBehavior"/> class.
         /// </summary>
         /// <param name="name">The name.</param>
         /// <param name="context">The context.</param>
-        public BiasingBehavior(string name, BehavioralComponentContext context) : base(name)
+        public BiasingBehavior(string name, BehavioralComponentContext context) 
+            : base(name)
         {
             _biasing = context.GetState<IBiasingSimulationState>();
 
             // Get the nodes
+            var branch = context.Behaviors.GetValue<IBranchedBehavior>().Branch;
             _posNode = _biasing.Map[context.Nodes[0]];
             _negNode = _biasing.Map[context.Nodes[1]];
+            _branch = _biasing.Map[branch];
 
             // Get the variables from our behavioral description
             int index = 0;
-            var locs = new MatrixLocation[context.ModelDescription.Count * 2];
+            var locs = new MatrixLocation[context.ModelDescription.Count];
             _funcs = new Func<double>[context.ModelDescription.Count];
             _value = context.ModelDescription.Value;
             _nodes = new int[context.ModelDescription.Count];
@@ -53,34 +54,32 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
             {
                 _nodes[index] = _biasing.Map[pair.Key];
                 _funcs[index] = pair.Value;
-                locs[index * 2] = new MatrixLocation(_posNode, _nodes[index]);
-                locs[index * 2 + 1] = new MatrixLocation(_negNode, _nodes[index]);
+                locs[index] = new MatrixLocation(_branch, _nodes[index]);
                 index++;
             }
-           
+
             // Get the matrix elements
-            _elements = new ElementSet<double>(_biasing.Solver, locs, new int[] { _posNode, _negNode });
+            _elements = new ElementSet<double>(_biasing.Solver, locs);
+            _coreElements = new ElementSet<double>(_biasing.Solver, new[] {
+                new MatrixLocation(_branch, _posNode),
+                new MatrixLocation(_branch, _negNode),
+                new MatrixLocation(_posNode, _branch),
+                new MatrixLocation(_negNode, _branch)
+            }, new[] { _branch });
         }
 
-        /// <summary>
-        /// Loads the Y-matrix and Rhs-vector.
-        /// </summary>
         void IBiasingBehavior.Load()
         {
-            double[] values = new double[_funcs.Length * 2 + 2];
-            var total = Current = _value();
-
-            int i;
-            for (i = 0; i < _funcs.Length; i++)
+            var values = new double[_funcs.Length];
+            var total = Voltage = _value();
+            for (var i = 0; i < _funcs.Length; i++)
             {
                 var df = _funcs[i].Invoke();
                 total -= _biasing.Solution[_nodes[i]] * df;
-                values[i * 2] = df;
-                values[i * 2 + 1] = -df;
+                values[i] = -df;
             }
-            values[i * 2] = -total;
-            values[i * 2 + 1] = total;
             _elements.Add(values);
+            _coreElements.Add(1.0, -1.0, 1.0, -1.0, total);
         }
     }
 }

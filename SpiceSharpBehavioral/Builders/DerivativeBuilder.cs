@@ -130,9 +130,8 @@ namespace SpiceSharpBehavioral.Builders
                     }
                     return result;
                 }
-
-                // Cannot derive to a complex quantity
-                throw new Exception("Cannot derive");
+                else
+                    throw new Exception("Cannot derive");
             }
             else
                 return base.CreateVoltage(node, reference, type);
@@ -159,8 +158,10 @@ namespace SpiceSharpBehavioral.Builders
                         result[behavior.Branch] = _one;
                         return result;
                     }
+                    return base.CreateCurrent(name, type);
                 }
-                throw new Exception("Cannot derive");
+                else
+                    throw new Exception("Cannot derive");
             }
             else
                 return base.CreateCurrent(name, type);
