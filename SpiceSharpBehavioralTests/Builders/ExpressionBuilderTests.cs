@@ -1,7 +1,4 @@
 ﻿using NUnit.Framework;
-using SpiceSharp;
-using SpiceSharp.Components;
-using SpiceSharp.Simulations;
 using SpiceSharpBehavioral.Builders;
 using SpiceSharpBehavioral.Parsers;
 using System;
@@ -63,7 +60,7 @@ namespace SpiceSharpBehavioralTests.Builders
             Assert.AreEqual(a + b, Compile(builder.Add(ca, cb)).Invoke(), 1e-20);
             Assert.AreEqual(a - b, Compile(builder.Subtract(ca, cb)).Invoke(), 1e-20);
             Assert.AreEqual(a * b, Compile(builder.Multiply(ca, cb)).Invoke(), 1e-20);
-            Assert.AreEqual(a / b, Compile(builder.Divide(ca, cb)).Invoke(), 1e-20);
+            Assert.AreEqual(b.Equals(0.0) ? double.PositiveInfinity : a / b, Compile(builder.Divide(ca, cb)).Invoke(), 1e-20);
             Assert.AreEqual(Math.Pow(a, b), Compile(builder.Pow(ca, cb)).Invoke(), 1e-20);
             Assert.AreEqual(a % b, Compile(builder.Mod(ca, cb)).Invoke(), 1e-20);
             Assert.AreEqual(a != 0.0 && b != 0.0 ? 1.0 : 0.0, Compile(builder.And(ca, cb)).Invoke(), 1e-20);
@@ -80,28 +77,36 @@ namespace SpiceSharpBehavioralTests.Builders
         [TestCaseSource(typeof(ExpressionBuilderTestData), nameof(ExpressionBuilderTestData.Functions1D))]
         public void When_Functions1D_Expect_Reference(string function, double argument, double expected)
         {
-            IBuilder<Expression> builder = new ExpressionBuilder { SimplifyConstants = false };
+            var builder = new ExpressionBuilder { SimplifyConstants = false };
+            builder.RegisterFunctions();
+            ExpressionBuilderHelper.SimplifyConstants = false;
             Assert.AreEqual(expected, Compile(builder.CreateFunction(function, new[] { Expression.Constant(argument) })).Invoke(), 1e-12);
         }
 
         [TestCaseSource(typeof(ExpressionBuilderTestData), nameof(ExpressionBuilderTestData.Functions2D))]
         public void When_Functions2D_Expect_Reference(string function, double arg1, double arg2, double expected)
         {
-            IBuilder<Expression> builder = new ExpressionBuilder { SimplifyConstants = false };
+            var builder = new ExpressionBuilder { SimplifyConstants = false };
+            builder.RegisterFunctions();
+            ExpressionBuilderHelper.SimplifyConstants = false;
             Assert.AreEqual(expected, Compile(builder.CreateFunction(function, new[] { Expression.Constant(arg1), Expression.Constant(arg2) })).Invoke(), 1e-12);
         }
 
         [TestCaseSource(typeof(ExpressionBuilderTestData), nameof(ExpressionBuilderTestData.Functions1D))]
         public void When_Functions1DSimplified_Expect_Reference(string function, double argument, double expected)
         {
-            IBuilder<Expression> builder = new ExpressionBuilder { SimplifyConstants = true };
+            var builder = new ExpressionBuilder { SimplifyConstants = true };
+            builder.RegisterFunctions();
+            ExpressionBuilderHelper.SimplifyConstants = true;
             Assert.AreEqual(expected, Compile(builder.CreateFunction(function, new[] { Expression.Constant(argument) })).Invoke(), 1e-12);
         }
 
         [TestCaseSource(typeof(ExpressionBuilderTestData), nameof(ExpressionBuilderTestData.Functions2D))]
         public void When_Functions2DSimplified_Expect_Reference(string function, double arg1, double arg2, double expected)
         {
-            IBuilder<Expression> builder = new ExpressionBuilder { SimplifyConstants = true };
+            var builder = new ExpressionBuilder { SimplifyConstants = true };
+            builder.RegisterFunctions();
+            ExpressionBuilderHelper.SimplifyConstants = false;
             Assert.AreEqual(expected, Compile(builder.CreateFunction(function, new[] { Expression.Constant(arg1), Expression.Constant(arg2) })).Invoke(), 1e-12);
         }
 
@@ -149,17 +154,6 @@ namespace SpiceSharpBehavioralTests.Builders
 
     public class ExpressionBuilderTestData
     {
-        public static double FudgeFactor = 1e-20;
-        private static double SafeDivide(double left, double right)
-        {
-            if (right < 0)
-                right -= FudgeFactor;
-            else
-                right += FudgeFactor;
-            if (right.Equals(0.0))
-                return double.PositiveInfinity;
-            return left / right;
-        }
         public static IEnumerable<TestCaseData> SpiceNumbers
         {
             get
@@ -233,9 +227,9 @@ namespace SpiceSharpBehavioralTests.Builders
                     yield return new TestCaseData("dabs(0)", arg, (double)Math.Sign(arg));
                     yield return new TestCaseData("sqrt", arg, arg < 0 ? double.PositiveInfinity : Math.Sqrt(arg));
                     yield return new TestCaseData("log", arg, arg < 0.0 ? double.PositiveInfinity : Math.Log(arg));
-                    yield return new TestCaseData("dlog(0)", arg, SafeDivide(1, arg));
+                    yield return new TestCaseData("dlog(0)", arg, Functions.SafeDivide(1, arg, 1e-20));
                     yield return new TestCaseData("log10", arg, arg < 0 ? double.PositiveInfinity : Math.Log10(arg));
-                    yield return new TestCaseData("dlog10(0)", arg, SafeDivide(1.0 / Math.Log(10.0), arg));
+                    yield return new TestCaseData("dlog10(0)", arg, Functions.SafeDivide(1.0 / Math.Log(10.0), arg, 1e-20));
                     yield return new TestCaseData("exp", arg, Math.Exp(arg));
                     yield return new TestCaseData("dexp(0)", arg, Math.Exp(arg));
                     yield return new TestCaseData("sin", arg, Math.Sin(arg));
@@ -243,11 +237,11 @@ namespace SpiceSharpBehavioralTests.Builders
                     yield return new TestCaseData("cos", arg, Math.Cos(arg));
                     yield return new TestCaseData("dcos(0)", arg, -Math.Sin(arg));
                     yield return new TestCaseData("tan", arg, Math.Tan(arg));
-                    yield return new TestCaseData("dtan(0)", arg, SafeDivide(1.0, Math.Cos(arg) * Math.Cos(arg)));
+                    yield return new TestCaseData("dtan(0)", arg, Functions.SafeDivide(1.0, Math.Cos(arg) * Math.Cos(arg), 1e-20));
                     yield return new TestCaseData("asin", arg, Math.Asin(arg));
-                    yield return new TestCaseData("dasin(0)", arg, arg < 0 || arg > 1 ? 0.0 : SafeDivide(1.0, Math.Sqrt(1 - arg * arg)));
+                    yield return new TestCaseData("dasin(0)", arg, arg < 0 || arg > 1 ? 0.0 : Functions.SafeDivide(1.0, Math.Sqrt(1 - arg * arg), 1e-20));
                     yield return new TestCaseData("acos", arg, Math.Acos(arg));
-                    yield return new TestCaseData("dacos(0)", arg, arg < 0 || arg > 1 ? 0.0 : SafeDivide(-1.0, Math.Sqrt(1 - arg * arg)));
+                    yield return new TestCaseData("dacos(0)", arg, arg < 0 || arg > 1 ? 0.0 : Functions.SafeDivide(-1.0, Math.Sqrt(1 - arg * arg), 1e-20));
                     yield return new TestCaseData("atan", arg, Math.Atan(arg));
                     yield return new TestCaseData("datan(0)", arg, 1.0 / (1.0 + arg * arg));
                     yield return new TestCaseData("sinh", arg, Math.Sinh(arg));
@@ -255,7 +249,7 @@ namespace SpiceSharpBehavioralTests.Builders
                     yield return new TestCaseData("cosh", arg, Math.Cosh(arg));
                     yield return new TestCaseData("dcosh(0)", arg, Math.Sinh(arg));
                     yield return new TestCaseData("tanh", arg, Math.Tanh(arg));
-                    yield return new TestCaseData("dtanh(0)", arg, SafeDivide(1, Math.Cosh(arg) * Math.Cosh(arg)));
+                    yield return new TestCaseData("dtanh(0)", arg, Functions.SafeDivide(1, Math.Cosh(arg) * Math.Cosh(arg), 1e-20));
                     yield return new TestCaseData("u", arg, Functions.Step(arg));
                     yield return new TestCaseData("du(0)", arg, 0.0);
                     yield return new TestCaseData("u2", arg, Functions.Step2(arg));

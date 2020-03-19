@@ -1,6 +1,7 @@
 ﻿using SpiceSharp;
 using System;
 using System.Collections.Generic;
+using SpiceSharpBehavioral.Builders;
 
 namespace SpiceSharpBehavioral.Parsers
 {

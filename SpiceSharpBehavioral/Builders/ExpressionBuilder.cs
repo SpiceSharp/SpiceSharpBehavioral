@@ -3,7 +3,6 @@ using SpiceSharp.Components;
 using SpiceSharp.Simulations;
 using SpiceSharpBehavioral.Parsers;
 using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Numerics;
 using System.Reflection;
@@ -19,42 +18,12 @@ namespace SpiceSharpBehavioral.Builders
     /// made antisymmetric.
     /// </remarks>
     /// <seealso cref="IBuilder{Expression}" />
-    public class ExpressionBuilder : BaseBuilder<Expression>, IBuilder<Expression>
+    public class ExpressionBuilder : BaseBuilder<Expression>, IEventBuilder<Expression>
     {
         private readonly static Expression _one = Expression.Constant(1.0);
         private readonly static Expression _zero = Expression.Constant(0.0);
-        private readonly static MethodInfo _divMethod = typeof(ExpressionBuilder).GetTypeInfo().GetMethod(nameof(SafeDivide), BindingFlags.Instance | BindingFlags.NonPublic);
-        private readonly static MethodInfo _absMethod = new Func<double, double>(Math.Abs).GetMethodInfo();
-        private readonly static MethodInfo _sgnMethod = new Func<double, double>(Functions.Sign).GetMethodInfo();
-        private readonly static MethodInfo _sqrtMethod = new Func<double, double>(Functions.Sqrt).GetMethodInfo();
+        private readonly static MethodInfo _divMethod = new Func<double, double, double, double>(Functions.SafeDivide).GetMethodInfo();
         private readonly static MethodInfo _powMethod = new Func<double, double, double>(Functions.Power).GetMethodInfo();
-        private readonly static MethodInfo _pwrMethod = new Func<double, double, double>(Functions.Power2).GetMethodInfo();
-        private readonly static MethodInfo _logMethod = new Func<double, double>(Functions.Log).GetMethodInfo();
-        private readonly static MethodInfo _log10Method = new Func<double, double>(Functions.Log10).GetMethodInfo();
-        private readonly static MethodInfo _expMethod = new Func<double, double>(Math.Exp).GetMethodInfo();
-        private readonly static MethodInfo _minMethod = new Func<double, double, double>(Math.Min).GetMethodInfo();
-        private readonly static MethodInfo _maxMethod = new Func<double, double, double>(Math.Max).GetMethodInfo();
-        private readonly static MethodInfo _sinMethod = new Func<double, double>(Math.Sin).GetMethodInfo();
-        private readonly static MethodInfo _cosMethod = new Func<double, double>(Math.Cos).GetMethodInfo();
-        private readonly static MethodInfo _tanMethod = new Func<double, double>(Math.Tan).GetMethodInfo();
-        private readonly static MethodInfo _sinhMethod = new Func<double, double>(Math.Sinh).GetMethodInfo();
-        private readonly static MethodInfo _coshMethod = new Func<double, double>(Math.Cosh).GetMethodInfo();
-        private readonly static MethodInfo _tanhMethod = new Func<double, double>(Math.Tanh).GetMethodInfo();
-        private readonly static MethodInfo _asinMethod = new Func<double, double>(Math.Asin).GetMethodInfo();
-        private readonly static MethodInfo _acosMethod = new Func<double, double>(Math.Acos).GetMethodInfo();
-        private readonly static MethodInfo _atanMethod = new Func<double, double>(Math.Atan).GetMethodInfo();
-        private readonly static MethodInfo _ustepMethod = new Func<double, double>(Functions.Step).GetMethodInfo();
-        private readonly static MethodInfo _ustep2Method = new Func<double, double>(Functions.Step2).GetMethodInfo();
-        private readonly static MethodInfo _ustep2DerivativeMethod = new Func<double, double>(Functions.Step2Derivative).GetMethodInfo();
-        private readonly static MethodInfo _urampMethod = new Func<double, double>(Functions.Ramp).GetMethodInfo();
-        private readonly static MethodInfo _urampDerivativeMethod = new Func<double, double>(Functions.RampDerivative).GetMethodInfo();
-        private readonly static MethodInfo _ceilMethod = new Func<double, double>(Math.Ceiling).GetMethodInfo();
-        private readonly static MethodInfo _floorMethod = new Func<double, double>(Math.Floor).GetMethodInfo();
-        private readonly static MethodInfo _roundMethod = new Func<double, int, double>(Math.Round).GetMethodInfo();
-        private readonly static MethodInfo _pwlMethod = new Func<double, Point[], double>(Functions.Pwl).GetMethodInfo();
-        private readonly static MethodInfo _pwlDerivativeMethod = new Func<double, Point[], double>(Functions.PwlDerivative).GetMethodInfo();
-        private readonly static MethodInfo _squareMethod = new Func<double, double>(Functions.Square).GetMethodInfo();
-        private readonly static ConstructorInfo _ptConstructor = typeof(Point).GetTypeInfo().GetConstructor(new[] { typeof(double), typeof(double) });
 
         /// <summary>
         /// Gets or sets the simulation that the builder should use.
@@ -89,23 +58,6 @@ namespace SpiceSharpBehavioral.Builders
         /// The fudge factor.
         /// </value>
         public double FudgeFactor { get; set; } = 1e-20;
-
-        /// <summary>
-        /// Safe division using a fudge factor.
-        /// </summary>
-        /// <param name="left">The left operand.</param>
-        /// <param name="right">The right operand.</param>
-        /// <returns>The result of the division.</returns>
-        protected double SafeDivide(double left, double right)
-        {
-            if (right < 0)
-                right -= FudgeFactor;
-            else
-                right += FudgeFactor;
-            if (right.Equals(0.0))
-                return double.PositiveInfinity;
-            return left / right;
-        }
 
         Expression IBuilder<Expression>.Plus(Expression argument) => argument;
         Expression IBuilder<Expression>.Minus(Expression argument)
@@ -209,14 +161,14 @@ namespace SpiceSharpBehavioral.Builders
                 {
                     double rv = (double)ceRight.Value;
                     if (left is ConstantExpression ceLeft)
-                        return Expression.Constant((double)ceLeft.Value / rv);
+                        return Expression.Constant(Functions.SafeDivide((double)ceLeft.Value, rv, FudgeFactor));
                     else if (rv.Equals(0.0))
                         return Expression.Constant(double.PositiveInfinity);
                     else
                         return Expression.Divide(left, ceRight);
                 }
             }
-            return Expression.Call(Expression.Constant(this), _divMethod, left, right);
+            return Expression.Call(_divMethod, left, right, Expression.Constant(FudgeFactor));
         }
         Expression IBuilder<Expression>.Pow(Expression left, Expression right)
         {
@@ -400,246 +352,6 @@ namespace SpiceSharpBehavioral.Builders
                     return (double)ceLeft.Value < (double)ceRight.Value ? _one : _zero;
             }
             return Expression.Condition(Expression.LessThan(left, right), _one, _zero);
-        }
-
-        /// <summary>
-        /// Creates the value of a function.
-        /// </summary>
-        /// <param name="name">The name of the function.</param>
-        /// <param name="arguments">The arguments.</param>
-        /// <returns>
-        /// The value of the function.
-        /// </returns>
-        public override Expression CreateFunction(string name, IReadOnlyList<Expression> arguments)
-        {
-            // Check the number of arguments
-            switch (name)
-            {
-                case "abs":
-                case "sgn":
-                case "dabs(0)":
-                case "sqrt":
-                case "dsqrt(0)":
-                case "log":
-                case "dlog(0)":
-                case "log10":
-                case "dlog10(0)":
-                case "exp":
-                case "dexp(0)":
-                case "sin":
-                case "dsin(0)":
-                case "cos":
-                case "dcos(0)":
-                case "tan":
-                case "dtan(0)":
-                case "asin":
-                case "dasin(0)":
-                case "acos":
-                case "dacos(0)":
-                case "atan":
-                case "datan(0)":
-                case "sinh":
-                case "dsinh(0)":
-                case "cosh":
-                case "dcosh(0)":
-                case "tanh":
-                case "dtanh(0)":
-                case "u":
-                case "du(0)":
-                case "u2":
-                case "du2(0)":
-                case "uramp":
-                case "duramp(0)":
-                case "ceil":
-                case "dceil(0)":
-                case "floor":
-                case "dfloor(0)":
-                case "nint":
-                case "dnint(0)":
-                case "square":
-                case "dsquare(0)":
-                    if (arguments.Count != 1)
-                        throw new Exception("Invalid number of arguments for {0}()".FormatString(name));
-                    break;
-                case "pwr":
-                case "dpwr(0)":
-                case "dpwr(1)":
-                case "min":
-                case "max":
-                case "round":
-                case "dround(0)":
-                case "dround(1)":
-                    if (arguments.Count != 2)
-                        throw new Exception("Invalid number of arguments for {0}()".FormatString(name));
-                    break;
-                case "pwl":
-                case "dpwl(0)":
-                    if (arguments.Count < 3 || arguments.Count % 2 != 1)
-                        throw new Exception("Invalid number of arguments for pwl()");
-                    break;
-            }
-            if (SimplifyConstants)
-            {
-                bool isConstant = true;
-                ConstantExpression[] ces = new ConstantExpression[arguments.Count];
-                for (var i = 0; i < arguments.Count; i++)
-                {
-                    if (arguments[i] is ConstantExpression ce)
-                        ces[i] = ce;
-                    else
-                    {
-                        isConstant = false;
-                        break;
-                    }
-                }
-                if (isConstant)
-                {
-                    double v = (double)ces[0].Value, v2;
-                    switch (name)
-                    {
-                        case "abs": return Expression.Constant(Math.Abs(v));
-                        case "sgn":
-                        case "dabs(0)": return Expression.Constant(Functions.Sign(v)); // abs(x)' = sgn(x)
-                        case "sqrt": return Expression.Constant(Functions.Sqrt(v));
-                        case "dsqrt(0)": return Expression.Constant(SafeDivide(0.5, Functions.Sqrt(v))); // sqrt(x)' = 1/(2*sqrt(x))
-                        case "pwr": return Expression.Constant(Functions.Power2(v, (double)ces[1].Value));
-                        case "dpwr(0)":
-                            v2 = (double)ces[1].Value;
-                            return Expression.Constant(v2 * Functions.Power2(v, v2 - 1.0)); // (x^n)' = n*x^(n-1)
-                        case "dpwr(1)":
-                            v2 = (double)ces[1].Value;
-                            return Expression.Constant(Functions.Power2(v, v2) * Functions.Log(v)); // (a^x)' = a^x*ln(a)
-                        case "min": return Expression.Constant(Math.Min(v, (double)ces[1].Value));
-                        case "max": return Expression.Constant(Math.Max(v, (double)ces[1].Value));
-                        case "log": return Expression.Constant(Functions.Log(v));
-                        case "dlog(0)": return Expression.Constant(SafeDivide(1.0, v));
-                        case "log10": return Expression.Constant(Functions.Log10(v));
-                        case "dlog10(0)": return Expression.Constant(SafeDivide(1.0 / Functions.Log(10.0), v));
-                        case "exp":
-                        case "dexp(0)": return Expression.Constant(Math.Exp(v));
-                        case "sin": return Expression.Constant(Math.Sin(v));
-                        case "dsin(0)":
-                        case "cos": return Expression.Constant(Math.Cos(v));
-                        case "dcos(0)": return Expression.Constant(-Math.Sin(v));
-                        case "tan": return Expression.Constant(Math.Tan(v));
-                        case "dtan(0)": return Expression.Constant(SafeDivide(1.0, Functions.Square(Math.Cos(v))));
-                        case "asin": return Expression.Constant(Math.Asin(v));
-                        case "dasin(0)": return Expression.Constant(SafeDivide(1.0, Functions.Sqrt(1 - v * v)));
-                        case "acos": return Expression.Constant(Math.Acos(v));
-                        case "dacos(0)": return Expression.Constant(SafeDivide(-1.0, Functions.Sqrt(1 - v * v)));
-                        case "atan": return Expression.Constant(Math.Atan(v));
-                        case "datan(0)": return Expression.Constant(SafeDivide(1.0, (1 + v * v)));
-                        case "sinh":
-                        case "dcosh(0)": return Expression.Constant(Math.Sinh(v));
-                        case "cosh":
-                        case "dsinh(0)": return Expression.Constant(Math.Cosh(v));
-                        case "tanh": return Expression.Constant(Math.Tanh(v));
-                        case "dtanh(0)": return Expression.Constant(SafeDivide(1, Functions.Square(Math.Cosh(v))));
-                        case "u": return Expression.Constant(Functions.Step(v));
-                        case "u2": return Expression.Constant(Functions.Step2(v));
-                        case "du2(0)": return Expression.Constant(Functions.Step2Derivative(v));
-                        case "uramp": return Expression.Constant(Functions.Ramp(v));
-                        case "duramp(0)": return Expression.Constant(Functions.RampDerivative(v));
-                        case "ceil": return Expression.Constant(Math.Ceiling(v));
-                        case "floor": return Expression.Constant(Math.Floor(v));
-                        case "nint": return Expression.Constant(Math.Round(v, 0));
-                        case "round": return Expression.Constant(Math.Round(v, (int)(double)ces[1].Value));
-                        case "square": return Expression.Constant(Functions.Square(v));
-                        case "dsquare(0)": return Expression.Constant(2 * v);
-                        case "pwl":
-                        case "dpwl(0)":
-                            int points = (arguments.Count - 1) / 2;
-                            var initArguments = new Point[points];
-                            for (var i = 0; i < points; i++)
-                                initArguments[i] = new Point((double)ces[2 * i + 1].Value, (double)ces[2 * i + 2].Value);
-                            if (name == "pwl")
-                                return Expression.Constant(Functions.Pwl(v, initArguments));
-                            else
-                                return Expression.Constant(Functions.PwlDerivative(v, initArguments));
-
-                        case "du(0)":
-                        case "dceil(0)":
-                        case "dfloor(0)":
-                        case "dnint(0)":
-                        case "dround(0)":
-                        case "dround(1)":
-                            return Expression.Constant(0.0);
-                    }
-                }
-            }
-
-            var builder = (IBuilder<Expression>)this;
-            switch (name)
-            {
-                case "abs": return Expression.Call(_absMethod, arguments[0]);
-                case "sgn":
-                case "dabs(0)": return Expression.Call(_sgnMethod, arguments[0]);
-                case "sqrt": return Expression.Call(_sqrtMethod, arguments[0]);
-                case "dsqrt(0)": return builder.Divide(Expression.Constant(0.5), Expression.Call(_sqrtMethod, arguments[0]));
-                case "pwr": return Expression.Call(_pwrMethod, arguments[0], arguments[1]);
-                case "dpwr(0)": return Expression.Multiply(arguments[1], Expression.Call(_pwrMethod, arguments[0], builder.Subtract(arguments[1], _one)));
-                case "dpwr(1)": return Expression.Multiply(Expression.Call(_pwrMethod, arguments[0], arguments[1]), Expression.Call(_logMethod, arguments[0]));
-                case "min": return Expression.Call(_minMethod, arguments[0], arguments[1]);
-                case "max": return Expression.Call(_maxMethod, arguments[0], arguments[1]);
-                case "log": return Expression.Call(_logMethod, arguments[0]);
-                case "dlog(0)": return builder.Divide(_one, arguments[0]);
-                case "log10": return Expression.Call(_log10Method, arguments[0]);
-                case "dlog10(0)": return builder.Divide(Expression.Constant(1.0 / Functions.Log(10.0)), arguments[0]);
-                case "exp":
-                case "dexp(0)": return Expression.Call(_expMethod, arguments[0]);
-                case "sin": return Expression.Call(_sinMethod, arguments[0]);
-                case "dsin(0)":
-                case "cos": return Expression.Call(_cosMethod, arguments[0]);
-                case "dcos(0)": return Expression.Negate(Expression.Call(_sinMethod, arguments[0]));
-                case "tan": return Expression.Call(_tanMethod, arguments[0]);
-                case "dtan(0)": return builder.Divide(_one, Expression.Call(_squareMethod, new[] { Expression.Call(_cosMethod, arguments[0]) }));
-                case "asin": return Expression.Call(_asinMethod, arguments[0]);
-                case "dasin(0)": return builder.Divide(
-                    _one, 
-                    Expression.Call(_sqrtMethod, new[] { Expression.Subtract(_one, Expression.Call(_squareMethod, new[] { arguments[0] })) }));
-                case "acos": return Expression.Call(_acosMethod, arguments[0]);
-                case "dacos(0)": return builder.Divide(
-                    Expression.Constant(-1.0), 
-                    Expression.Call(_sqrtMethod, new[] { Expression.Subtract(_one, Expression.Call(_squareMethod, new[] { arguments[0] })) }));
-                case "atan": return Expression.Call(_atanMethod, arguments[0]);
-                case "datan(0)": return builder.Divide(_one, Expression.Add(_one, Expression.Call(_squareMethod, new[] { arguments[0] })));
-                case "dcosh(0)":
-                case "sinh": return Expression.Call(_sinhMethod, arguments[0]);
-                case "dsinh(0)":
-                case "cosh": return Expression.Call(_coshMethod, arguments[0]);
-                case "tanh": return Expression.Call(_tanhMethod, arguments[0]);
-                case "dtanh(0)": return builder.Divide(_one, Expression.Call(_squareMethod, new[] { Expression.Call(_coshMethod, new[] { arguments[0] }) }));
-                case "u": return Expression.Call(_ustepMethod, arguments[0]);
-                case "u2": return Expression.Call(_ustep2Method, arguments[0]);
-                case "du2(0)": return Expression.Call(_ustep2DerivativeMethod, arguments[0]);
-                case "uramp": return Expression.Call(_urampMethod, arguments[0]);
-                case "duramp(0)": return Expression.Call(_urampDerivativeMethod, arguments[0]);
-                case "ceil": return Expression.Call(_ceilMethod, arguments[0]);
-                case "floor": return Expression.Call(_floorMethod, arguments[0]);
-                case "nint": return Expression.Call(_roundMethod, arguments[0], Expression.Constant(0));
-                case "round": return Expression.Call(_roundMethod, arguments[0], Expression.Convert(arguments[1], typeof(int)));
-                case "square": return Expression.Call(_squareMethod, arguments[0]);
-                case "dsquare(0)": return Expression.Multiply(Expression.Constant(2.0), arguments[0]);
-                case "pwl":
-                case "dpwl(0)":
-                    int points = (arguments.Count - 1) / 2;
-                    var initArguments = new Expression[points];
-                    for (var i = 0; i < points; i++)
-                        initArguments[i] = Expression.New(_ptConstructor, arguments[i * 2 + 1], arguments[i * 2 + 2]);
-                    var arr = Expression.NewArrayInit(typeof(Point), initArguments);
-                    if (name == "pwl")
-                        return Expression.Call(_pwlMethod, arguments[0], arr);
-                    return Expression.Call(_pwlDerivativeMethod, arguments[0], arr);
-                case "du(0)":
-                case "dceil(0)":
-                case "dfloor(0)":
-                case "dnint(0)":
-                case "dround(0)":
-                case "dround(1)":
-                    return _zero;
-                default:
-                    return base.CreateFunction(name, arguments);
-            }
         }
 
         /// <summary>

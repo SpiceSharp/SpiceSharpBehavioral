@@ -1,7 +1,7 @@
-﻿using SpiceSharp.Simulations;
+﻿using SpiceSharpBehavioral.Parsers;
 using System.Collections.Generic;
 
-namespace SpiceSharpBehavioral.Parsers
+namespace SpiceSharpBehavioral.Builders
 {
     /// <summary>
     /// A builder for parsing expressions.

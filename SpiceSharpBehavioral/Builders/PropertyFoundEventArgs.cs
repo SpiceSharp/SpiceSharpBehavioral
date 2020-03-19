@@ -2,7 +2,7 @@
 using SpiceSharpBehavioral.Parsers;
 using System;
 
-namespace SpiceSharpBehavioral.Parsers
+namespace SpiceSharpBehavioral.Builders
 {
     /// <summary>
     /// Event arguments used when a variable was found.

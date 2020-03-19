@@ -51,6 +51,7 @@ namespace SpiceSharp.Components.BehavioralComponents
         public BehavioralParser()
         {
             BaseBuilder = new ExpressionBuilder();
+            BaseBuilder.RegisterFunctions();
             Builder = new DerivativeBuilder<Expression>(BaseBuilder);
             Parser = new Parser<Derivatives<Expression>>(Builder);
         }

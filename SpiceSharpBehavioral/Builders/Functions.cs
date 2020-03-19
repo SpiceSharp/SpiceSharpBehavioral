@@ -8,6 +8,26 @@ namespace SpiceSharpBehavioral.Builders
     public static class Functions
     {
         /// <summary>
+        /// Divides two numbers while avoiding division by 0 using a fudge factor.
+        /// </summary>
+        /// <param name="left">The left argument.</param>
+        /// <param name="right">The right argument.</param>
+        /// <param name="fudgeFactor">The fudge factor.</param>
+        /// <returns>
+        /// The division.
+        /// </returns>
+        public static double SafeDivide(double left, double right, double fudgeFactor)
+        {
+            if (right < 0)
+                right -= fudgeFactor;
+            else
+                right += fudgeFactor;
+            if (right.Equals(0.0))
+                return double.PositiveInfinity;
+            return left / right;
+        }
+
+        /// <summary>
         /// Takes the natural logarithm.
         /// </summary>
         /// <param name="arg">The argument.</param>

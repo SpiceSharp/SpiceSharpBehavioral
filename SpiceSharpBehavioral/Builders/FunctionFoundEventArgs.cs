@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SpiceSharpBehavioral.Parsers
+namespace SpiceSharpBehavioral.Builders
 {
     /// <summary>
     /// Event arguments used when a function was found.
