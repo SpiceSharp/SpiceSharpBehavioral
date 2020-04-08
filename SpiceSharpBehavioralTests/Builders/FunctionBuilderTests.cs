@@ -1,11 +1,7 @@
 ﻿using NUnit.Framework;
 using SpiceSharpBehavioral.Builders;
 using SpiceSharpBehavioral.Parsers.Nodes;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SpiceSharpBehavioralTests.Builders
 {
@@ -36,7 +32,21 @@ namespace SpiceSharpBehavioralTests.Builders
             {
                 FunctionDefinitions = FunctionBuilderHelper.Defaults
             };
-            builder.Build(Node.Function("rnd", new Node[0]));
+            var func = builder.Build(Node.Function("rnd", new Node[0]));
+            func();
+        }
+
+        [Test]
+        public void When_FunctionCall_Expect_Reference()
+        {
+            var builder = new FunctionBuilder();
+            var func1 = builder.Build(Node.Add(Node.Constant("1"), Node.Constant("2")));
+            builder.FunctionDefinitions = new Dictionary<string, ApplyFunction>
+            {
+                { "f", (fbi, args) => fbi.Call(func1.Invoke) }
+            };
+            var func = builder.Build(Node.Multiply(Node.Function("f", new Node[0]), Node.Constant("2")));
+            Assert.AreEqual(6.0, func(), 1e-20);
         }
     }
 }

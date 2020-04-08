@@ -1,4 +1,5 @@
 ﻿using SpiceSharp;
+using SpiceSharp.Simulations;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,30 @@ namespace SpiceSharpBehavioral.Builders
         /// The functions.
         /// </value>
         public Dictionary<string, Func<double[], double>> FunctionDefinitions { get; set; }
+
+        /// <summary>
+        /// Gets or sets the voltages.
+        /// </summary>
+        /// <value>
+        /// The voltages.
+        /// </value>
+        public Dictionary<string, IVariable<double>> Voltages { get; set; }
+
+        /// <summary>
+        /// Gets or sets the currents.
+        /// </summary>
+        /// <value>
+        /// The currents.
+        /// </value>
+        public Dictionary<string, IVariable<double>> Currents { get; set; }
+
+        /// <summary>
+        /// Gets or sets the variables.
+        /// </summary>
+        /// <value>
+        /// The variables.
+        /// </value>
+        public Dictionary<string, IVariable<double>> Variables { get; set; }
 
         /// <summary>
         /// Gets or sets the fudge factor.
@@ -95,7 +120,36 @@ namespace SpiceSharpBehavioral.Builders
                     break;
 
                 case ConstantNode cn:
-                    return Functions.ParseNumber(cn.Literal);                   
+                    return Functions.ParseNumber(cn.Literal);
+
+                case VoltageNode vn:
+                    if (vn.QuantityType == QuantityTypes.Raw && Voltages != null)
+                    {
+                        if (Voltages.TryGetValue(vn.Name, out var variable))
+                        {
+                            var result = variable.Value;
+                            if (vn.Reference != null && Voltages.TryGetValue(vn.Reference, out variable))
+                                result -= variable.Value;
+                            return result;
+                        }
+                    }
+                    break;
+
+                case CurrentNode curn:
+                    if (curn.QuantityType == QuantityTypes.Raw && Currents != null)
+                    {
+                        if (Currents.TryGetValue(curn.Name, out var variable))
+                            return variable.Value;
+                    }
+                    break;
+
+                case VariableNode varn:
+                    if (Variables != null)
+                    {
+                        if (Variables.TryGetValue(varn.Name, out var variable))
+                            return variable.Value;
+                    }
+                    break;
             }
             return BuildNode(expression);
         }
@@ -108,7 +162,7 @@ namespace SpiceSharpBehavioral.Builders
         /// <exception cref="Exception">Unrecognized node</exception>
         protected virtual double BuildNode(Node node)
         {
-            throw new Exception("Unrecognized parser node {0}".FormatString(node));
+            throw new Exception("Unrecognized expression node {0}".FormatString(node));
         }
     }
 }

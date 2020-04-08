@@ -108,7 +108,13 @@ namespace SpiceSharpBehavioral.Builders
         private static void Pwr(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) => fbi.Call(Functions.Power2, arguments);
         private static void Min(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) => fbi.Call(Math.Min, arguments);
         private static void Max(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) => fbi.Call(Math.Max, arguments);
-        private static void Round(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) { fbi.Push(arguments.Check(2)[0]); fbi.Push(arguments[1]); fbi.Generator.Emit(OpCodes.Conv_I4); fbi.Generator.Emit(OpCodes.Call, _round); }
+        private static void Round(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) 
+        { 
+            fbi.Push(arguments.Check(2)[0]); 
+            fbi.Push(arguments[1]); 
+            fbi.Generator.Emit(OpCodes.Conv_I4); 
+            fbi.Generator.Emit(OpCodes.Call, _round); 
+        }
 
         // N-argument functions
         private static void Pwl(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments)

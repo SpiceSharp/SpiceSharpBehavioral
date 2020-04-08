@@ -16,6 +16,7 @@ namespace SpiceSharpBehavioral.Builders
         private static readonly MethodInfo _safeDiv = ((Func<double, double, double, double>)Functions.SafeDivide).GetMethodInfo();
         private static readonly MethodInfo _power = ((Func<double, double, double>)Functions.Power).GetMethodInfo();
         private static readonly MethodInfo _equals = ((Func<double, double, double, double, bool>)Functions.Equals).GetMethodInfo();
+        private static readonly MethodInfo _invoke0 = typeof(Func<double>).GetTypeInfo().GetMethod("Invoke", BindingFlags.Public | BindingFlags.Instance);
         private readonly DynamicMethod _method;
         private readonly Dictionary<object, int> _referenceMap = new Dictionary<object, int>();
 
@@ -225,6 +226,7 @@ namespace SpiceSharpBehavioral.Builders
                 Generator.Emit(OpCodes.Ldarg_0);
                 Push(index);
                 Generator.Emit(OpCodes.Ldelem_Ref);
+                Generator.Emit(OpCodes.Castclass, target.GetType());
             }
 
             // Push
@@ -233,7 +235,12 @@ namespace SpiceSharpBehavioral.Builders
                 foreach (var arg in args)
                     Push(arg);
             }
-            Generator.Emit(OpCodes.Call, method);
+
+            // If the method has a target, then we may want to call the late-bound version.
+            if (target != null)
+                Generator.Emit(OpCodes.Callvirt, method);
+            else
+                Generator.Emit(OpCodes.Call, method);
         }
 
         /// <summary>
