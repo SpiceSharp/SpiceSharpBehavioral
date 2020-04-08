@@ -1,4 +1,4 @@
-﻿using System;
+﻿using SpiceSharpBehavioral.Parsers.Nodes;
 
 namespace SpiceSharpBehavioral.Parsers
 {
@@ -6,7 +6,7 @@ namespace SpiceSharpBehavioral.Parsers
     /// Describes a parser.
     /// </summary>
     /// <typeparam name="T">The base value type.</typeparam>
-    public interface IParser<T>
+    public interface IParser
     {
         /// <summary>
         /// Parses an expression using the specified lexer.
@@ -15,6 +15,6 @@ namespace SpiceSharpBehavioral.Parsers
         /// <returns>
         /// The parse result.
         /// </returns>
-        T Parse(ILexer lexer);
+        Node Parse(ILexer lexer);
     }
 }

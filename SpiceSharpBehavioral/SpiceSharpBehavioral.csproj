@@ -33,6 +33,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Components\**" />
+    <EmbeddedResource Remove="Components\**" />
+    <None Remove="Components\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Builders\BaseBuilder.cs" />
+    <Compile Remove="Builders\Derivatives.cs" />
+    <Compile Remove="Builders\ExpressionBuilder.cs" />
+    <Compile Remove="Builders\ExpressionBuilderHelper.cs" />
+    <Compile Remove="Builders\IEventBuilder.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -42,6 +56,7 @@
 
   <ItemGroup>
     <PackageReference Include="System.Linq.Expressions" Version="4.3.0" />
+    <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />
   </ItemGroup>
 
   <ItemGroup>

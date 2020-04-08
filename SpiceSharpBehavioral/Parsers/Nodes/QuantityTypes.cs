@@ -1,4 +1,4 @@
-﻿namespace SpiceSharpBehavioral.Parsers
+﻿namespace SpiceSharpBehavioral.Parsers.Nodes
 {
     /// <summary>
     /// Quantity types.

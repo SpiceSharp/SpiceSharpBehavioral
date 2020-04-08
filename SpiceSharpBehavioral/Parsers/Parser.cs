@@ -1,7 +1,6 @@
-﻿using SpiceSharp;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using SpiceSharpBehavioral.Builders;
+using SpiceSharpBehavioral.Parsers.Nodes;
 
 namespace SpiceSharpBehavioral.Parsers
 {
@@ -11,35 +10,14 @@ namespace SpiceSharpBehavioral.Parsers
     /// <remarks>
     /// This is a recursive descent parser.
     /// </remarks>
-    /// <typeparam name="T">The value type.</typeparam>
-    public class Parser<T>
+    public class Parser
     {
-        /// <summary>
-        /// Gets the builder.
-        /// </summary>
-        /// <value>
-        /// The builder.
-        /// </value>
-        public IBuilder<T> Builder { get; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Parser{T}"/> class.
-        /// </summary>
-        /// <param name="builder">The builder for building the result.</param>
-        public Parser(IBuilder<T> builder)
-        {
-            Builder = builder.ThrowIfNull(nameof(builder));
-        }
-
         /// <summary>
         /// Parses the specified expression.
         /// </summary>
         /// <param name="expression">The expression.</param>
         /// <returns>The value of the parsed expression.</returns>
-        public T Parse(string expression)
-        {
-            return Parse(new Lexer(expression));
-        }
+        public Node Parse(string expression) => Parse(new Lexer(expression));
 
         /// <summary>
         /// Parses the expression using a lexer.
@@ -47,7 +25,7 @@ namespace SpiceSharpBehavioral.Parsers
         /// <param name="lexer">The lexer.</param>
         /// <returns>The value of the lexed expression.</returns>
         /// <exception cref="Exception">Invalid expression</exception>
-        public T Parse(ILexer lexer)
+        public Node Parse(ILexer lexer)
         {
             lexer.ReadToken();
             var result = ParseConditional(lexer);
@@ -56,7 +34,7 @@ namespace SpiceSharpBehavioral.Parsers
             return result;
         }
 
-        private T ParseConditional(ILexer lexer)
+        private Node ParseConditional(ILexer lexer)
         {
             var result = ParseConditionalOr(lexer);
             while (lexer.Token == TokenType.Huh)
@@ -67,171 +45,171 @@ namespace SpiceSharpBehavioral.Parsers
                     throw new Exception("Invalid conditional");
                 lexer.ReadToken();
                 var ifFalse = ParseConditional(lexer);
-                result = Builder.Conditional(result, ifTrue, ifFalse);
+                result = Node.Conditional(result, ifTrue, ifFalse);
             }
             return result;
         }
-        private T ParseConditionalOr(ILexer lexer)
+        private Node ParseConditionalOr(ILexer lexer)
         {
             var result = ParseConditionalAnd(lexer);
             while (lexer.Token == TokenType.Or)
             {
                 lexer.ReadToken();
                 var right = ParseConditionalAnd(lexer);
-                result = Builder.Or(result, right);
+                result = Node.Or(result, right);
             }
             return result;
         }
-        private T ParseConditionalAnd(ILexer lexer)
+        private Node ParseConditionalAnd(ILexer lexer)
         {
             var result = ParseEquality(lexer);
             while (lexer.Token == TokenType.And)
             {
                 lexer.ReadToken();
                 var right = ParseEquality(lexer);
-                result = Builder.And(result, right);
+                result = Node.And(result, right);
             }
             return result;
         }
-        private T ParseEquality(ILexer lexer)
+        private Node ParseEquality(ILexer lexer)
         {
             var result = ParseRelational(lexer);
             while (lexer.Token == TokenType.Equals || lexer.Token == TokenType.NotEquals)
             {
-                T right;
+                Node right;
                 switch (lexer.Token)
                 {
                     case TokenType.Equals:
                         lexer.ReadToken();
                         right = ParseRelational(lexer);
-                        result = Builder.Equals(result, right);
+                        result = Node.Equals(result, right);
                         break;
                     case TokenType.NotEquals:
                         lexer.ReadToken();
                         right = ParseRelational(lexer);
-                        result = Builder.NotEquals(result, right);
+                        result = Node.NotEquals(result, right);
                         break;
                 }
             }
             return result;
         }
-        private T ParseRelational(ILexer lexer)
+        private Node ParseRelational(ILexer lexer)
         {
             var result = ParseAdditive(lexer);
             while (true)
             {
-                T right;
+                Node right;
                 switch (lexer.Token)
                 {
                     case TokenType.LessThan:
                         lexer.ReadToken();
                         right = ParseAdditive(lexer);
-                        result = Builder.LessThan(result, right);
+                        result = Node.LessThan(result, right);
                         break;
                     case TokenType.GreaterThan:
                         lexer.ReadToken();
                         right = ParseAdditive(lexer);
-                        result = Builder.GreaterThan(result, right);
+                        result = Node.GreaterThan(result, right);
                         break;
                     case TokenType.LessEqual:
                         lexer.ReadToken();
                         right = ParseAdditive(lexer);
-                        result = Builder.LessThanOrEqual(result, right);
+                        result = Node.LessThanOrEqual(result, right);
                         break;
                     case TokenType.GreaterEqual:
                         lexer.ReadToken();
                         right = ParseAdditive(lexer);
-                        result = Builder.GreaterThanOrEqual(result, right);
+                        result = Node.GreaterThanOrEqual(result, right);
                         break;
                     default:
                         return result;
                 }
             }
         }
-        private T ParseAdditive(ILexer lexer)
+        private Node ParseAdditive(ILexer lexer)
         {
             var result = ParseMultiplicative(lexer);
             while (true)
             {
-                T right;
+                Node right;
                 switch (lexer.Token)
                 {
                     case TokenType.Plus:
                         lexer.ReadToken();
                         right = ParseMultiplicative(lexer);
-                        result = Builder.Add(result, right);
+                        result = Node.Add(result, right);
                         break;
                     case TokenType.Minus:
                         lexer.ReadToken();
                         right = ParseMultiplicative(lexer);
-                        result = Builder.Subtract(result, right);
+                        result = Node.Subtract(result, right);
                         break;
                     default:
                         return result;
                 }
             }
         }
-        private T ParseMultiplicative(ILexer lexer)
+        private Node ParseMultiplicative(ILexer lexer)
         {
             var result = ParseUnary(lexer);
             while (true)
             {
-                T right;
+                Node right;
                 switch (lexer.Token)
                 {
                     case TokenType.Times:
                         lexer.ReadToken();
                         right = ParseUnary(lexer);
-                        result = Builder.Multiply(result, right);
+                        result = Node.Multiply(result, right);
                         break;
                     case TokenType.Divide:
                         lexer.ReadToken();
                         right = ParseUnary(lexer);
-                        result = Builder.Divide(result, right);
+                        result = Node.Divide(result, right);
                         break;
                     case TokenType.Mod:
                         lexer.ReadToken();
                         right = ParseUnary(lexer);
-                        result = Builder.Mod(result, right);
+                        result = Node.Modulo(result, right);
                         break;
                     default:
                         return result;
                 }
             }
         }
-        private T ParseUnary(ILexer lexer)
+        private Node ParseUnary(ILexer lexer)
         {
-            T argument;
+            Node argument;
             switch (lexer.Token)
             {
                 case TokenType.Plus:
                     lexer.ReadToken();
                     argument = ParseUnary(lexer);
-                    return Builder.Plus(argument);
+                    return Node.Plus(argument);
 
                 case TokenType.Minus:
                     lexer.ReadToken();
                     argument = ParseUnary(lexer);
-                    return Builder.Minus(argument);
+                    return Node.Minus(argument);
 
                 default:
                     return ParsePower(lexer);
             }
         }
-        private T ParsePower(ILexer lexer)
+        private Node ParsePower(ILexer lexer)
         {
             var result = ParseTerminal(lexer);
             if (lexer.Token == TokenType.Power)
             {
                 lexer.ReadToken();
                 var right = ParsePower(lexer);
-                result = Builder.Pow(result, right);
+                result = Node.Power(result, right);
             }
             return result;
         }
-        private T ParseTerminal(ILexer lexer)
+        private Node ParseTerminal(ILexer lexer)
         {
-            T result;
+            Node result;
             switch (lexer.Token)
             {
                 // Nested
@@ -245,7 +223,7 @@ namespace SpiceSharpBehavioral.Parsers
 
                 // A number
                 case TokenType.Number:
-                    result = Builder.CreateNumber(lexer.Content);
+                    result = Node.Constant(lexer.Content);
                     lexer.ReadToken();
                     break;
 
@@ -283,7 +261,7 @@ namespace SpiceSharpBehavioral.Parsers
                                 if (lexer.Token != TokenType.RightParenthesis)
                                     throw new Exception("Invalid voltage specifier");
                                 lexer.ReadToken();
-                                result = Builder.CreateVoltage(a, b, type);
+                                result = Node.Voltage(a, b, type);
                                 break;
 
                             case "ir":
@@ -304,26 +282,30 @@ namespace SpiceSharpBehavioral.Parsers
                                 if (lexer.Token != TokenType.RightParenthesis)
                                     throw new Exception("Invalid current specifier");
                                 lexer.ReadToken();
-                                result = Builder.CreateCurrent(a, type);
+                                result = Node.Current(a, type);
                                 break;
 
                             default:
-                                List<T> arguments = new List<T>(2);
+                                var arguments = new List<Node>(2);
+
+                                // Let's go to the first token after the function call
+                                lexer.ReadToken();
                                 while (lexer.Token != TokenType.RightParenthesis)
                                 {
-                                    lexer.ReadToken();
                                     arguments.Add(ParseConditional(lexer));
-                                    if (lexer.Token != TokenType.Comma && lexer.Token != TokenType.RightParenthesis)
+                                    if (lexer.Token == TokenType.Comma)
+                                        lexer.ReadToken();
+                                    else if (lexer.Token != TokenType.RightParenthesis)
                                         throw new Exception("Invalid function call");
                                 }
-                                result = Builder.CreateFunction(name, arguments);
+                                result = Node.Function(name, arguments);
                                 lexer.ReadToken();
                                 break;
                         }
                     }
                     else
                     {
-                        result = Builder.CreateVariable(lexer.Content);
+                        result = Node.Variable(lexer.Content);
                         lexer.ReadToken();
                     }
                     break;
@@ -335,7 +317,7 @@ namespace SpiceSharpBehavioral.Parsers
                     if (lexer.Token != TokenType.LeftIndex)
                         throw new Exception("Invalid property identifier");
                     lexer.ReadNode();
-                    result = Builder.CreateProperty(name, lexer.Content, QuantityTypes.Raw);
+                    result = Node.Property(name, lexer.Content, QuantityTypes.Raw);
                     lexer.ReadToken();
                     if (lexer.Token != TokenType.RightIndex)
                         throw new Exception("Invalid property identifier");
