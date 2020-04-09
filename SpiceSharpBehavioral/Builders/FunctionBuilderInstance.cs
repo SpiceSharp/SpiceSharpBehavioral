@@ -1,4 +1,5 @@
 ﻿using SpiceSharp;
+using SpiceSharp.Simulations;
 using SpiceSharpBehavioral.Diagnostics;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
@@ -16,7 +17,9 @@ namespace SpiceSharpBehavioral.Builders
         private static readonly MethodInfo _safeDiv = ((Func<double, double, double, double>)Functions.SafeDivide).GetMethodInfo();
         private static readonly MethodInfo _power = ((Func<double, double, double>)Functions.Power).GetMethodInfo();
         private static readonly MethodInfo _equals = ((Func<double, double, double, double, bool>)Functions.Equals).GetMethodInfo();
-        private static readonly MethodInfo _invoke0 = typeof(Func<double>).GetTypeInfo().GetMethod("Invoke", BindingFlags.Public | BindingFlags.Instance);
+        private static readonly MethodInfo _invoke0 = typeof(Func<double>).GetTypeInfo().GetMethod("Invoke");
+        private static readonly MethodInfo _invoke1 = typeof(Func<double, double>).GetTypeInfo().GetMethod("Invoke");
+        private static readonly MethodInfo _invoke2 = typeof(Func<double, double, double>).GetTypeInfo().GetMethod("Invoke");
         private readonly DynamicMethod _method;
         private readonly Dictionary<object, int> _referenceMap = new Dictionary<object, int>();
 
@@ -59,6 +62,30 @@ namespace SpiceSharpBehavioral.Builders
         /// The function definitions.
         /// </value>
         public Dictionary<string, ApplyFunction> FunctionDefinitions { get; set; }
+
+        /// <summary>
+        /// Gets or sets the voltages.
+        /// </summary>
+        /// <value>
+        /// The voltages.
+        /// </value>
+        public Dictionary<string, IVariable<double>> Voltages { get; set; }
+
+        /// <summary>
+        /// Gets or sets the currents.
+        /// </summary>
+        /// <value>
+        /// The currents.
+        /// </value>
+        public Dictionary<string, IVariable<double>> Currents { get; set; }
+
+        /// <summary>
+        /// Gets or sets the variables.
+        /// </summary>
+        /// <value>
+        /// The variables.
+        /// </value>
+        public Dictionary<string, IVariable<double>> Variables { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FunctionBuilderInstance"/> class.
@@ -151,6 +178,38 @@ namespace SpiceSharpBehavioral.Builders
                         return;
                     }
                     break;
+
+                case VoltageNode vn:
+                    if (Voltages != null && Voltages.TryGetValue(vn.Name, out var variable))
+                    {
+                        if (vn.Reference == null)
+                        {
+                            Call(() => variable.Value);
+                            return;
+                        }
+                        else if (Voltages.TryGetValue(vn.Reference, out var refVariable))
+                        {
+                            Call(() => variable.Value - refVariable.Value);
+                            return;
+                        }
+                    }
+                    break;
+
+                case CurrentNode curn:
+                    if (Currents != null && Currents.TryGetValue(curn.Name, out variable))
+                    {
+                        Call(() => variable.Value);
+                        return;
+                    }
+                    break;
+
+                case VariableNode varn:
+                    if (Variables != null && Variables.TryGetValue(varn.Name, out variable))
+                    {
+                        Call(() => variable.Value);
+                        return;
+                    }
+                    break;
             }
 
             throw new Exception("Unrecognized node {0}".FormatString(node));
@@ -174,7 +233,7 @@ namespace SpiceSharpBehavioral.Builders
                 case 6: Generator.Emit(OpCodes.Ldc_I4_6); break;
                 case 7: Generator.Emit(OpCodes.Ldc_I4_7); break;
                 case 8: Generator.Emit(OpCodes.Ldc_I4_8); break;
-                case int s when s > 8 && s <= 127: Generator.Emit(OpCodes.Ldc_I4_S); break;
+                case int s when s > 8 && s <= 127: Generator.Emit(OpCodes.Ldc_I4_S, (byte)s); break;
                 default: Generator.Emit(OpCodes.Ldc_I4, index); break;
             }
         }
@@ -249,7 +308,10 @@ namespace SpiceSharpBehavioral.Builders
         /// <param name="function">The function.</param>
         public void Call(Func<double> function)
         {
-            Call(function.Target, function.GetMethodInfo(), null);
+            if (function.Target == null)
+                Call(null, function.GetMethodInfo(), null);
+            else
+                Call(function, _invoke0, null);
         }
 
         /// <summary>
@@ -262,7 +324,11 @@ namespace SpiceSharpBehavioral.Builders
         {
             if (args == null || args.Count != 1)
                 throw new ArgumentMismatchException(1, args?.Count ?? 0);
-            Call(function.Target, function.GetMethodInfo(), args);
+            if (function.Target == null)
+                Call(null, function.GetMethodInfo(), args);
+            else
+                Call(function, _invoke1, args);
+
         }
 
         /// <summary>
@@ -275,7 +341,10 @@ namespace SpiceSharpBehavioral.Builders
         {
             if (args == null || args.Count != 2)
                 throw new ArgumentMismatchException(2, args?.Count ?? 0);
-            Call(function.Target, function.GetMethodInfo(), args);
+            if (function.Target == null)
+                Call(null, function.GetMethodInfo(), args);
+            else
+                Call(function, _invoke2, args);
         }
     }
 

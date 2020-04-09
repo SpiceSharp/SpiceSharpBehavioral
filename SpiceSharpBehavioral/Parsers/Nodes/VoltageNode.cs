@@ -71,15 +71,20 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         /// </returns>
         public override bool Equals(object obj)
         {
+            if (ReferenceEquals(this, obj))
+                return true;
             if (obj is VoltageNode vn)
             {
                 if (QuantityType != vn.QuantityType)
                     return false;
                 if (!Name.Equals(vn.Name))
                     return false;
-                if (Reference != null && vn.Reference != null)
-                    return false;
-                if (!Reference.Equals(vn.Reference))
+                if (Reference != null)
+                {
+                    if (vn.Reference == null || !Reference.Equals(vn.Reference))
+                        return false;
+                }
+                else if (vn.Reference != null)
                     return false;
                 return true;
             }

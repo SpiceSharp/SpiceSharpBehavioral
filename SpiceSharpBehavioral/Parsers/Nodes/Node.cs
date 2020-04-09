@@ -26,6 +26,7 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         public static Node Power(Node left, Node right) => BinaryOperatorNode.Power(left, right);
         public static Node Plus(Node argument) => UnaryOperatorNode.Plus(argument);
         public static Node Minus(Node argument) => UnaryOperatorNode.Minus(argument);
+        public static Node Not(Node argument) => UnaryOperatorNode.Not(argument);
         public static Node Conditional(Node condition, Node ifTrue, Node ifFalse) => TernaryOperatorNode.Conditional(condition, ifTrue, ifFalse);
         public static Node Voltage(string name, QuantityTypes qtype = QuantityTypes.Raw) => VoltageNode.Voltage(name, qtype);
         public static Node Voltage(string name, string reference, QuantityTypes qtype = QuantityTypes.Raw) => VoltageNode.Voltage(name, reference, qtype);

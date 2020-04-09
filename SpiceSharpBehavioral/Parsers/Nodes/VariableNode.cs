@@ -45,6 +45,8 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         /// </returns>
         public override bool Equals(object obj)
         {
+            if (ReferenceEquals(this, obj))
+                return true;
             if (obj is VariableNode vn)
             {
                 if (!Name.Equals(vn.Name))

@@ -16,6 +16,6 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         /// <summary>
         /// The result is constant.
         /// </summary>
-        Constant = 0x01
+        Constant = 0x01,
     }
 }

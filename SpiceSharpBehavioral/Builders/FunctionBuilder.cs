@@ -1,4 +1,5 @@
-﻿using SpiceSharpBehavioral.Parsers.Nodes;
+﻿using SpiceSharp.Simulations;
+using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
 using System.Collections.Generic;
 
@@ -35,12 +36,36 @@ namespace SpiceSharpBehavioral.Builders
         public double AbsoluteTolerance { get; set; } = 1e-12;
 
         /// <summary>
-        /// Gets the function definitions.
+        /// Gets or sets the function definitions.
         /// </summary>
         /// <value>
         /// The function definitions.
         /// </value>
         public Dictionary<string, ApplyFunction> FunctionDefinitions { get; set; }
+
+        /// <summary>
+        /// Gets or sets the voltages.
+        /// </summary>
+        /// <value>
+        /// The voltages.
+        /// </value>
+        public Dictionary<string, IVariable<double>> Voltages { get; set; }
+
+        /// <summary>
+        /// Gets or sets the currents.
+        /// </summary>
+        /// <value>
+        /// The currents.
+        /// </value>
+        public Dictionary<string, IVariable<double>> Currents { get; set; }
+
+        /// <summary>
+        /// Gets or sets the variables.
+        /// </summary>
+        /// <value>
+        /// The variables.
+        /// </value>
+        public Dictionary<string, IVariable<double>> Variables { get; set; }
 
         /// <summary>
         /// Builds the specified value from the specified expression node.
@@ -51,12 +76,16 @@ namespace SpiceSharpBehavioral.Builders
         /// </returns>
         public Func<double> Build(Node expression)
         {
+            // Create a new instance that will be used to build the function
             var instance = new FunctionBuilderInstance()
             {
                 FunctionDefinitions = FunctionDefinitions,
                 RelativeTolerance = RelativeTolerance,
                 AbsoluteTolerance = AbsoluteTolerance,
-                FudgeFactor = FudgeFactor
+                FudgeFactor = FudgeFactor,
+                Variables = Variables,
+                Voltages = Voltages,
+                Currents = Currents
             };
 
             instance.Push(expression);

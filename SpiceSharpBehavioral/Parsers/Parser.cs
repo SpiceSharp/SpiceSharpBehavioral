@@ -192,6 +192,11 @@ namespace SpiceSharpBehavioral.Parsers
                     argument = ParseUnary(lexer);
                     return Node.Minus(argument);
 
+                case TokenType.Bang:
+                    lexer.ReadToken();
+                    argument = ParseUnary(lexer);
+                    return Node.Not(argument);
+
                 default:
                     return ParsePower(lexer);
             }
