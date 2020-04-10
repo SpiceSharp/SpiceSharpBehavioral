@@ -27,7 +27,7 @@ namespace SpiceSharpBehavioralTests.Components
             };
             op.Run(ckt);
         }
-        /*
+
         [TestCaseSource(typeof(BehavioralCurrentSourceTestData), nameof(BehavioralCurrentSourceTestData.Ac))]
         public void When_Ac_Expect_Reference(string expression, double dcVoltage, double acVoltage, double dcCurrent, double acCurrent, Func<Complex, Complex> expected)
         {
@@ -47,7 +47,7 @@ namespace SpiceSharpBehavioralTests.Components
             };
             ac.Run(ckt);
         }
-        */
+
         [TestCaseSource(typeof(BehavioralCurrentSourceTestData), nameof(BehavioralCurrentSourceTestData.ImpedanceOp))]
         public void When_UsedAsImpedanceOp_Expect_Reference(string expression, double dcVoltage, double resistance, double expected)
         {

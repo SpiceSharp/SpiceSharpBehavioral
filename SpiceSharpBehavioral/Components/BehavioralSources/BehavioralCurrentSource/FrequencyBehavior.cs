@@ -1,7 +1,9 @@
 ﻿using SpiceSharp.Algebra;
 using SpiceSharp.Behaviors;
 using SpiceSharp.Components.BehavioralComponents;
+using SpiceSharp.Components.CommonBehaviors;
 using SpiceSharp.Simulations;
+using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
 using System.Numerics;
 
@@ -14,11 +16,9 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
     /// <seealso cref="IFrequencyBehavior" />
     public class FrequencyBehavior : BiasingBehavior, IFrequencyBehavior
     {
-        private readonly int _posNode, _negNode;
+        private readonly OnePort<Complex> _variables;
         private readonly ElementSet<Complex> _elements;
-        private readonly Func<double>[] _funcs;
-        private readonly int[] _nodes;
-        private readonly IComplexSimulationState _complex;
+        private readonly Complex[] _values;
 
         /// <summary>
         /// Gets the complex current.
@@ -36,46 +36,43 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
         public FrequencyBehavior(string name, BehavioralComponentContext context)
             : base(name, context)
         {
-            _complex = context.GetState<IComplexSimulationState>();
+            var state = context.GetState<IComplexSimulationState>();
+            _variables = new OnePort<Complex>(
+                state.GetSharedVariable(context.Nodes[0]),
+                state.GetSharedVariable(context.Nodes[1]));
 
-            // Get the nodes
-            _posNode = _complex.Map[context.Nodes[0]];
-            _negNode = _complex.Map[context.Nodes[1]];
-
-            // Get the variables from our behavioral description
-            int index = 0;
-            var locs = new MatrixLocation[context.ModelDescription.Count * 2];
-            _funcs = new Func<double>[context.ModelDescription.Count];
-            _nodes = new int[context.ModelDescription.Count];
-            foreach (var pair in context.ModelDescription)
+            var rows = _variables.GetRhsIndices(state.Map);
+            var matLocs = new MatrixLocation[Functions.Length * 2];
+            _values = new Complex[Functions.Length * 2];
+            for (var i = 0; i < Functions.Length; i++)
             {
-                _nodes[index] = _complex.Map[pair.Key];
-                _funcs[index] = pair.Value;
-                locs[index * 2] = new MatrixLocation(_posNode, _nodes[index]);
-                locs[index * 2 + 1] = new MatrixLocation(_negNode, _nodes[index]);
-                index++;
+                IVariable<Complex> variable = Functions[i].Item1.NodeType switch
+                {
+                    NodeTypes.Voltage => state.GetSharedVariable(Functions[i].Item1.Name),
+                    NodeTypes.Current => context.Branches[Functions[i].Item1].GetValue<IBranchedBehavior<Complex>>().Branch,
+                    _ => throw new Exception("Invalid variable"),
+                };
+                matLocs[i * 2] = new MatrixLocation(rows[0], state.Map[variable]);
+                matLocs[i * 2 + 1] = new MatrixLocation(rows[1], state.Map[variable]);
             }
 
             // Get the matrix elements
-            _elements = new ElementSet<Complex>(_complex.Solver, locs);
+            _elements = new ElementSet<Complex>(state.Solver, matLocs);
         }
 
         void IFrequencyBehavior.InitializeParameters()
         {
+            for (var i = 0; i < Functions.Length; i++)
+            {
+                var value = Functions[i].Item3.Invoke();
+                _values[i * 2] = value;
+                _values[i * 2 + 1] = -value;
+            }
         }
 
         void IFrequencyBehavior.Load()
         {
-            Complex[] values = new Complex[_funcs.Length * 2];
-            Complex total = new Complex();
-            for (var i = 0; i < _funcs.Length; i++)
-            {
-                var df = _funcs[i].Invoke();
-                total += _complex.Solution[_nodes[i]] * df;
-                values[i * 2] = df;
-                values[i * 2 + 1] = -df;
-            }
-            _elements.Add(values);
+            _elements.Add(_values);
         }
     }
 }

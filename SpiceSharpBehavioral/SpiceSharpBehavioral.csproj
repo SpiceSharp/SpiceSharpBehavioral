@@ -33,18 +33,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Components\BehavioralSources\BehavioralVoltageSource\**" />
-    <EmbeddedResource Remove="Components\BehavioralSources\BehavioralVoltageSource\**" />
-    <None Remove="Components\BehavioralSources\BehavioralVoltageSource\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Remove="Builders\BaseBuilder.cs" />
     <Compile Remove="Builders\Derivatives.cs" />
     <Compile Remove="Builders\ExpressionBuilder.cs" />
     <Compile Remove="Builders\ExpressionBuilderHelper.cs" />
     <Compile Remove="Builders\IEventBuilder.cs" />
-    <Compile Remove="Components\BehavioralSources\BehavioralCurrentSource\FrequencyBehavior.cs" />
   </ItemGroup>
 
   <ItemGroup>

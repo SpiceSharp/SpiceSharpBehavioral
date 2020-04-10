@@ -2,8 +2,12 @@
 using SpiceSharp.Attributes;
 using SpiceSharp.Behaviors;
 using SpiceSharp.Components.BehavioralComponents;
+using SpiceSharp.Components.CommonBehaviors;
 using SpiceSharp.Simulations;
+using SpiceSharpBehavioral.Builders;
+using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
+using System.Collections.Generic;
 
 namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
 {
@@ -12,14 +16,14 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
     /// </summary>
     /// <seealso cref="Behavior" />
     /// <seealso cref="IBiasingBehavior" />
-    public class BiasingBehavior : Behavior, IBiasingBehavior
+    public class BiasingBehavior : Behavior, IBiasingBehavior, IBranchedBehavior<double>
     {
-        private readonly int _posNode, _negNode, _branch;
+        private readonly OnePort<double> _variables;
+        private readonly IVariable<double> _branch;
         private readonly ElementSet<double> _elements, _coreElements;
         private readonly Func<double> _value;
-        private readonly Func<double>[] _funcs;
-        private readonly int[] _nodes;
-        private readonly IBiasingSimulationState _biasing;
+
+        IVariable<double> IBranchedBehavior<double>.Branch => _branch;
 
         /// <summary>
         /// Gets the voltage.
@@ -31,13 +35,18 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         public double Voltage { get; private set; }
 
         /// <summary>
+        /// The functions that compute the derivatives.
+        /// </summary>
+        protected Tuple<VariableNode, IVariable<double>, Func<double>>[] Functions;
+
+        /// <summary>
         /// Gets the current.
         /// </summary>
         /// <value>
         /// The current.
         /// </value>
         [ParameterName("i"), ParameterName("c"), ParameterInfo("The instantaneous current")]
-        public double Current => _biasing.Solution[_branch];
+        public double Current => _branch.Value;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BiasingBehavior"/> class.
@@ -47,46 +56,78 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         public BiasingBehavior(string name, BehavioralComponentContext context) 
             : base(name)
         {
-            _biasing = context.GetState<IBiasingSimulationState>();
+            var bp = context.GetParameterSet<BaseParameters>();
+            var state = context.GetState<IBiasingSimulationState>();
+            _variables = new OnePort<double>(
+                state.GetSharedVariable(context.Nodes[0]),
+                state.GetSharedVariable(context.Nodes[1]));
+            _branch = state.CreatePrivateVariable(Name.Combine("branch"), Units.Ampere);
 
-            // Get the nodes
-            var branch = context.Behaviors.GetValue<IBranchedBehavior>().Branch;
-            _posNode = _biasing.Map[context.Nodes[0]];
-            _negNode = _biasing.Map[context.Nodes[1]];
-            _branch = _biasing.Map[branch];
+            // Build the functions using our variable
+            var df = context.Derivatives;
 
-            // Get the variables from our behavioral description
-            int index = 0;
-            var locs = new MatrixLocation[context.ModelDescription.Count];
-            _funcs = new Func<double>[context.ModelDescription.Count];
-            _value = context.ModelDescription.Value;
-            _nodes = new int[context.ModelDescription.Count];
-            foreach (var pair in context.ModelDescription)
+            // TODO: Take this from parameters
+            var builder = new FunctionBuilder
             {
-                _nodes[index] = _biasing.Map[pair.Key];
-                _funcs[index] = pair.Value;
-                locs[index] = new MatrixLocation(_branch, _nodes[index]);
+                Variables = new Dictionary<VariableNode, IVariable<double>>(),
+                FunctionDefinitions = FunctionBuilderHelper.Defaults
+            };
+
+            foreach (var pair in df)
+            {
+                switch (pair.Key.NodeType)
+                {
+                    case NodeTypes.Voltage: builder.Variables.Add(pair.Key, state.GetSharedVariable(pair.Key.Name)); break;
+                    case NodeTypes.Current:
+                        var container = context.Branches[pair.Key];
+                        if (container == context.Behaviors)
+                            builder.Variables.Add(pair.Key, _branch);
+                        else
+                            builder.Variables.Add(pair.Key, container.GetValue<IBranchedBehavior<double>>().Branch);
+                        break;
+                    default:
+                        throw new Exception("Invalid variable");
+                }
+            }
+
+            // Let's build the derivative functions and get their matrix locations/rhs locations
+            _value = builder.Build(bp.Function);
+            Functions = new Tuple<VariableNode, IVariable<double>, Func<double>>[df.Count];
+            var matLocs = new MatrixLocation[df.Count];
+            var rhsLocs = state.Map[_branch];
+            int index = 0;
+            foreach (var pair in df)
+            {
+                var variable = builder.Variables[pair.Key];
+                var func = builder.Build(pair.Value);
+                Functions[index] = Tuple.Create(pair.Key, variable, func);
+                matLocs[index] = new MatrixLocation(rhsLocs, state.Map[variable]);
                 index++;
             }
 
             // Get the matrix elements
-            _elements = new ElementSet<double>(_biasing.Solver, locs);
-            _coreElements = new ElementSet<double>(_biasing.Solver, new[] {
-                new MatrixLocation(_branch, _posNode),
-                new MatrixLocation(_branch, _negNode),
-                new MatrixLocation(_posNode, _branch),
-                new MatrixLocation(_negNode, _branch)
-            }, new[] { _branch });
+            _elements = new ElementSet<double>(state.Solver, matLocs);
+            int br = state.Map[_branch];
+            int pos = state.Map[_variables.Positive];
+            int neg = state.Map[_variables.Negative];
+            _coreElements = new ElementSet<double>(state.Solver, new[] {
+                new MatrixLocation(br, pos),
+                new MatrixLocation(br, neg),
+                new MatrixLocation(pos, br),
+                new MatrixLocation(neg, br)
+            }, new[] { br });
         }
 
         void IBiasingBehavior.Load()
         {
-            var values = new double[_funcs.Length];
+            double[] values = new double[Functions.Length];
             var total = Voltage = _value();
-            for (var i = 0; i < _funcs.Length; i++)
+
+            int i;
+            for (i = 0; i < Functions.Length; i++)
             {
-                var df = _funcs[i].Invoke();
-                total -= _biasing.Solution[_nodes[i]] * df;
+                var df = Functions[i].Item3.Invoke();
+                total -= Functions[i].Item2.Value * df;
                 values[i] = -df;
             }
             _elements.Add(values);

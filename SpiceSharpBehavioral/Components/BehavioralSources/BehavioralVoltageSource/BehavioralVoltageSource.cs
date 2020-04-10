@@ -45,16 +45,11 @@ namespace SpiceSharp.Components
         /// <param name="simulation">The simulation.</param>
         public override void CreateBehaviors(ISimulation simulation)
         {
-            // We have to add the behavior container immediately to allow self-referencing
             var behaviors = new BehaviorContainer(Name);
-            behaviors.Add<IBranchedBehavior>(new BranchedBehavior(Name, simulation.Variables));
             simulation.EntityBehaviors.Add(behaviors);
 
-            // Parse the expression to be used
-            var derivatives = GetDescription(simulation);
-
             // Create the context, and use it to create our behaviors
-            var context = new BehavioralComponentContext(this, simulation, LinkParameters, derivatives);
+            var context = new BehavioralComponentContext(this, simulation, LinkParameters, VariableNodes);
             behaviors
                 .AddIfNo<IFrequencyBehavior>(simulation, () => new FrequencyBehavior(Name, context))
                 .AddIfNo<IBiasingBehavior>(simulation, () => new BiasingBehavior(Name, context));

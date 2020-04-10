@@ -3,9 +3,6 @@ using SpiceSharp.Simulations;
 using SpiceSharp.Behaviors;
 using SpiceSharp.Components.BehavioralCurrentSourceBehaviors;
 using SpiceSharp.Attributes;
-using SpiceSharpBehavioral.Parsers.Nodes;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace SpiceSharp.Components
 {
@@ -56,7 +53,7 @@ namespace SpiceSharp.Components
             // Create the context, and use it to create our behaviors
             var context = new BehavioralComponentContext(this, simulation, LinkParameters, VariableNodes);
             behaviors
-                // .AddIfNo<IFrequencyBehavior>(simulation, () => new FrequencyBehavior(Name, context))
+                .AddIfNo<IFrequencyBehavior>(simulation, () => new FrequencyBehavior(Name, context))
                 .AddIfNo<IBiasingBehavior>(simulation, () => new BiasingBehavior(Name, context));
         }
     }

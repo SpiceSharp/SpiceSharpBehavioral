@@ -57,6 +57,7 @@
     <Compile Include="Builders\DoubleBuilderTests.cs" />
     <Compile Include="Builders\FunctionBuilderTests.cs" />
     <Compile Include="Components\BehavioralCurrentSourceTests.cs" />
+    <Compile Include="Components\BehavioralVoltageSourceTests.cs" />
     <Compile Include="Parsers\DerivativesTests.cs" />
     <Compile Include="Parsers\LexerTests.cs" />
     <Compile Include="Parsers\ParserTests.cs" />

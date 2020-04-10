@@ -5,6 +5,8 @@ using System;
 using System.Numerics;
 using SpiceSharp.Components.BehavioralComponents;
 using SpiceSharp.Attributes;
+using SpiceSharp.Components.CommonBehaviors;
+using SpiceSharpBehavioral.Parsers.Nodes;
 
 namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
 {
@@ -13,13 +15,14 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
     /// </summary>
     /// <seealso cref="BiasingBehavior" />
     /// <seealso cref="IFrequencyBehavior" />
-    public class FrequencyBehavior : BiasingBehavior, IFrequencyBehavior
+    public class FrequencyBehavior : BiasingBehavior, IFrequencyBehavior, IBranchedBehavior<Complex>
     {
-        private readonly int _posNode, _negNode, _branch;
+        private readonly OnePort<Complex> _variables;
+        private readonly IVariable<Complex> _branch;
         private readonly ElementSet<Complex> _elements, _coreElements;
-        private readonly Func<double>[] _funcs;
-        private readonly int[] _nodes;
-        private readonly IComplexSimulationState _complex;
+        private readonly Complex[] _values;
+
+        IVariable<Complex> IBranchedBehavior<Complex>.Branch => _branch;
 
         /// <summary>
         /// Gets the complex voltage.
@@ -37,7 +40,7 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         /// The complex current.
         /// </value>
         [ParameterName("i"), ParameterName("i_c"), ParameterInfo("The complex current")]
-        public Complex ComplexCurrent => _complex.Solution[_branch];
+        public Complex ComplexCurrent => _branch.Value;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FrequencyBehavior"/> class.
@@ -47,52 +50,59 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         public FrequencyBehavior(string name, BehavioralComponentContext context)
             : base(name, context)
         {
-            _complex = context.GetState<IComplexSimulationState>();
+            var state = context.GetState<IComplexSimulationState>();
+            _variables = new OnePort<Complex>(
+                state.GetSharedVariable(context.Nodes[0]),
+                state.GetSharedVariable(context.Nodes[1]));
+            _branch = state.CreatePrivateVariable(Name.Combine("branch"), Units.Ampere);
 
-            // Get the nodes
-            var branch = context.Behaviors.GetValue<IBranchedBehavior>().Branch;
-            _posNode = _complex.Map[context.Nodes[0]];
-            _negNode = _complex.Map[context.Nodes[1]];
-            _branch = _complex.Map[branch];
-
-            // Get the variables from our behavioral description
-            int index = 0;
-            var locs = new MatrixLocation[context.ModelDescription.Count];
-            _funcs = new Func<double>[context.ModelDescription.Count];
-            _nodes = new int[context.ModelDescription.Count];
-            foreach (var pair in context.ModelDescription)
+            var row = state.Map[_branch];
+            var matLocs = new MatrixLocation[Functions.Length * 2];
+            _values = new Complex[Functions.Length * 2];
+            for (var i = 0; i < Functions.Length; i++)
             {
-                _nodes[index] = _complex.Map[pair.Key];
-                _funcs[index] = pair.Value;
-                locs[index] = new MatrixLocation(_branch, _nodes[index]);
-                index++;
+                IVariable<Complex> variable;
+                switch (Functions[i].Item1.NodeType)
+                {
+                    case NodeTypes.Voltage: variable = state.GetSharedVariable(Functions[i].Item1.Name); break;
+                    case NodeTypes.Current:
+                        var container = context.Branches[Functions[i].Item1];
+                        if (container == context.Behaviors)
+                            variable = _branch;
+                        else
+                            variable = container.GetValue<IBranchedBehavior<Complex>>().Branch;
+                        break;
+                    default:
+                        throw new Exception("Invalid variable");
+                };
+                matLocs[i] = new MatrixLocation(row, state.Map[variable]);
             }
 
             // Get the matrix elements
-            _elements = new ElementSet<Complex>(_complex.Solver, locs);
-            _coreElements = new ElementSet<Complex>(_complex.Solver, new[] {
-                new MatrixLocation(_branch, _posNode),
-                new MatrixLocation(_branch, _negNode),
-                new MatrixLocation(_posNode, _branch),
-                new MatrixLocation(_negNode, _branch)
+            _elements = new ElementSet<Complex>(state.Solver, matLocs);
+            int br = state.Map[_branch];
+            int pos = state.Map[_variables.Positive];
+            int neg = state.Map[_variables.Negative];
+            _coreElements = new ElementSet<Complex>(state.Solver, new[] {
+                new MatrixLocation(br, pos),
+                new MatrixLocation(br, neg),
+                new MatrixLocation(pos, br),
+                new MatrixLocation(neg, br)
             });
         }
 
         void IFrequencyBehavior.InitializeParameters()
         {
+            for (var i = 0; i < Functions.Length; i++)
+            {
+                var value = Functions[i].Item3.Invoke();
+                _values[i] = -value;
+            }
         }
 
         void IFrequencyBehavior.Load()
         {
-            var values = new Complex[_funcs.Length];
-            ComplexVoltage = new Complex();
-            for (var i = 0; i < _funcs.Length; i++)
-            {
-                var df = _funcs[i].Invoke();
-                ComplexVoltage += _complex.Solution[_nodes[i]] * df;
-                values[i] = -df;
-            }
-            _elements.Add(values);
+            _elements.Add(_values);
             _coreElements.Add(1.0, -1.0, 1.0, -1.0);
         }
     }
