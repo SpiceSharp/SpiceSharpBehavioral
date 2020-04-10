@@ -50,6 +50,7 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
             var isConstant = true;
             foreach (var arg in arguments)
             {
+                arg.ThrowIfNull(nameof(arg));
                 if ((arg.Properties & NodeProperties.Constant) == 0)
                 {
                     isConstant = false;

@@ -36,7 +36,7 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         protected UnaryOperatorNode(NodeTypes type, Node argument)
             : base(type)
         {
-            Argument = argument;
+            Argument = argument.ThrowIfNull(nameof(argument));
 
             if ((Argument.Properties & NodeProperties.Constant) != 0)
                 Properties = NodeProperties.Constant;

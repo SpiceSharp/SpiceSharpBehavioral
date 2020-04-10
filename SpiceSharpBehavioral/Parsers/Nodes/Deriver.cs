@@ -10,10 +10,6 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
     /// </summary>
     public class Deriver
     {
-        private static readonly Node _zero = Node.Constant("0");
-        private static readonly Node _one = Node.Constant("1");
-        private static readonly Node _two = Node.Constant("2");
-
         /// <summary>
         /// Gets the map.
         /// </summary>
@@ -80,21 +76,21 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
                     {
                         case NodeTypes.Add: return Combine(a, b, n1 => n1, n2 => n2);
                         case NodeTypes.Subtract: return Combine(a, b, n1 => n1, n2 => Node.Minus(n2), (n1, n2) => Node.Subtract(n1, n2));
-                        case NodeTypes.Multiply: return Combine(a, b, n1 => Multiply(n1, bn.Right), n2 => Multiply(bn.Left, n2));
+                        case NodeTypes.Multiply: return Combine(a, b, n1 => n1 * bn.Right, n2 => bn.Left * n2);
                         case NodeTypes.Divide:
                             return Combine(a, b,
-                                n1 => Divide(n1, bn.Right), 
-                                n2 => Node.Minus(Divide(n2, Node.Power(bn.Right, _two))),
-                                (n1, n2) => Divide(Node.Subtract(Multiply(n1, bn.Right), Multiply(bn.Left, n2)), Node.Power(bn.Right, _two)));
+                                n1 => n1 / bn.Right,
+                                n2 => -(n2 / Node.Power(bn.Right, Node.Two)),
+                                (n1, n2) => (n1 * bn.Right - bn.Left * n2) / Node.Power(bn.Right, Node.Two));
                         case NodeTypes.Pow:
                             return Combine(a, b,
-                                n1 => Multiply(Multiply(bn.Right, Node.Power(bn.Left, Node.Subtract(bn.Right, _one))), n1),
-                                n2 => Multiply(Multiply(bn, Node.Function("log", new[] { bn.Left })), n2));
+                                n1 => n1 * bn.Right * Node.Power(bn.Left, bn.Right - Node.One),
+                                n2 => n2 * Node.Function("log", bn.Left) * bn);
                         case NodeTypes.Modulo:
                             return Combine(a, b,
                                 n1 => n1,
-                                n2 => Node.Minus(Multiply(bn, n2)),
-                                (n1, n2) => Node.Subtract(n1, Node.Multiply(bn, n2)));
+                                n2 => n2 * -bn,
+                                (n1, n2) => n1 - n2 * bn);
                         case NodeTypes.GreaterThan:
                         case NodeTypes.GreaterThanOrEqual:
                         case NodeTypes.LessThan:
@@ -109,8 +105,8 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
                     a = Derive(tn.IfTrue);
                     b = Derive(tn.IfFalse);
                     return Combine(a, b,
-                        n1 => Node.Conditional(tn.Condition, n1, _zero),
-                        n2 => Node.Conditional(tn.Condition, _zero, n2),
+                        n1 => Node.Conditional(tn.Condition, n1, Node.Zero),
+                        n2 => Node.Conditional(tn.Condition, Node.Zero, n2),
                         (n1, n2) => Node.Conditional(tn.Condition, n1, n2));
 
                 case FunctionNode fn:
@@ -159,7 +155,7 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
                     {
                         a = new Dictionary<VariableNode, Node>
                         {
-                            { vn, _one }
+                            { vn, Node.One }
                         };
                         return a;
                     }
@@ -171,42 +167,6 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
             }
 
             throw new Exception("Could not derive expression node {0}".FormatString(node));
-        }
-
-        /// <summary>
-        /// Multiplies the specified nodes.
-        /// </summary>
-        /// <param name="left">The left.</param>
-        /// <param name="right">The right.</param>
-        /// <returns></returns>
-        public static Node Multiply(Node left, Node right)
-        {
-            if (left == null || right == null)
-                return null;
-            if (left.Equals(_zero) || right.Equals(_zero))
-                return null;
-
-            // Every derivative becomes 1 when derived, so quite common...
-            if (left.Equals(_one))
-                return right;
-            if (right.Equals(_one))
-                return left;
-            return Node.Multiply(left, right);
-        }
-
-        /// <summary>
-        /// Divides the specified nodes.
-        /// </summary>
-        /// <param name="left">The left.</param>
-        /// <param name="right">The right.</param>
-        /// <returns></returns>
-        public static Node Divide(Node left, Node right)
-        {
-            if (left.Equals(_zero))
-                return _zero;
-            if (right.Equals(_one))
-                return left;
-            return Node.Divide(left, right);
         }
 
         /// <summary>
@@ -223,7 +183,7 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
             {
                 if (dargs[i] == null)
                     break;
-                var b = Multiply(Node.Function(format.FormatString(function.Name, i), function.Arguments), dargs[i]);
+                var b = Node.Function(format.FormatString(function.Name, i), function.Arguments) * dargs[i];
                 result = result == null ? b : Node.Add(result, b);
             }
             return result;
@@ -276,14 +236,9 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
                 {
                     if (both == null)
                     {
-                        var l = leftOnly(valueL);
-                        var r = rightOnly(valueR);
-                        if (l == null)
+                        var r = leftOnly(valueL) + rightOnly(valueR);
+                        if (r != null)
                             result.Add(key, r);
-                        else if (r == null)
-                            result.Add(key, l);
-                        else
-                            result.Add(key, Node.Add(l, r));
                     }
                     else
                         result.Add(key, both(valueL, valueR));

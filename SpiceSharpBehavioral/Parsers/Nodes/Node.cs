@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using SpiceSharp;
+using System;
+using System.Collections.Generic;
 
 namespace SpiceSharpBehavioral.Parsers.Nodes
 {
@@ -10,6 +12,21 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
     /// </remarks>
     public abstract class Node
     {
+        /// <summary>
+        /// A constant that represents zero. Can be used for simplifications.
+        /// </summary>
+        public static readonly Node Zero = Constant("0");
+
+        /// <summary>
+        /// A constant that represents one. Can be used for simplifications.
+        /// </summary>
+        public static readonly Node One = Constant("1");
+
+        /// <summary>
+        /// A constant that represents two. Can be used for simplifications.
+        /// </summary>
+        public static readonly Node Two = Constant("2");
+        
         public static BinaryOperatorNode Add(Node left, Node right) => BinaryOperatorNode.Add(left, right);
         public static BinaryOperatorNode Subtract(Node left, Node right) => BinaryOperatorNode.Subtract(left, right);
         public static BinaryOperatorNode Multiply(Node left, Node right) => BinaryOperatorNode.Multiply(left, right);
@@ -63,5 +80,114 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
             NodeType = type;
             Properties = properties;
         }
+
+        /// <summary>
+        /// Implements the operator +.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
+        public static Node operator +(Node left, Node right)
+        {
+            if (left == null || left.Equals(Zero))
+                return right;
+            if (right == null || right.Equals(Zero))
+                return left;
+            return Add(left, right);
+        }
+
+        /// <summary>
+        /// Implements the operator -.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
+        public static Node operator -(Node left, Node right)
+        {
+            if (left == null || left.Equals(Zero))
+                return Minus(right);
+            if (right == null || right.Equals(Zero))
+                return left;
+            return Subtract(left, right);
+        }
+
+        /// <summary>
+        /// Implements the operator *.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
+        public static Node operator *(Node left, Node right)
+        {
+            if (left == null || right == null || left.Equals(Zero) || right.Equals(Zero))
+                return null;
+            if (left.Equals(One))
+                return right;
+            if (right.Equals(One))
+                return left;
+            return Multiply(left, right);
+        }
+
+        /// <summary>
+        /// Implements the operator /.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
+        public static Node operator /(Node left, Node right)
+        {
+            if (left == null || left.Equals(Zero))
+                return Zero;
+            if (right == null || right.Equals(Zero))
+                throw new DivideByZeroException();
+            if (right.Equals(One))
+                return left;
+            return Divide(left, right);
+        }
+
+        /// <summary>
+        /// Implements the operator %.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
+        public static Node operator %(Node left, Node right)
+        {
+            if (left == null || left.Equals(Zero))
+                return null;
+            if (right == null || right.Equals(Zero))
+                throw new DivideByZeroException();
+            if (right.Equals(One))
+                return Zero;
+            return Modulo(left, right);
+        }
+
+        /// <summary>
+        /// Implements the operator +.
+        /// </summary>
+        /// <param name="arg">The argument.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
+        public static Node operator +(Node arg) => arg == null ? null : Plus(arg);
+
+        /// <summary>
+        /// Implements the operator -.
+        /// </summary>
+        /// <param name="arg">The argument.</param>
+        /// <returns>
+        /// The result of the operator.
+        /// </returns>
+        public static Node operator -(Node arg) => arg == null ? null : Minus(arg);
     }
 }

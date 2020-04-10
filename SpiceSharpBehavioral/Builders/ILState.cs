@@ -110,7 +110,7 @@ namespace SpiceSharpBehavioral.Builders
                 case ConstantNode cn:
                     Generator.Emit(OpCodes.Ldc_R8, Functions.ParseNumber(cn.Literal));
                     return;
-
+                
                 case UnaryOperatorNode un:
                     Push(un.Argument);
                     switch (un.NodeType)

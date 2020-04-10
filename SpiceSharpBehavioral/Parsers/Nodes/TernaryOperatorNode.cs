@@ -52,9 +52,9 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         protected TernaryOperatorNode(NodeTypes type, Node condition, Node ifTrue, Node ifFalse)
             : base(type)
         {
-            Condition = condition;
-            IfTrue = ifTrue;
-            IfFalse = ifFalse;
+            Condition = condition.ThrowIfNull(nameof(condition));
+            IfTrue = ifTrue.ThrowIfNull(nameof(ifTrue));
+            IfFalse = ifFalse.ThrowIfNull(nameof(ifFalse));
 
             if (((Condition.Properties & NodeProperties.Constant) != 0) &&
                 ((IfTrue.Properties & NodeProperties.Constant) != 0) &&

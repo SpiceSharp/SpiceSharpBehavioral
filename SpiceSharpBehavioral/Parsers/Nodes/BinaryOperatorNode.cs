@@ -56,8 +56,8 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         protected BinaryOperatorNode(NodeTypes type, Node left, Node right)
             : base(type)
         {
-            Left = left;
-            Right = right;
+            Left = left.ThrowIfNull(nameof(left));
+            Right = right.ThrowIfNull(nameof(right));
 
             // If both are constant, the result is also constant
             if ((Left.Properties & NodeProperties.Constant) != 0 && (Right.Properties & NodeProperties.Constant) != 0)

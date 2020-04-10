@@ -17,7 +17,8 @@ namespace SpiceSharpBehavioral.Builders
             _safeDiv = ((Func<double, double, double, double>)Functions.SafeDivide).GetMethodInfo(),
             _sgn = ((Func<double, int>)Math.Sign).GetMethodInfo(),
             _round = ((Func<double, int, double>)Math.Round).GetMethodInfo(),
-            _pwl = ((Func<double, Point[], double>)Functions.Pwl).GetMethodInfo();
+            _pwl = ((Func<double, Point[], double>)Functions.Pwl).GetMethodInfo(),
+            _pwlDerivative = ((Func<double, Point[], double>)Functions.PwlDerivative).GetMethodInfo();
         private static readonly ConstructorInfo _point = typeof(Point).GetTypeInfo().GetConstructor(new[] { typeof(double), typeof(double) });
 
         /// <summary>
@@ -41,15 +42,15 @@ namespace SpiceSharpBehavioral.Builders
             { "asin", Asin },
             { "acos", Acos },
             { "atan", Atan },
-            { "u", U },
-            { "u2", U2 },
-            { "uramp", URamp },
+            { "u", U }, { "du(0)", Zero },
+            { "u2", U2 }, { "du2(0)", DU2 },
+            { "uramp", URamp }, { "duramp(0)", DURampDerivative },
             { "ceil", Ceil },
             { "floor", Floor },
             { "nint", Nint },
             { "round", Round },
             { "square", Square },
-            { "pwl", Pwl },
+            { "pwl", Pwl }, { "dpwl(0)", PwlDerivative },
             { "min", Min },
             { "max", Max },
             { "rnd", Random }
@@ -93,8 +94,10 @@ namespace SpiceSharpBehavioral.Builders
             ils.Generator.Emit(OpCodes.Call, _safeDiv);
         }
         private static void URamp(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Ramp, arguments);
+        private static void DURampDerivative(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.RampDerivative, arguments);
         private static void U(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Step, arguments);
         private static void U2(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Step2, arguments);
+        private static void DU2(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Step2Derivative, arguments);
         private static void Sin(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Sin, arguments);
         private static void Cos(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Cos, arguments);
         private static void Tan(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Tan, arguments);
@@ -114,22 +117,6 @@ namespace SpiceSharpBehavioral.Builders
 
         // Two-argument functions
         private static void Pwr(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Power2, arguments);
-        private static void DPwr0(ILState ils, IReadOnlyList<Node> arguments)
-        {
-            arguments.Check(2);
-            ils.Push(Node.Multiply(
-                arguments[1],
-                Node.Function("pwr", new[] { arguments[0], Node.Subtract(arguments[1], Node.Constant("1")) })
-                ));
-        }
-        private static void DPwr1(ILState ils, IReadOnlyList<Node> arguments)
-        {
-            arguments.Check(2);
-            ils.Push(Node.Multiply(
-                Node.Function("pwr", new[] { arguments[0], arguments[1] }),
-                Node.Function("log", new[] { arguments[0] })
-                ));
-        }
         private static void Min(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Min, arguments);
         private static void Max(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Max, arguments);
         private static void Round(ILState ils, IReadOnlyList<Node> arguments) 
@@ -169,6 +156,35 @@ namespace SpiceSharpBehavioral.Builders
                 il.Emit(OpCodes.Stelem, typeof(Point));
             }
             il.Emit(OpCodes.Call, _pwl);
+        }
+        private static void PwlDerivative(ILState ils, IReadOnlyList<Node> arguments)
+        {
+            if (arguments.Count < 3)
+                throw new ArgumentMismatchException(3, arguments.Count);
+            int points = (arguments.Count - 1) / 2;
+            if (arguments.Count % 2 == 0)
+                throw new ArgumentMismatchException(points * 2 + 1, arguments.Count);
+
+            var il = ils.Generator;
+
+            // Create our array
+            ils.Push(arguments[0]);
+            ils.Push(points);
+            il.Emit(OpCodes.Newarr, typeof(Point));
+            for (var i = 0; i < points; i++)
+            {
+                il.Emit(OpCodes.Dup); // Make another reference to the array
+                ils.Push(i); // Set the index
+
+                // Create the point
+                ils.Push(arguments[i * 2 + 1]);
+                ils.Push(arguments[i * 2 + 2]);
+                il.Emit(OpCodes.Newobj, _point);
+
+                // Store the element
+                il.Emit(OpCodes.Stelem, typeof(Point));
+            }
+            il.Emit(OpCodes.Call, _pwlDerivative);
         }
     }
 }
