@@ -238,56 +238,54 @@ namespace SpiceSharpBehavioral.Parsers
                     lexer.ReadToken();
                     if (lexer.Token == TokenType.LeftParenthesis)
                     {
-                        string a, b = null;
-                        QuantityTypes type = QuantityTypes.Raw;
+                        // Function call!
+                        string function = null;
                         switch (name)
                         {
                             case "vr":
-                                type = QuantityTypes.Real; goto case "v";
+                                function = "real"; goto case "v";
                             case "vi":
-                                type = QuantityTypes.Imaginary; goto case "v";
+                                function = "imag"; goto case "v";
                             case "vm":
-                                type = QuantityTypes.Magnitude; goto case "v";
+                                function = "abs"; goto case "v";
                             case "vdb":
-                                type = QuantityTypes.Decibels; goto case "v";
+                                function = "db"; goto case "v";
                             case "vph":
-                                type = QuantityTypes.Phase; goto case "v";
+                                function = "phase"; goto case "v";
                             case "v":
                                 // Read the nodes
                                 lexer.ReadNode();
-                                a = lexer.Content;
+                                result = Node.Voltage(lexer.Content);
                                 lexer.ReadToken();
                                 if (lexer.Token == TokenType.Comma)
                                 {
                                     lexer.ReadNode();
-                                    b = lexer.Content;
+                                    result = Node.Subtract(result, Node.Voltage(lexer.Content));
                                     lexer.ReadToken();
                                 }
                                 if (lexer.Token != TokenType.RightParenthesis)
                                     throw new Exception("Invalid voltage specifier");
                                 lexer.ReadToken();
-                                result = Node.Voltage(a, b, type);
                                 break;
 
                             case "ir":
-                                type = QuantityTypes.Real; goto case "i";
+                                function = "real"; goto case "i";
                             case "ii":
-                                type = QuantityTypes.Imaginary; goto case "i";
+                                function = "imag"; goto case "i";
                             case "im":
-                                type = QuantityTypes.Magnitude; goto case "i";
+                                function = "abs"; goto case "i";
                             case "idb":
-                                type = QuantityTypes.Decibels; goto case "i";
+                                function = "db"; goto case "i";
                             case "iph":
-                                type = QuantityTypes.Phase; goto case "i";
+                                function = "phase"; goto case "i";
                             case "i":
                                 // Read the name
                                 lexer.ReadNode();
-                                a = lexer.Content;
+                                result = Node.Current(lexer.Content);
                                 lexer.ReadToken();
                                 if (lexer.Token != TokenType.RightParenthesis)
                                     throw new Exception("Invalid current specifier");
                                 lexer.ReadToken();
-                                result = Node.Current(a, type);
                                 break;
 
                             default:
@@ -307,6 +305,8 @@ namespace SpiceSharpBehavioral.Parsers
                                 lexer.ReadToken();
                                 break;
                         }
+                        if (function != null)
+                            result = Node.Function(function, new[] { result });
                     }
                     else
                     {
@@ -322,7 +322,7 @@ namespace SpiceSharpBehavioral.Parsers
                     if (lexer.Token != TokenType.LeftIndex)
                         throw new Exception("Invalid property identifier");
                     lexer.ReadNode();
-                    result = Node.Property(name, lexer.Content, QuantityTypes.Raw);
+                    result = Node.Property(name, lexer.Content);
                     lexer.ReadToken();
                     if (lexer.Token != TokenType.RightIndex)
                         throw new Exception("Invalid property identifier");

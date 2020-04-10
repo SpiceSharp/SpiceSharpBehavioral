@@ -59,36 +59,38 @@ namespace SpiceSharpBehavioralTests.Builders
         {
             get
             {
+                double fudgeFactor = 1e-20;
+
                 // Test some execution of arguments
-                yield return new TestCaseData(Node.Function("abs", new[] { Node.Add(Node.Multiply(Node.Minus(Node.Constant("2")), Node.Constant("6")), Node.Constant("7")) }), 5.0).SetName("{m}(abs -2*6+7)");
-                yield return new TestCaseData(Node.Function("min", new[] { Node.Minus(Node.Constant("2")), Node.Multiply(Node.Constant("6"), Node.Constant("2")) }), -2.0).SetName("{m}(min -2, 6*2)");
-                yield return new TestCaseData(Node.Function("pwl", new[] { Node.Constant("2"), Node.Constant("0"), Node.Constant("1"), Node.Constant("3"), Node.Constant("4") }), 3.0).SetName("{m}(pwl 2,0,1,3,4)");
+                yield return new TestCaseData(Node.Function("abs", Node.Add(Node.Multiply(Node.Minus(Node.Constant("2")), Node.Constant("6")), Node.Constant("7"))), 5.0).SetName("{m}(abs -2*6+7)");
+                yield return new TestCaseData(Node.Function("min", Node.Minus(Node.Constant("2")), Node.Multiply(Node.Constant("6"), Node.Constant("2"))), -2.0).SetName("{m}(min -2, 6*2)");
+                yield return new TestCaseData(Node.Function("pwl", Node.Constant("2"), Node.Constant("0"), Node.Constant("1"), Node.Constant("3"), Node.Constant("4")), 3.0).SetName("{m}(pwl 2,0,1,3,4)");
 
                 foreach (var data in Single)
                 {
                     var node = (Node)data.Arguments[0];
                     var arg = (double)data.Arguments[1];
-                    yield return new TestCaseData(Node.Function("abs", new[] { node }), Math.Abs(arg)).SetName("{{m}}(abs {0})".FormatString(arg));
-                    yield return new TestCaseData(Node.Function("sqrt", new[] { node }), arg < 0 ? double.PositiveInfinity : Math.Sqrt(arg)).SetName("{{m}}(sqrt {0})".FormatString(arg));
-                    yield return new TestCaseData(Node.Function("log", new[] { node }), arg < 0.0 ? double.PositiveInfinity : Math.Log(arg)).SetName("{{m}}(log {0})".FormatString(arg));
-                    yield return new TestCaseData(Node.Function("log10", new[] { node }), arg < 0 ? double.PositiveInfinity : Math.Log10(arg)).SetName("{{m}}(log10 {0})".FormatString(arg));
-                    yield return new TestCaseData(Node.Function("exp", new[] { node }), Math.Exp(arg)).SetName("{{m}}(exp {0})".FormatString(arg));
-                    yield return new TestCaseData(Node.Function("sin", new[] { node }), Math.Sin(arg)).SetName("{{m}}(sin {0})".FormatString(arg));
-                    yield return new TestCaseData(Node.Function("cos", new[] { node }), Math.Cos(arg)).SetName("{{m}}(cos {0})".FormatString(arg));
-                    yield return new TestCaseData(Node.Function("tan", new[] { node }), Math.Tan(arg)).SetName("{{m}}(tan {0})".FormatString(arg));
-                    yield return new TestCaseData(Node.Function("asin", new[] { node }), Math.Asin(arg)).SetName("{{m}}(asin {0})".FormatString(arg));
-                    yield return new TestCaseData(Node.Function("acos", new[] { node }), Math.Acos(arg)).SetName("{{m}}(acos {0})".FormatString(arg));
-                    yield return new TestCaseData(Node.Function("atan", new[] { node }), Math.Atan(arg)).SetName("{{m}}(atan {0})".FormatString(arg));
-                    yield return new TestCaseData(Node.Function("sinh", new[] { node }), Math.Sinh(arg)).SetName("{{m}}(sinh {0})".FormatString(arg));
-                    yield return new TestCaseData(Node.Function("cosh", new[] { node }), Math.Cosh(arg)).SetName("{{m}}(cosh {0})".FormatString(arg));
-                    yield return new TestCaseData(Node.Function("tanh", new[] { node }), Math.Tanh(arg)).SetName("{{m}}(tanh {0})".FormatString(arg));
-                    yield return new TestCaseData(Node.Function("u", new[] { node }), Functions.Step(arg)).SetName("{{m}}(u {0})".FormatString(arg));
-                    yield return new TestCaseData(Node.Function("u2", new[] { node }), Functions.Step2(arg)).SetName("{{m}}(u2 {0})".FormatString(arg));
-                    yield return new TestCaseData(Node.Function("uramp", new[] { node }), Functions.Ramp(arg)).SetName("{{m}}(uramp {0})".FormatString(arg));
-                    yield return new TestCaseData(Node.Function("ceil", new[] { node }), Math.Ceiling(arg)).SetName("{{m}}(ceil {0})".FormatString(arg));
-                    yield return new TestCaseData(Node.Function("floor", new[] { node }), Math.Floor(arg)).SetName("{{m}}(floor {0})".FormatString(arg));
-                    yield return new TestCaseData(Node.Function("nint", new[] { node }), Math.Round(arg, 0)).SetName("{{m}}(nint {0})".FormatString(arg));
-                    yield return new TestCaseData(Node.Function("square", new[] { node }), arg * arg).SetName("{{m}}(square {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("abs", node), Math.Abs(arg)).SetName("{{m}}(abs {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("sqrt", node), Functions.Sqrt(arg)).SetName("{{m}}(sqrt {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("log", node), Functions.Log(arg)).SetName("{{m}}(log {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("log10", node), Functions.Log10(arg)).SetName("{{m}}(log10 {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("exp", node), Math.Exp(arg)).SetName("{{m}}(exp {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("sin", node), Math.Sin(arg)).SetName("{{m}}(sin {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("cos", node), Math.Cos(arg)).SetName("{{m}}(cos {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("tan", node), Math.Tan(arg)).SetName("{{m}}(tan {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("asin", node), Math.Asin(arg)).SetName("{{m}}(asin {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("acos", node), Math.Acos(arg)).SetName("{{m}}(acos {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("atan", node), Math.Atan(arg)).SetName("{{m}}(atan {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("sinh", node), Math.Sinh(arg)).SetName("{{m}}(sinh {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("cosh", node), Math.Cosh(arg)).SetName("{{m}}(cosh {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("tanh", node), Math.Tanh(arg)).SetName("{{m}}(tanh {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("u", node), Functions.Step(arg)).SetName("{{m}}(u {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("u2", node), Functions.Step2(arg)).SetName("{{m}}(u2 {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("uramp", node), Functions.Ramp(arg)).SetName("{{m}}(uramp {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("ceil", node), Math.Ceiling(arg)).SetName("{{m}}(ceil {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("floor", node), Math.Floor(arg)).SetName("{{m}}(floor {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("nint", node), Math.Round(arg, 0)).SetName("{{m}}(nint {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("square", node), arg * arg).SetName("{{m}}(square {0})".FormatString(arg));
                 }
             }
         }

@@ -1,7 +1,8 @@
 ﻿using SpiceSharp.Behaviors;
 using SpiceSharp.Simulations;
-using SpiceSharpBehavioral.Builders;
-using System;
+using SpiceSharpBehavioral.Parsers.Nodes;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SpiceSharp.Components.BehavioralComponents
 {
@@ -12,12 +13,20 @@ namespace SpiceSharp.Components.BehavioralComponents
     public class BehavioralComponentContext : ComponentBindingContext
     {
         /// <summary>
-        /// Gets the model description.
+        /// Gets the derivatives w.r.t. to any voltage and current nodes.
         /// </summary>
         /// <value>
-        /// The model description.
+        /// The derivatives.
         /// </value>
-        public Derivatives<Func<double>> ModelDescription { get; }
+        public Dictionary<VariableNode, Node> Derivatives { get; }
+
+        /// <summary>
+        /// Gets the current references.
+        /// </summary>
+        /// <value>
+        /// The current references.
+        /// </value>
+        public Dictionary<VariableNode, IBehaviorContainer> Branches { get; }
 
         /// <summary>
         /// Gets the behaviors already created by the component.
@@ -28,17 +37,24 @@ namespace SpiceSharp.Components.BehavioralComponents
         public IBehaviorContainer Behaviors { get; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BehavioralComponentContext"/> class.
+        /// Initializes a new instance of the <see cref="BehavioralComponentContext" /> class.
         /// </summary>
         /// <param name="component">The component creating the behavior.</param>
         /// <param name="simulation">The simulation for which a behavior is created.</param>
         /// <param name="linkParameters">Flag indicating that parameters should be linked. If false, only cloned parameters are returned by the context.</param>
-        /// <param name="modelDescription">The model description.</param>
-        public BehavioralComponentContext(IComponent component, ISimulation simulation, bool linkParameters, Derivatives<Func<double>> modelDescription) 
+        /// <param name="variables">The variables that need to be derived to.</param>
+        public BehavioralComponentContext(IComponent component, ISimulation simulation, bool linkParameters, IEnumerable<VariableNode> variables) 
             : base(component, simulation, linkParameters)
         {
             Behaviors = simulation.EntityBehaviors[component.Name];
-            ModelDescription = modelDescription.ThrowIfNull(nameof(modelDescription));
+            Branches = new Dictionary<VariableNode, IBehaviorContainer>();
+
+            var varr = variables.ToArray();
+            foreach (var variable in varr.Where(vn => vn.NodeType == NodeTypes.Current))
+                Branches.Add(variable, simulation.EntityBehaviors[variable.Name]);
+            var p = component.GetParameterSet<BaseParameters>();
+            var deriver = new Deriver(varr);
+            Derivatives = deriver.Derive(p.Function) ?? new Dictionary<VariableNode, Node>();
         }
     }
 }

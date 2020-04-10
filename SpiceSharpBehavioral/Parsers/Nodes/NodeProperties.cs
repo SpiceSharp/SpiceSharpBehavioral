@@ -17,5 +17,10 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         /// The result is constant.
         /// </summary>
         Constant = 0x01,
+
+        /// <summary>
+        /// The node generates a value without taking parameters.
+        /// </summary>
+        Terminal = 0x02,
     }
 }

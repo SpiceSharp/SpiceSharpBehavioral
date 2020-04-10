@@ -36,12 +36,12 @@ namespace SpiceSharpBehavioral.Builders
             { "uramp", URamp },
             { "ceil", Ceil },
             { "floor", Floor },
-            { "nint", Nint }, 
+            { "nint", Nint },
             { "round", Round },
             { "square", Square },
             { "pwl", Pwl },
             { "min", Min },
-            { "max", Max }
+            { "max", Max },
         };
 
         private static double[] Check(this double[] args, int expected)
@@ -105,6 +105,19 @@ namespace SpiceSharpBehavioral.Builders
             for (var i = 0; i < points; i++)
                 data[i] = new Point(args[i * 2 + 1], args[i * 2 + 2]);
             return Functions.Pwl(args[0], data);
+        }
+        private static double PwlDerivative(double[] args)
+        {
+            if (args.Length < 3)
+                throw new ArgumentMismatchException(3, args.Length);
+            int points = (args.Length - 1) / 2;
+            if (args.Length % 2 == 0)
+                throw new ArgumentMismatchException(points * 2 + 1, args.Length);
+
+            var data = new Point[points];
+            for (var i = 0; i < points; i++)
+                data[i] = new Point(args[i * 2 + 1], args[i * 2 + 2]);
+            return Functions.PwlDerivative(args[0], data);
         }
     }
 }

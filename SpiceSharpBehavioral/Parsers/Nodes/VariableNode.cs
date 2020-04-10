@@ -8,7 +8,9 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
     /// <seealso cref="Node" />
     public class VariableNode : Node
     {
-        public static VariableNode Variable(string name) => new VariableNode(name);
+        public static VariableNode Voltage(string name) => new VariableNode(NodeTypes.Voltage, name);
+        public static VariableNode Current(string name) => new VariableNode(NodeTypes.Current, name);
+        public static VariableNode Variable(string name) => new VariableNode(NodeTypes.Variable, name);
 
         /// <summary>
         /// Gets the name of the variable.
@@ -21,9 +23,10 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         /// <summary>
         /// Initializes a new instance of the <see cref="VariableNode"/> class.
         /// </summary>
+        /// <param name="type">The node type.</param>
         /// <param name="name">The name.</param>
-        protected VariableNode(string name)
-            : base(NodeTypes.Variable)
+        protected VariableNode(NodeTypes type, string name)
+            : base(type, NodeProperties.Terminal)
         {
             Name = name.ThrowIfNull(nameof(name));
         }
@@ -62,6 +65,14 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         /// <returns>
         /// A <see cref="System.String" /> that represents this instance.
         /// </returns>
-        public override string ToString() => Name;
+        public override string ToString()
+        {
+            switch (NodeType)
+            {
+                case NodeTypes.Voltage: return "V({0})".FormatString(Name);
+                case NodeTypes.Current: return "I({0})".FormatString(Name);
+                default: return Name;
+            }
+        }
     }
 }

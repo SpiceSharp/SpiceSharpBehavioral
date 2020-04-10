@@ -10,49 +10,66 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
     /// </summary>
     public class Deriver
     {
-        private static readonly Node Zero = Node.Constant("0");
-        private static readonly Node One = Node.Constant("1");
-        private static readonly Node MinusOne = Node.Minus(Node.Constant("1"));
-        private static readonly Node Two = Node.Constant("2");
+        private static readonly Node _zero = Node.Constant("0");
+        private static readonly Node _one = Node.Constant("1");
+        private static readonly Node _two = Node.Constant("2");
 
         /// <summary>
-        /// Gets the comparer.
+        /// Gets the map.
         /// </summary>
         /// <value>
-        /// The comparer.
+        /// The map.
         /// </value>
-        public IEqualityComparer<string> Comparer { get; }
+        public HashSet<VariableNode> Variables { get; } = new HashSet<VariableNode>();
+
+        /// <summary>
+        /// Gets or sets derivative definitions.
+        /// </summary>
+        /// <value>
+        /// The derivative definitions.
+        /// </value>
+        public Dictionary<string, FunctionRule> FunctionRules { get; set; } = DeriverHelper.Defaults;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Deriver"/> class.
         /// </summary>
-        /// <param name="comparer">The comparer.</param>
-        public Deriver(IEqualityComparer<string> comparer = null)
+        /// <param name="variables">The variables to which the derivative should be computed.</param>
+        public Deriver(IEnumerable<VariableNode> variables)
         {
-            Comparer = comparer ?? EqualityComparer<string>.Default;
+            foreach (var variable in variables)
+                Variables.Add(variable);
         }
 
         /// <summary>
-        /// Derives the specified nodes.
+        /// Initializes a new instance of the <see cref="Deriver"/> class.
+        /// </summary>
+        /// <param name="variables">The variables.</param>
+        public Deriver(params VariableNode[] variables)
+            : this((IEnumerable<VariableNode>)variables)
+        {
+        }
+
+        /// <summary>
+        /// Derives the specified node to the variables.
         /// </summary>
         /// <param name="node">The nodes.</param>
-        /// <returns>The derived nodes.</returns>
-        public virtual Derivatives Derive(Node node)
+        /// <returns>The derived nodes, or <c>null</c> if all derivatives are zero.</returns>
+        public virtual Dictionary<VariableNode, Node> Derive(Node node)
         {
             // We can skip anything that is constant!
             if ((node.Properties & NodeProperties.Constant) != 0)
-                return Derivatives.Empty;
+                return null;
 
-            Derivatives result, a, b;
+            Dictionary<VariableNode, Node> a = null, b = null;
             switch (node)
             {
                 case UnaryOperatorNode un:
                     a = Derive(un.Argument);
                     switch (un.NodeType)
                     {
-                        case NodeTypes.Plus: return Combine(a, n => Node.Plus(n));
-                        case NodeTypes.Minus: return Combine(a, n => Node.Minus(n));
-                        case NodeTypes.Not: return Derivatives.Empty;
+                        case NodeTypes.Plus: return Apply(a, n => Node.Plus(n));
+                        case NodeTypes.Minus: return Apply(a, n => Node.Minus(n));
+                        case NodeTypes.Not: return null;
                     }
                     break;
 
@@ -61,27 +78,17 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
                     b = Derive(bn.Right);
                     switch (bn.NodeType)
                     {
-                        case NodeTypes.Add:
-                            return Combine(a, b, 
-                                n1 => n1,
-                                n2 => n2);
-                        case NodeTypes.Subtract:
-                            return Combine(a, b, 
-                                n1 => n1, 
-                                n2 => Node.Minus(n2), 
-                                (n1, n2) => Node.Subtract(n1, n2));
-                        case NodeTypes.Multiply:
-                            return Combine(a, b, 
-                                n1 => Multiply(n1, bn.Right),
-                                n2 => Multiply(bn.Left, n2));
+                        case NodeTypes.Add: return Combine(a, b, n1 => n1, n2 => n2);
+                        case NodeTypes.Subtract: return Combine(a, b, n1 => n1, n2 => Node.Minus(n2), (n1, n2) => Node.Subtract(n1, n2));
+                        case NodeTypes.Multiply: return Combine(a, b, n1 => Multiply(n1, bn.Right), n2 => Multiply(bn.Left, n2));
                         case NodeTypes.Divide:
-                            return Combine(a, b, 
+                            return Combine(a, b,
                                 n1 => Divide(n1, bn.Right), 
-                                n2 => Node.Minus(Divide(n2, Node.Power(bn.Right, Two))),
-                                (n1, n2) => Divide(Node.Subtract(Multiply(n1, bn.Right), Multiply(bn.Left, n2)), Node.Power(bn.Right, Two)));
+                                n2 => Node.Minus(Divide(n2, Node.Power(bn.Right, _two))),
+                                (n1, n2) => Divide(Node.Subtract(Multiply(n1, bn.Right), Multiply(bn.Left, n2)), Node.Power(bn.Right, _two)));
                         case NodeTypes.Pow:
                             return Combine(a, b,
-                                n1 => Multiply(Multiply(bn.Right, Node.Power(bn.Left, Node.Subtract(bn.Right, One))), n1),
+                                n1 => Multiply(Multiply(bn.Right, Node.Power(bn.Left, Node.Subtract(bn.Right, _one))), n1),
                                 n2 => Multiply(Multiply(bn, Node.Function("log", new[] { bn.Left })), n2));
                         case NodeTypes.Modulo:
                             return Combine(a, b,
@@ -94,7 +101,7 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
                         case NodeTypes.LessThanOrEqual:
                         case NodeTypes.Equals:
                         case NodeTypes.NotEquals:
-                            return Derivatives.Empty;
+                            return null;
                     }
                     break;
 
@@ -102,167 +109,199 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
                     a = Derive(tn.IfTrue);
                     b = Derive(tn.IfFalse);
                     return Combine(a, b,
-                        n1 => Node.Conditional(tn.Condition, n1, Zero),
-                        n2 => Node.Conditional(tn.Condition, Zero, n2),
+                        n1 => Node.Conditional(tn.Condition, n1, _zero),
+                        n2 => Node.Conditional(tn.Condition, _zero, n2),
                         (n1, n2) => Node.Conditional(tn.Condition, n1, n2));
 
                 case FunctionNode fn:
-                    result = new Derivatives();
+                    if (fn.Arguments.Count == 0)
+                        return null;
+
+                    // Build the derived arguments
+                    var lst = new Dictionary<VariableNode, Node[]>();
                     for (var i = 0; i < fn.Arguments.Count; i++)
                     {
-                        // Chain rule
-                        a = Derive(fn.Arguments[i]);
-                        string dname = "d{0}({1})".FormatString(fn.Name, i);
-                        result = Combine(result, a,
-                            n1 => n1,
-                            n2 => Multiply(Node.Function(dname, fn.Arguments), n2));
+                        var darg = Derive(fn.Arguments[i]);
+                        if (darg != null)
+                        {
+                            foreach (var pair in darg)
+                            {
+                                if (!lst.TryGetValue(pair.Key, out var dargs))
+                                {
+                                    dargs = new Node[fn.Arguments.Count];
+                                    lst.Add(pair.Key, dargs);
+                                }
+                                dargs[i] = pair.Value;
+                            }
+                        }
                     }
-                    return result;
 
-                case VoltageNode vn:
-                    if (vn.QuantityType != QuantityTypes.Raw)
-                        throw new Exception("Invalid derivative: Voltage quantity {0} cannot be used".FormatString(vn.QuantityType));
-                    if (Comparer.Equals(vn.Name, vn.Reference))
-                        return new Derivatives();
-                    result = new Derivatives(new Dictionary<string, Node>(Comparer), null);
-                    result.Voltage.Add(vn.Name, One);
-                    if (vn.Reference != null)
-                        result.Voltage.Add(vn.Reference, MinusOne);
-                    return result;
+                    // If there are no derivative, let's just stop here
+                    if (lst.Count == 0)
+                        return null;
 
-                case CurrentNode cn:
-                    if (cn.QuantityType != QuantityTypes.Raw)
-                        throw new Exception("Invalid derivative: Voltage quantity {0} cannot be used".FormatString(cn.QuantityType));
-                    result = new Derivatives(null, new Dictionary<string, Node>(Comparer));
-                    result.Current.Add(cn.Name, One);
-                    return result;
+                    // Give a chance to our function rules
+                    if (FunctionRules == null || !FunctionRules.TryGetValue(fn.Name, out var rule))
+                        rule = (fn, darg) => ChainRule(fn, darg, "d{0}({1})");
+                    a = new Dictionary<VariableNode, Node>();
+                    foreach (var pair in lst)
+                    {
+                        var df = rule(fn, pair.Value);
+                        if (df != null)
+                            a.Add(pair.Key, df);
+                    }
 
-                case ConstantNode _:
+                    // If all derivatives are zero, return null
+                    return a.Count > 0 ? a : null;
+                
+                case VariableNode vn:
+                    if (Variables.Contains(vn))
+                    {
+                        a = new Dictionary<VariableNode, Node>
+                        {
+                            { vn, _one }
+                        };
+                        return a;
+                    }
+                    return null;
+
                 case PropertyNode _:
-                case VariableNode _:
-                    return Derivatives.Empty;
+                case ConstantNode _:
+                    return null;
             }
 
             throw new Exception("Could not derive expression node {0}".FormatString(node));
         }
 
-        private static Node Multiply(Node left, Node right)
+        /// <summary>
+        /// Multiplies the specified nodes.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
+        /// <returns></returns>
+        public static Node Multiply(Node left, Node right)
         {
-            if (left.Equals(Zero) || right.Equals(Zero))
-                return Zero;
-            if (left.Equals(One))
+            if (left == null || right == null)
+                return null;
+            if (left.Equals(_zero) || right.Equals(_zero))
+                return null;
+
+            // Every derivative becomes 1 when derived, so quite common...
+            if (left.Equals(_one))
                 return right;
-            if (right.Equals(One))
+            if (right.Equals(_one))
                 return left;
             return Node.Multiply(left, right);
         }
 
-        private static Node Divide(Node left, Node right)
+        /// <summary>
+        /// Divides the specified nodes.
+        /// </summary>
+        /// <param name="left">The left.</param>
+        /// <param name="right">The right.</param>
+        /// <returns></returns>
+        public static Node Divide(Node left, Node right)
         {
-            if (left.Equals(Zero))
-                return Zero;
-            if (right.Equals(One))
+            if (left.Equals(_zero))
+                return _zero;
+            if (right.Equals(_one))
                 return left;
             return Node.Divide(left, right);
         }
 
         /// <summary>
-        /// Combines two derivatives using combination functions.
+        /// Applies the chain rule on a function.
         /// </summary>
-        /// <param name="left">The left argument.</param>
-        /// <param name="right">The right argument.</param>
-        /// <param name="leftOnly">The function called when only a left argument exists.</param>
-        /// <param name="rightOnly">The function called when only a right argument exists.</param>
-        /// <param name="both">The function called when both arguments exist.</param>
-        /// <returns>The result.</returns>
-        protected Derivatives Combine(
-            Derivatives left, Derivatives right,
-            Func<Node, Node> leftOnly, Func<Node, Node> rightOnly, Func<Node, Node, Node> both = null)
+        /// <param name="function">The function definition.</param>
+        /// <param name="dargs">The derivatives of the arguments.</param>
+        /// <param name="format">The format of the new function. {0} denotes the old name, while {1} will hold the index to which the function should be derived.</param>
+        /// <returns></returns>
+        public static Node ChainRule(FunctionNode function, IReadOnlyList<Node> dargs, string format)
         {
-            Dictionary<string, Node> v = null, c = null;
-
-            Node nl = null, nr = null;
-            if ((left.Voltage != null && left.Voltage.Count > 0) ||
-                (right.Voltage != null && right.Voltage.Count > 0))
+            Node result = null;
+            for (var i = 0; i < dargs.Count; i++)
             {
-                v = new Dictionary<string, Node>(Comparer);
-                foreach (var key in Keys(left.Voltage, right.Voltage))
-                {
-                    var hasLeft = left.Voltage?.TryGetValue(key, out nl) ?? false;
-                    var hasRight = right.Voltage?.TryGetValue(key, out nr) ?? false;
-                    if (hasLeft && hasRight)
-                    {
-                        if (both != null)
-                            v.Add(key, both(nl, nr));
-                        else
-                            v.Add(key, Node.Add(leftOnly(nl), rightOnly(nr)));
-                    }
-                    else if (hasLeft)
-                        v.Add(key, leftOnly(nl));
-                    else if (hasRight)
-                        v.Add(key, rightOnly(nr));
-                }
+                if (dargs[i] == null)
+                    break;
+                var b = Multiply(Node.Function(format.FormatString(function.Name, i), function.Arguments), dargs[i]);
+                result = result == null ? b : Node.Add(result, b);
             }
-
-            if ((left.Current != null && left.Current.Count > 0) ||
-                (right.Current != null && right.Current.Count > 0))
-            {
-                c = new Dictionary<string, Node>(Comparer);
-                foreach (var key in Keys(left.Current, right.Current))
-                {
-                    var hasLeft = left.Current?.TryGetValue(key, out nl) ?? false;
-                    var hasRight = right.Current?.TryGetValue(key, out nr) ?? false;
-                    if (hasLeft && hasRight)
-                    {
-                        if (both != null)
-                            v.Add(key, both(nl, nr));
-                        else
-                            v.Add(key, Node.Add(leftOnly(nl), rightOnly(nr)));
-                    }
-                    else if (hasLeft)
-                        c.Add(key, leftOnly(nl));
-                    else if (hasRight)
-                        c.Add(key, rightOnly(nr));
-                }
-            }
-
-            return new Derivatives(v, c);
+            return result;
         }
 
         /// <summary>
-        /// Combines the specified argument.
+        /// Applies the specified argument.
         /// </summary>
         /// <param name="argument">The argument.</param>
         /// <param name="func">The function.</param>
-        /// <returns>The result.</returns>
-        protected Derivatives Combine(Derivatives argument, Func<Node, Node> func)
+        /// <returns></returns>
+        public static Dictionary<VariableNode, Node> Apply(Dictionary<VariableNode, Node> argument, Func<Node, Node> func)
         {
-            Dictionary<string, Node> v = null, c = null;
-
-            if (argument.Voltage != null)
-            {
-                v = new Dictionary<string, Node>(Comparer);
-                foreach (var pair in argument.Voltage)
-                    v.Add(pair.Key, func(pair.Value));
-            }
-            if (argument.Current != null)
-            {
-                c = new Dictionary<string, Node>(Comparer);
-                foreach (var pair in argument.Current)
-                    c.Add(pair.Key, func(pair.Value));
-            }
-            return new Derivatives(v, c);
+            if (argument == null)
+                return null;
+            var result = new Dictionary<VariableNode, Node>();
+            foreach (var pair in argument)
+                result.Add(pair.Key, func(pair.Value));
+            return result;
         }
 
-        private IEnumerable<string> Keys(Dictionary<string, Node> left, Dictionary<string, Node> right)
+        /// <summary>
+        /// Combines two arguments together.
+        /// </summary>
+        /// <param name="left">The left argument.</param>
+        /// <param name="right">The right argument.</param>
+        /// <param name="leftOnly">The function called when the left argument is not zero.</param>
+        /// <param name="rightOnly">The function called when the right argument is not zero.</param>
+        /// <param name="both">The function called when both arguments are not zero.</param>
+        /// <returns>The result.</returns>
+        public static Dictionary<VariableNode, Node> Combine(Dictionary<VariableNode, Node> left, Dictionary<VariableNode, Node> right,
+            Func<Node, Node> leftOnly, Func<Node, Node> rightOnly, Func<Node, Node, Node> both = null)
         {
-            if (left != null && right != null)
-                return left.Keys.Union(right.Keys).Distinct(Comparer);
-            else if (left != null)
-                return left.Keys;
-            else if (right != null)
-                return right.Keys;
-            return Enumerable.Empty<string>();
+            // Deal with special cases
+            if (left == null && right == null)
+                return null;
+            else if (right == null)
+                return Apply(left, leftOnly);
+            else if (left == null)
+                return Apply(right, rightOnly);
+
+            // General case
+            var result = new Dictionary<VariableNode, Node>();
+            foreach (var key in left.Keys.Union(right.Keys).Distinct())
+            {
+                var hasL = left.TryGetValue(key, out var valueL);
+                var hasR = right.TryGetValue(key, out var valueR);
+
+                if (hasL && hasR)
+                {
+                    if (both == null)
+                    {
+                        var l = leftOnly(valueL);
+                        var r = rightOnly(valueR);
+                        if (l == null)
+                            result.Add(key, r);
+                        else if (r == null)
+                            result.Add(key, l);
+                        else
+                            result.Add(key, Node.Add(l, r));
+                    }
+                    else
+                        result.Add(key, both(valueL, valueR));
+                }
+                else if (hasL)
+                    result.Add(key, leftOnly(valueL));
+                else if (hasR)
+                    result.Add(key, rightOnly(valueR));
+            }
+            return result;
         }
     }
+
+    /// <summary>
+    /// A function rule that can derive a function.
+    /// </summary>
+    /// <param name="function">The function that needs to be derived.</param>
+    /// <param name="derivedArguments">The derived arguments.</param>
+    /// <returns>The derived function.</returns>
+    public delegate Node FunctionRule(FunctionNode function, IReadOnlyList<Node> derivedArguments);
 }

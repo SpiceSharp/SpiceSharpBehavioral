@@ -19,20 +19,12 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         public string Literal { get; }
 
         /// <summary>
-        /// Gets the properties.
-        /// </summary>
-        /// <value>
-        /// The properties.
-        /// </value>
-        public override NodeProperties Properties => NodeProperties.Constant;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ConstantNode"/> class.
         /// </summary>
         /// <param name="type">The type.</param>
         /// <param name="literal">The literal.</param>
         protected ConstantNode(NodeTypes type, string literal)
-            : base(type)
+            : base(type, NodeProperties.Constant | NodeProperties.Terminal)
         {
             Literal = literal.ThrowIfNull(nameof(literal));
         }

@@ -1,10 +1,8 @@
 ﻿using SpiceSharp.Entities;
-using SpiceSharp.Simulations;
 using SpiceSharpBehavioral.Builders;
-using SpiceSharpBehavioral.Parsers;
-using System;
+using SpiceSharpBehavioral.Parsers.Nodes;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 namespace SpiceSharp.Components.BehavioralComponents
 {
@@ -17,6 +15,7 @@ namespace SpiceSharp.Components.BehavioralComponents
         IParameterized<BaseParameters>
     {
         private readonly string[] _connections;
+        private readonly NodeFinder _nodeFinder = new NodeFinder();
 
         /// <summary>
         /// Gets the parameter set.
@@ -35,19 +34,43 @@ namespace SpiceSharp.Components.BehavioralComponents
         public string Model { get; set; }
 
         /// <summary>
-        /// Gets the number of nodes.
+        /// Gets the voltage nodes.
         /// </summary>
         /// <value>
-        /// The number of nodes.
+        /// The voltage nodes.
         /// </value>
-        public int PinCount => _connections.Length + (_nodes?.Count ?? 0);
+        protected IEnumerable<string> VoltageNodes => _nodeFinder.VoltageNodes(Parameters.Function).Select(n => n.Name);
 
-        private List<string> _nodes
+        /// <summary>
+        /// Gets the current nodes.
+        /// </summary>
+        /// <value>
+        /// The current nodes.
+        /// </value>
+        protected IEnumerable<string> CurrentNodes => _nodeFinder.CurrentNodes(Parameters.Function).Select(n => n.Name);
+
+        /// <summary>
+        /// Gets all variable nodes.
+        /// </summary>
+        /// <value>
+        /// The variable nodes.
+        /// </value>
+        protected IEnumerable<VariableNode> VariableNodes => _nodeFinder.Build(Parameters.Function);
+
+        /// <summary>
+        /// Gets the nodes.
+        /// </summary>
+        /// <value>
+        /// The nodes.
+        /// </value>
+        public IReadOnlyList<string> Nodes
         {
             get
             {
-                var parser = new Parser<List<string>>(new NodeFinder());
-                return parser.Parse(Parameters.LexerFactory(Parameters.Expression));
+                var nodes = new List<string>();
+                nodes.AddRange(_connections);
+                nodes.AddRange(VoltageNodes);
+                return nodes.AsReadOnly();
             }
         }
 
@@ -60,21 +83,6 @@ namespace SpiceSharp.Components.BehavioralComponents
             : base(name)
         {
             _connections = new string[basePinCount];
-        }
-
-        /// <summary>
-        /// Gets the behavioral description.
-        /// </summary>
-        /// <param name="simulation">The simulation.</param>
-        /// <returns>
-        /// The functions for evaluating the behavioral component.
-        /// </returns>
-        protected Derivatives<Func<double>> GetDescription(ISimulation simulation)
-        {
-            var parser = Parameters.ParserFactory();
-            var lexer = Parameters.LexerFactory(Parameters.Expression);
-            parser.Simulation = simulation.ThrowIfNull(nameof(simulation));
-            return parser.Parse(lexer);
         }
 
         /// <summary>
@@ -94,44 +102,6 @@ namespace SpiceSharp.Components.BehavioralComponents
                 _connections[i] = nodes[i];
             }
             return this;
-        }
-
-        /// <summary>
-        /// Gets the node name by pin index.
-        /// </summary>
-        /// <param name="index">The pin index.</param>
-        /// <returns>
-        /// The node index.
-        /// </returns>
-        public string GetNode(int index)
-        {
-            if (index < 0)
-                throw new ArgumentOutOfRangeException(nameof(index));
-            if (index < 2)
-                return _connections[index];
-            index -= 2;
-
-            // We'll have to find the node inside our expression
-            return _nodes[index];
-        }
-
-        /// <summary>
-        /// Maps the nodes
-        /// </summary>
-        /// <param name="variables"></param>
-        /// <returns></returns>
-        public IReadOnlyList<Variable> MapNodes(IVariableSet variables)
-        {
-            variables.ThrowIfNull(nameof(variables));
-            var nodes = new List<string>(_connections);
-
-            // Parse the expression to find other nodes
-            if (_nodes != null)
-                nodes.AddRange(_nodes);
-            var result = new Variable[nodes.Count];
-            for (var i = 0; i < nodes.Count; i++)
-                result[i] = variables.MapNode(nodes[i], VariableType.Voltage);
-            return result;
         }
     }
 }

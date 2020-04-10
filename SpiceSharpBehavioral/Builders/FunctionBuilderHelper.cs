@@ -14,6 +14,7 @@ namespace SpiceSharpBehavioral.Builders
     public static class FunctionBuilderHelper
     {
         private static readonly MethodInfo
+            _safeDiv = ((Func<double, double, double, double>)Functions.SafeDivide).GetMethodInfo(),
             _sgn = ((Func<double, int>)Math.Sign).GetMethodInfo(),
             _round = ((Func<double, int, double>)Math.Round).GetMethodInfo(),
             _pwl = ((Func<double, Point[], double>)Functions.Pwl).GetMethodInfo();
@@ -73,51 +74,74 @@ namespace SpiceSharpBehavioral.Builders
         }
 
         // No-argument functions
-        private static void Random(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments)
+        private static void Random(ILState ils, IReadOnlyList<Node> arguments)
         {
             Random rnd = new Random();
-            fbi.Call(rnd.NextDouble);
+            ils.Call(rnd.NextDouble);
         }
 
         // One-argument functions
-        private static void Zero(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) => fbi.Push(0.0);
-        private static void Abs(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) => fbi.Call(Math.Abs, arguments);
-        private static void Sgn(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) { fbi.Call(null, _sgn, arguments.Check(1)); fbi.Generator.Emit(OpCodes.Conv_R8); }
-        private static void Sqrt(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) => fbi.Call(Functions.Sqrt, arguments);
-        private static void URamp(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) => fbi.Call(Functions.Ramp, arguments);
-        private static void U(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) => fbi.Call(Functions.Step, arguments);
-        private static void U2(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) => fbi.Call(Functions.Step2, arguments);
-        private static void Sin(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) => fbi.Call(Math.Sin, arguments);
-        private static void Cos(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) => fbi.Call(Math.Cos, arguments);
-        private static void Tan(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) => fbi.Call(Math.Tan, arguments);
-        private static void Asin(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) => fbi.Call(Math.Asin, arguments);
-        private static void Acos(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) => fbi.Call(Math.Acos, arguments);
-        private static void Atan(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) => fbi.Call(Math.Atan, arguments);
-        private static void Sinh(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) => fbi.Call(Math.Sinh, arguments);
-        private static void Cosh(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) => fbi.Call(Math.Cosh, arguments);
-        private static void Tanh(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) => fbi.Call(Math.Tanh, arguments);
-        private static void Ceil(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) => fbi.Call(Math.Ceiling, arguments);
-        private static void Floor(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) => fbi.Call(Math.Floor, arguments);
-        private static void Exp(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) => fbi.Call(Math.Exp, arguments);
-        private static void Log(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) => fbi.Call(Functions.Log, arguments);
-        private static void Log10(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) => fbi.Call(Functions.Log10, arguments);
-        private static void Square(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) { fbi.Push(arguments.Check(1)[0]); fbi.Generator.Emit(OpCodes.Dup); fbi.Generator.Emit(OpCodes.Mul); }
-        private static void Nint(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) { fbi.Push(arguments.Check(1)[0]); fbi.Push(0); fbi.Generator.Emit(OpCodes.Call, _round); }
+        private static void Zero(ILState ils, IReadOnlyList<Node> arguments) => ils.Push(0.0);
+        private static void Abs(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Abs, arguments);
+        private static void Sgn(ILState ils, IReadOnlyList<Node> arguments) { ils.Call(null, _sgn, arguments.Check(1)); ils.Generator.Emit(OpCodes.Conv_R8); }
+        private static void Sqrt(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Sqrt, arguments);
+        private static void DSqrt0(ILState ils, IReadOnlyList<Node> arguments)
+        {
+            ils.Push(0.5);
+            ils.Call(Functions.Sqrt, arguments);
+            ils.Push(ils.Builder.FudgeFactor);
+            ils.Generator.Emit(OpCodes.Call, _safeDiv);
+        }
+        private static void URamp(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Ramp, arguments);
+        private static void U(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Step, arguments);
+        private static void U2(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Step2, arguments);
+        private static void Sin(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Sin, arguments);
+        private static void Cos(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Cos, arguments);
+        private static void Tan(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Tan, arguments);
+        private static void Asin(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Asin, arguments);
+        private static void Acos(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Acos, arguments);
+        private static void Atan(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Atan, arguments);
+        private static void Sinh(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Sinh, arguments);
+        private static void Cosh(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Cosh, arguments);
+        private static void Tanh(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Tanh, arguments);
+        private static void Ceil(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Ceiling, arguments);
+        private static void Floor(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Floor, arguments);
+        private static void Exp(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Exp, arguments);
+        private static void Log(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Log, arguments);
+        private static void Log10(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Log10, arguments);
+        private static void Square(ILState ils, IReadOnlyList<Node> arguments) { ils.Push(arguments.Check(1)[0]); ils.Generator.Emit(OpCodes.Dup); ils.Generator.Emit(OpCodes.Mul); }
+        private static void Nint(ILState ils, IReadOnlyList<Node> arguments) { ils.Push(arguments.Check(1)[0]); ils.Push(0); ils.Generator.Emit(OpCodes.Call, _round); }
 
         // Two-argument functions
-        private static void Pwr(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) => fbi.Call(Functions.Power2, arguments);
-        private static void Min(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) => fbi.Call(Math.Min, arguments);
-        private static void Max(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) => fbi.Call(Math.Max, arguments);
-        private static void Round(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments) 
+        private static void Pwr(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Power2, arguments);
+        private static void DPwr0(ILState ils, IReadOnlyList<Node> arguments)
+        {
+            arguments.Check(2);
+            ils.Push(Node.Multiply(
+                arguments[1],
+                Node.Function("pwr", new[] { arguments[0], Node.Subtract(arguments[1], Node.Constant("1")) })
+                ));
+        }
+        private static void DPwr1(ILState ils, IReadOnlyList<Node> arguments)
+        {
+            arguments.Check(2);
+            ils.Push(Node.Multiply(
+                Node.Function("pwr", new[] { arguments[0], arguments[1] }),
+                Node.Function("log", new[] { arguments[0] })
+                ));
+        }
+        private static void Min(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Min, arguments);
+        private static void Max(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Max, arguments);
+        private static void Round(ILState ils, IReadOnlyList<Node> arguments) 
         { 
-            fbi.Push(arguments.Check(2)[0]); 
-            fbi.Push(arguments[1]); 
-            fbi.Generator.Emit(OpCodes.Conv_I4); 
-            fbi.Generator.Emit(OpCodes.Call, _round); 
+            ils.Push(arguments.Check(2)[0]); 
+            ils.Push(arguments[1]); 
+            ils.Generator.Emit(OpCodes.Conv_I4); 
+            ils.Generator.Emit(OpCodes.Call, _round); 
         }
 
         // N-argument functions
-        private static void Pwl(FunctionBuilderInstance fbi, IReadOnlyList<Node> arguments)
+        private static void Pwl(ILState ils, IReadOnlyList<Node> arguments)
         {
             if (arguments.Count < 3)
                 throw new ArgumentMismatchException(3, arguments.Count);
@@ -125,20 +149,20 @@ namespace SpiceSharpBehavioral.Builders
             if (arguments.Count % 2 == 0)
                 throw new ArgumentMismatchException(points * 2 + 1, arguments.Count);
 
-            var il = fbi.Generator;
+            var il = ils.Generator;
 
             // Create our array
-            fbi.Push(arguments[0]);
-            fbi.Push(points);
+            ils.Push(arguments[0]);
+            ils.Push(points);
             il.Emit(OpCodes.Newarr, typeof(Point));
             for (var i = 0; i < points; i++)
             {
                 il.Emit(OpCodes.Dup); // Make another reference to the array
-                fbi.Push(i); // Set the index
+                ils.Push(i); // Set the index
 
                 // Create the point
-                fbi.Push(arguments[i * 2 + 1]);
-                fbi.Push(arguments[i * 2 + 2]);
+                ils.Push(arguments[i * 2 + 1]);
+                ils.Push(arguments[i * 2 + 2]);
                 il.Emit(OpCodes.Newobj, _point);
 
                 // Store the element

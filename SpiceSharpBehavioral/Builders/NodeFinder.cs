@@ -1,5 +1,6 @@
 ﻿using SpiceSharpBehavioral.Parsers.Nodes;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SpiceSharpBehavioral.Builders
 {
@@ -7,48 +8,66 @@ namespace SpiceSharpBehavioral.Builders
     /// A builder that evaluates which nodes are in the expression.
     /// </summary>
     /// <seealso cref="IBuilder{T}" />
-    public class NodeFinder : IBuilder<List<string>>
+    public class NodeFinder : IBuilder<IEnumerable<VariableNode>>
     {
         /// <summary>
         /// Builds the specified value from the specified expression node.
         /// </summary>
         /// <param name="expression">The expression node.</param>
         /// <returns>
-        /// The value.
+        /// The variable nodes.
         /// </returns>
-        public List<string> Build(Node expression)
+        public IEnumerable<VariableNode> Build(Node expression)
         {
-            var result = new List<string>(3);
-            Build(result, expression);
-            return result;
+            switch (expression)
+            {
+                case UnaryOperatorNode un:
+                    foreach (var n in Build(un.Argument))
+                        yield return n;
+                    break;
+
+                case BinaryOperatorNode bn:
+                    foreach (var n in Build(bn.Left))
+                        yield return n;
+                    foreach (var n in Build(bn.Right))
+                        yield return n;
+                    break;
+
+                case TernaryOperatorNode tn:
+                    foreach (var n in Build(tn.Condition))
+                        yield return n;
+                    foreach (var n in Build(tn.IfTrue))
+                        yield return n;
+                    foreach (var n in Build(tn.IfFalse))
+                        yield return n;
+                    break;
+
+                case FunctionNode fn:
+                    foreach (var arg in fn.Arguments)
+                    {
+                        foreach (var n in Build(arg))
+                            yield return n;
+                    }
+                    break;
+
+                case VariableNode vn:
+                    yield return vn;
+                    break;
+            }
         }
 
         /// <summary>
-        /// Builds the specified list with nodes.
+        /// Finds all voltage nodes.
         /// </summary>
-        /// <param name="list">The list.</param>
-        /// <param name="node">The node.</param>
-        protected virtual void Build(List<string> list, Node node)
-        {
-            if (node is UnaryOperatorNode un)
-                Build(list, un.Argument);
-            else if (node is BinaryOperatorNode bn)
-            {
-                Build(list, bn.Left);
-                Build(list, bn.Right);
-            }
-            else if (node is TernaryOperatorNode tn)
-            {
-                Build(list, tn.Condition);
-                Build(list, tn.IfTrue);
-                Build(list, tn.IfFalse);
-            }
-            else if (node is VoltageNode vn)
-            {
-                list.Add(vn.Name);
-                if (vn.Reference != null)
-                    list.Add(vn.Reference);
-            }
-        }
+        /// <param name="expression">The expression node.</param>
+        /// <returns>The voltage nodes.</returns>
+        public IEnumerable<VariableNode> VoltageNodes(Node expression) => Build(expression).Where(n => n.NodeType == NodeTypes.Voltage);
+
+        /// <summary>
+        /// Finds all current nodes.
+        /// </summary>
+        /// <param name="expression">The expression.</param>
+        /// <returns>The current nodes.</returns>
+        public IEnumerable<VariableNode> CurrentNodes(Node expression) => Build(expression).Where(n => n.NodeType == NodeTypes.Current);
     }
 }

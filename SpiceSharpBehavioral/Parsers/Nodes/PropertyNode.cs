@@ -8,7 +8,7 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
     /// <seealso cref="Node" />
     public class PropertyNode : Node
     {
-        public static PropertyNode Property(string name, string property, QuantityTypes qtype) => new PropertyNode(name, property, qtype);
+        public static PropertyNode Property(string name, string property) => new PropertyNode(name, property);
 
         /// <summary>
         /// Gets the name of the entity.
@@ -27,25 +27,15 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         public string PropertyName { get; }
 
         /// <summary>
-        /// Gets the type of the quantity.
-        /// </summary>
-        /// <value>
-        /// The type of the quantity.
-        /// </value>
-        public QuantityTypes QuantityType { get; }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="PropertyNode"/> class.
         /// </summary>
         /// <param name="name">The name.</param>
         /// <param name="property">The property.</param>
-        /// <param name="qtype">The quantity type.</param>
-        protected PropertyNode(string name, string property, QuantityTypes qtype)
-            : base(NodeTypes.Property)
+        protected PropertyNode(string name, string property)
+            : base(NodeTypes.Property, NodeProperties.Terminal)
         {
             Name = name.ThrowIfNull(nameof(name));
             PropertyName = property.ThrowIfNull(nameof(property));
-            QuantityType = qtype;
         }
 
         /// <summary>
@@ -54,7 +44,7 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         /// <returns>
         /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
         /// </returns>
-        public override int GetHashCode() => NodeType.GetHashCode() ^ QuantityType.GetHashCode() ^ Name.GetHashCode() ^ (PropertyName.GetHashCode() * 13);
+        public override int GetHashCode() => NodeType.GetHashCode() ^ Name.GetHashCode() ^ (PropertyName.GetHashCode() * 13);
 
         /// <summary>
         /// Determines whether the specified <see cref="System.Object" />, is equal to this instance.
@@ -69,8 +59,6 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
                 return true;
             if (obj is PropertyNode pn)
             {
-                if (QuantityType != pn.QuantityType)
-                    return false;
                 if (!Name.Equals(pn.Name))
                     return false;
                 if (!PropertyName.Equals(pn.PropertyName))

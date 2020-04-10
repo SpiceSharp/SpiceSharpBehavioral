@@ -21,28 +21,12 @@ namespace SpiceSharpBehavioral.Builders
         public Dictionary<string, Func<double[], double>> FunctionDefinitions { get; set; }
 
         /// <summary>
-        /// Gets or sets the voltages.
-        /// </summary>
-        /// <value>
-        /// The voltages.
-        /// </value>
-        public Dictionary<string, IVariable<double>> Voltages { get; set; }
-
-        /// <summary>
-        /// Gets or sets the currents.
-        /// </summary>
-        /// <value>
-        /// The currents.
-        /// </value>
-        public Dictionary<string, IVariable<double>> Currents { get; set; }
-
-        /// <summary>
-        /// Gets or sets the variables.
+        /// Gets the variables.
         /// </summary>
         /// <value>
         /// The variables.
         /// </value>
-        public Dictionary<string, IVariable<double>> Variables { get; set; }
+        public Dictionary<VariableNode, IVariable<double>> Variables { get; set; }
 
         /// <summary>
         /// Gets or sets the fudge factor.
@@ -122,33 +106,9 @@ namespace SpiceSharpBehavioral.Builders
                 case ConstantNode cn:
                     return Functions.ParseNumber(cn.Literal);
 
-                case VoltageNode vn:
-                    if (vn.QuantityType == QuantityTypes.Raw && Voltages != null)
-                    {
-                        if (Voltages.TryGetValue(vn.Name, out var variable))
-                        {
-                            var result = variable.Value;
-                            if (vn.Reference != null && Voltages.TryGetValue(vn.Reference, out variable))
-                                result -= variable.Value;
-                            return result;
-                        }
-                    }
-                    break;
-
-                case CurrentNode curn:
-                    if (curn.QuantityType == QuantityTypes.Raw && Currents != null)
-                    {
-                        if (Currents.TryGetValue(curn.Name, out var variable))
-                            return variable.Value;
-                    }
-                    break;
-
-                case VariableNode varn:
-                    if (Variables != null)
-                    {
-                        if (Variables.TryGetValue(varn.Name, out var variable))
-                            return variable.Value;
-                    }
+                case VariableNode vn:
+                    if (Variables != null && Variables.TryGetValue(vn, out var variable))
+                        return variable.Value;
                     break;
             }
             return BuildNode(expression);

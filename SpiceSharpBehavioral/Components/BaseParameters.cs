@@ -1,5 +1,6 @@
 ﻿using SpiceSharp.Attributes;
 using SpiceSharpBehavioral.Parsers;
+using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
 
 namespace SpiceSharp.Components.BehavioralComponents
@@ -10,29 +11,66 @@ namespace SpiceSharp.Components.BehavioralComponents
     /// <seealso cref="ParameterSet" />
     public class BaseParameters : ParameterSet
     {
+        private bool _isDirty;
+
         /// <summary>
         /// Gets or sets the expression.
         /// </summary>
         /// <value>
         /// The expression.
         /// </value>
-        [ParameterName("expression"), ParameterName("e"), ParameterInfo("The expression describing the component.")]
-        public string Expression { get; set; }
+        [ParameterName("expression"), ParameterName("e"), ParameterInfo("The expression describing the component")]
+        public string Expression 
+        { 
+            get => _expression;
+            set
+            {
+                if (!ReferenceEquals(_expression, value))
+                    _isDirty = true;
+                _expression = value;
+            }
+        }
+        private string _expression;
 
         /// <summary>
-        /// Gets or sets the parser factory.
+        /// Gets the function.
         /// </summary>
         /// <value>
-        /// The parser factory.
+        /// The function.
         /// </value>
-        public Func<IBehavioralParser> ParserFactory { get; set; } = () => new BehavioralParser();
+        [ParameterName("node"), ParameterInfo("The node that represents the expression")]
+        public Node Function
+        {
+            get
+            {
+                if (_isDirty)
+                {
+                    if (_parseAction == null || _expression == null)
+                        _function = null;
+                    else
+                        _function = _parseAction(_expression);
+                }
+                return _function;
+            }
+        }
+        private Node _function;
 
         /// <summary>
-        /// Gets or sets the lexer factory.
+        /// Gets or sets the parse action.
         /// </summary>
         /// <value>
-        /// The lexer factory.
+        /// The parse action.
         /// </value>
-        public Func<string, ILexer> LexerFactory { get; set; } = expression => new Lexer(expression);
+        public Func<string, Node> ParseAction
+        {
+            get => _parseAction;
+            set
+            {
+                if (_parseAction != value)
+                    _isDirty = true;
+                _parseAction = value;
+            }
+        }
+        private Func<string, Node> _parseAction = e => new Parser().Parse(e);
     }
 }

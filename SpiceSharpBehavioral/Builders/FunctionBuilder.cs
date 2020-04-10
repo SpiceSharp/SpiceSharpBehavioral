@@ -9,7 +9,7 @@ namespace SpiceSharpBehavioral.Builders
     /// A function builder.
     /// </summary>
     /// <seealso cref="IBuilder{T}" />
-    public class FunctionBuilder : IBuilder<Func<double>>
+    public partial class FunctionBuilder : IBuilder<Func<double>>
     {
         /// <summary>
         /// Gets or sets the fudge factor.
@@ -44,28 +44,12 @@ namespace SpiceSharpBehavioral.Builders
         public Dictionary<string, ApplyFunction> FunctionDefinitions { get; set; }
 
         /// <summary>
-        /// Gets or sets the voltages.
-        /// </summary>
-        /// <value>
-        /// The voltages.
-        /// </value>
-        public Dictionary<string, IVariable<double>> Voltages { get; set; }
-
-        /// <summary>
-        /// Gets or sets the currents.
-        /// </summary>
-        /// <value>
-        /// The currents.
-        /// </value>
-        public Dictionary<string, IVariable<double>> Currents { get; set; }
-
-        /// <summary>
         /// Gets or sets the variables.
         /// </summary>
         /// <value>
         /// The variables.
         /// </value>
-        public Dictionary<string, IVariable<double>> Variables { get; set; }
+        public Dictionary<VariableNode, IVariable<double>> Variables { get; set; }
 
         /// <summary>
         /// Builds the specified value from the specified expression node.
@@ -77,19 +61,16 @@ namespace SpiceSharpBehavioral.Builders
         public Func<double> Build(Node expression)
         {
             // Create a new instance that will be used to build the function
-            var instance = new FunctionBuilderInstance()
-            {
-                FunctionDefinitions = FunctionDefinitions,
-                RelativeTolerance = RelativeTolerance,
-                AbsoluteTolerance = AbsoluteTolerance,
-                FudgeFactor = FudgeFactor,
-                Variables = Variables,
-                Voltages = Voltages,
-                Currents = Currents
-            };
-
+            var instance = new ILState(this);
             instance.Push(expression);
             return instance.CreateFunction();
         }
     }
+
+    /// <summary>
+    /// A delegate for applying a function.
+    /// </summary>
+    /// <param name="state">The state.</param>
+    /// <param name="arguments">The arguments.</param>
+    public delegate void ApplyFunction(ILState state, IReadOnlyList<Node> arguments);
 }

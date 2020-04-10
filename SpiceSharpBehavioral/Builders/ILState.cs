@@ -1,5 +1,4 @@
 ﻿using SpiceSharp;
-using SpiceSharp.Simulations;
 using SpiceSharpBehavioral.Diagnostics;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
@@ -12,7 +11,7 @@ namespace SpiceSharpBehavioral.Builders
     /// <summary>
     /// An instance for building functions.
     /// </summary>
-    public class FunctionBuilderInstance
+    public class ILState
     {
         private static readonly MethodInfo _safeDiv = ((Func<double, double, double, double>)Functions.SafeDivide).GetMethodInfo();
         private static readonly MethodInfo _power = ((Func<double, double, double>)Functions.Power).GetMethodInfo();
@@ -24,6 +23,14 @@ namespace SpiceSharpBehavioral.Builders
         private readonly Dictionary<object, int> _referenceMap = new Dictionary<object, int>();
 
         /// <summary>
+        /// Gets the builder.
+        /// </summary>
+        /// <value>
+        /// The builder.
+        /// </value>
+        public FunctionBuilder Builder { get; }
+
+        /// <summary>
         /// Gets the IL generator.
         /// </summary>
         /// <value>
@@ -32,66 +39,11 @@ namespace SpiceSharpBehavioral.Builders
         public ILGenerator Generator { get; private set; }
 
         /// <summary>
-        /// Gets or sets the fudge factor.
+        /// Initializes a new instance of the <see cref="ILState"/> class.
         /// </summary>
-        /// <value>
-        /// The fudge factor.
-        /// </value>
-        public double FudgeFactor { get; set; } = 1e-20;
-
-        /// <summary>
-        /// Gets or sets the relative tolerance.
-        /// </summary>
-        /// <value>
-        /// The relative tolerance.
-        /// </value>
-        public double RelativeTolerance { get; set; } = 1e-6;
-
-        /// <summary>
-        /// Gets or sets the absolute tolerance.
-        /// </summary>
-        /// <value>
-        /// The absolute tolerance.
-        /// </value>
-        public double AbsoluteTolerance { get; set; } = 1e-12;
-
-        /// <summary>
-        /// Gets the function definitions.
-        /// </summary>
-        /// <value>
-        /// The function definitions.
-        /// </value>
-        public Dictionary<string, ApplyFunction> FunctionDefinitions { get; set; }
-
-        /// <summary>
-        /// Gets or sets the voltages.
-        /// </summary>
-        /// <value>
-        /// The voltages.
-        /// </value>
-        public Dictionary<string, IVariable<double>> Voltages { get; set; }
-
-        /// <summary>
-        /// Gets or sets the currents.
-        /// </summary>
-        /// <value>
-        /// The currents.
-        /// </value>
-        public Dictionary<string, IVariable<double>> Currents { get; set; }
-
-        /// <summary>
-        /// Gets or sets the variables.
-        /// </summary>
-        /// <value>
-        /// The variables.
-        /// </value>
-        public Dictionary<string, IVariable<double>> Variables { get; set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FunctionBuilderInstance"/> class.
-        /// </summary>
-        public FunctionBuilderInstance()
+        public ILState(FunctionBuilder parent)
         {
+            Builder = parent.ThrowIfNull(nameof(parent));
             _method = new DynamicMethod("function", typeof(double), new[] { typeof(object[]) });
             Generator = _method.GetILGenerator();
         }
@@ -105,16 +57,14 @@ namespace SpiceSharpBehavioral.Builders
             Generator.Emit(OpCodes.Ret);
             if (_referenceMap.Count > 0)
             {
-                // Create the context - which is an array
+                // Create a context - which is just an array of objects
                 var context = new object[_referenceMap.Count];
                 foreach (var pair in _referenceMap)
                     context[pair.Value] = pair.Key;
                 return (Func<double>)_method.CreateDelegate(typeof(Func<double>), context);
             }
             else
-            {
                 return (Func<double>)_method.CreateDelegate(typeof(Func<double>));
-            }
         }
 
         /// <summary>
@@ -135,21 +85,21 @@ namespace SpiceSharpBehavioral.Builders
                         case NodeTypes.Add: Generator.Emit(OpCodes.Add); return;
                         case NodeTypes.Subtract: Generator.Emit(OpCodes.Sub); return;
                         case NodeTypes.Multiply: Generator.Emit(OpCodes.Mul); return;
-                        case NodeTypes.Divide: Generator.Emit(OpCodes.Ldc_R8, FudgeFactor); Generator.Emit(OpCodes.Call, _safeDiv); return;
+                        case NodeTypes.Divide: Generator.Emit(OpCodes.Ldc_R8, Builder.FudgeFactor); Generator.Emit(OpCodes.Call, _safeDiv); return;
                         case NodeTypes.Modulo: Generator.Emit(OpCodes.Rem); return;
                         case NodeTypes.GreaterThan: PushCheck(OpCodes.Bgt_S); return;
                         case NodeTypes.LessThan: PushCheck(OpCodes.Blt_S); return;
                         case NodeTypes.GreaterThanOrEqual: PushCheck(OpCodes.Bge_S); return;
                         case NodeTypes.LessThanOrEqual: PushCheck(OpCodes.Ble_S); return;
                         case NodeTypes.Equals:
-                            Generator.Emit(OpCodes.Ldc_R8, RelativeTolerance);
-                            Generator.Emit(OpCodes.Ldc_R8, AbsoluteTolerance);
+                            Generator.Emit(OpCodes.Ldc_R8, Builder.RelativeTolerance);
+                            Generator.Emit(OpCodes.Ldc_R8, Builder.AbsoluteTolerance);
                             Generator.Emit(OpCodes.Call, _equals);
                             PushCheck(OpCodes.Brtrue_S);
                             return;
                         case NodeTypes.NotEquals:
-                            Generator.Emit(OpCodes.Ldc_R8, RelativeTolerance);
-                            Generator.Emit(OpCodes.Ldc_R8, AbsoluteTolerance);
+                            Generator.Emit(OpCodes.Ldc_R8, Builder.RelativeTolerance);
+                            Generator.Emit(OpCodes.Ldc_R8, Builder.AbsoluteTolerance);
                             Generator.Emit(OpCodes.Call, _equals);
                             PushCheck(OpCodes.Brfalse_S);
                             return;
@@ -171,7 +121,7 @@ namespace SpiceSharpBehavioral.Builders
                     break;
 
                 case FunctionNode fn:
-                    if (FunctionDefinitions != null && FunctionDefinitions.TryGetValue(fn.Name, out var definition))
+                    if (Builder.FunctionDefinitions != null && Builder.FunctionDefinitions.TryGetValue(fn.Name, out var definition))
                     {
                         definition.ThrowIfNull(nameof(definition));
                         definition.Invoke(this, fn.Arguments);
@@ -179,32 +129,8 @@ namespace SpiceSharpBehavioral.Builders
                     }
                     break;
 
-                case VoltageNode vn:
-                    if (Voltages != null && Voltages.TryGetValue(vn.Name, out var variable))
-                    {
-                        if (vn.Reference == null)
-                        {
-                            Call(() => variable.Value);
-                            return;
-                        }
-                        else if (Voltages.TryGetValue(vn.Reference, out var refVariable))
-                        {
-                            Call(() => variable.Value - refVariable.Value);
-                            return;
-                        }
-                    }
-                    break;
-
-                case CurrentNode curn:
-                    if (Currents != null && Currents.TryGetValue(curn.Name, out variable))
-                    {
-                        Call(() => variable.Value);
-                        return;
-                    }
-                    break;
-
-                case VariableNode varn:
-                    if (Variables != null && Variables.TryGetValue(varn.Name, out variable))
+                case VariableNode vn:
+                    if (Builder.Variables != null && Builder.Variables.TryGetValue(vn, out var variable))
                     {
                         Call(() => variable.Value);
                         return;
@@ -347,11 +273,4 @@ namespace SpiceSharpBehavioral.Builders
                 Call(function, _invoke2, args);
         }
     }
-
-    /// <summary>
-    /// A delegate for applying functions.
-    /// </summary>
-    /// <param name="instance">The instance generating the function.</param>
-    /// <param name="arguments">The arguments.</param>
-    public delegate void ApplyFunction(FunctionBuilderInstance instance, IReadOnlyList<Node> arguments);
 }

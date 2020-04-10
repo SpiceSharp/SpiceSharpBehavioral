@@ -29,9 +29,9 @@ namespace SpiceSharpBehavioralTests.Parsers
                     yield return new TestCaseData("5+--3", Node.Add(Node.Constant("5"), Node.Minus(Node.Minus(Node.Constant("3"))))); // Right-associative unary operator
                     yield return new TestCaseData("3^2", Node.Power(Node.Constant("3"), Node.Constant("2"))); // Power
                     yield return new TestCaseData("2*(3+4)*5", Node.Multiply(Node.Multiply(Node.Constant("2"), Node.Add(Node.Constant("3"), Node.Constant("4"))), Node.Constant("5"))); // Parenthesis
-                    yield return new TestCaseData("abs(-2*6+7)", Node.Function("abs", new[] { Node.Add(Node.Multiply(Node.Minus(Node.Constant("2")), Node.Constant("6")), Node.Constant("7")) })); // Function
-                    yield return new TestCaseData("min(-2,6*2)", Node.Function("min", new[] { Node.Minus(Node.Constant("2")), Node.Multiply(Node.Constant("6"), Node.Constant("2")) })); // Function with multiple arguments
-                    yield return new TestCaseData("rnd()", Node.Function("rnd", new Node[0])); // Function without arguments
+                    yield return new TestCaseData("abs(-2*6+7)", Node.Function("abs", Node.Add(Node.Multiply(Node.Minus(Node.Constant("2")), Node.Constant("6")), Node.Constant("7")))); // Function
+                    yield return new TestCaseData("min(-2,6*2)", Node.Function("min", Node.Minus(Node.Constant("2")), Node.Multiply(Node.Constant("6"), Node.Constant("2")))); // Function with multiple arguments
+                    yield return new TestCaseData("rnd()", Node.Function("rnd")); // Function without arguments
                 }
             }
         }
