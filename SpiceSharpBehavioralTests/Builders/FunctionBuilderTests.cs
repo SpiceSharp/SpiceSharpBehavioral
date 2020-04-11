@@ -42,12 +42,12 @@ namespace SpiceSharpBehavioralTests.Builders
         public void When_FunctionCall_Expect_Reference()
         {
             var builder = new FunctionBuilder();
-            var func1 = builder.Build(Node.Add(Node.Constant("1"), Node.Constant("2")));
+            var func1 = builder.Build(Node.Add(1.0, 2.0));
             builder.FunctionDefinitions = new Dictionary<string, ApplyFunction>
             {
                 { "f", (fbi, args) => fbi.Call(func1.Invoke) }
             };
-            var func = builder.Build(Node.Multiply(Node.Function("f", new Node[0]), Node.Constant("2")));
+            var func = builder.Build(Node.Function("f") * 2.0);
             Assert.AreEqual(6.0, func(), 1e-20);
         }
 
@@ -59,7 +59,7 @@ namespace SpiceSharpBehavioralTests.Builders
             builder.Variables = new Dictionary<VariableNode, IVariable<double>> { { VariableNode.Variable("a"), variable } };
 
             variable.Value = 2.0;
-            Assert.AreEqual(5.0, builder.Build(Node.Add(Node.Variable("a"), Node.Constant("3"))).Invoke(), 1e-20);
+            Assert.AreEqual(5.0, builder.Build(Node.Variable("a") + 3.0).Invoke(), 1e-20);
         }
 
     }

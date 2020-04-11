@@ -1,5 +1,4 @@
-﻿using SpiceSharp;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace SpiceSharpBehavioral.Parsers.Nodes
@@ -15,17 +14,17 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         /// <summary>
         /// A constant that represents zero. Can be used for simplifications.
         /// </summary>
-        public static readonly Node Zero = Constant("0");
+        public static readonly Node Zero = Constant(0);
 
         /// <summary>
         /// A constant that represents one. Can be used for simplifications.
         /// </summary>
-        public static readonly Node One = Constant("1");
+        public static readonly Node One = Constant(1);
 
         /// <summary>
         /// A constant that represents two. Can be used for simplifications.
         /// </summary>
-        public static readonly Node Two = Constant("2");
+        public static readonly Node Two = Constant(2);
         
         public static BinaryOperatorNode Add(Node left, Node right) => BinaryOperatorNode.Add(left, right);
         public static BinaryOperatorNode Subtract(Node left, Node right) => BinaryOperatorNode.Subtract(left, right);
@@ -52,7 +51,7 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         public static FunctionNode Function(string name, IReadOnlyList<Node> arguments) => FunctionNode.Function(name, arguments);
         public static FunctionNode Function(string name, params Node[] arguments) => FunctionNode.Function(name, arguments);
         public static VariableNode Variable(string name) => VariableNode.Variable(name);
-        public static ConstantNode Constant(string name) => ConstantNode.Constant(name);
+        public static ConstantNode Constant(double literal) => ConstantNode.Constant(literal);
 
         /// <summary>
         /// Gets the type of the node.
@@ -189,5 +188,14 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         /// The result of the operator.
         /// </returns>
         public static Node operator -(Node arg) => arg == null ? null : Minus(arg);
+
+        /// <summary>
+        /// Performs an implicit conversion from <see cref="System.Double"/> to <see cref="Node"/>.
+        /// </summary>
+        /// <param name="literal">The literal.</param>
+        /// <returns>
+        /// The result of the conversion.
+        /// </returns>
+        public static implicit operator Node(double literal) => Constant(literal);
     }
 }

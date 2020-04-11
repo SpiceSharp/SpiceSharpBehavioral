@@ -8,7 +8,7 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
     /// <summary>
     /// A class that can derive an expression node tree.
     /// </summary>
-    public class Deriver
+    public class Derivatives
     {
         /// <summary>
         /// Gets the map.
@@ -24,23 +24,23 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         /// <value>
         /// The derivative definitions.
         /// </value>
-        public Dictionary<string, FunctionRule> FunctionRules { get; set; } = DeriverHelper.Defaults;
+        public Dictionary<string, FunctionRule> FunctionRules { get; set; } = DerivativesHelper.Defaults;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Deriver"/> class.
+        /// Initializes a new instance of the <see cref="Derivatives"/> class.
         /// </summary>
         /// <param name="variables">The variables to which the derivative should be computed.</param>
-        public Deriver(IEnumerable<VariableNode> variables)
+        public Derivatives(IEnumerable<VariableNode> variables)
         {
             foreach (var variable in variables)
                 Variables.Add(variable);
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Deriver"/> class.
+        /// Initializes a new instance of the <see cref="Derivatives"/> class.
         /// </summary>
         /// <param name="variables">The variables.</param>
-        public Deriver(params VariableNode[] variables)
+        public Derivatives(params VariableNode[] variables)
             : this((IEnumerable<VariableNode>)variables)
         {
         }

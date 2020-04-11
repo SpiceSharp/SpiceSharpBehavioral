@@ -33,7 +33,7 @@ namespace SpiceSharpBehavioralTests.Builders
             builder.Variables = new Dictionary<VariableNode, IVariable<double>> { { VariableNode.Variable("a"), variable } };
 
             variable.Value = 2.0;
-            Assert.AreEqual(5.0, builder.Build(Node.Add(Node.Variable("a"), Node.Constant("3"))), 1e-20);
+            Assert.AreEqual(5.0, builder.Build(Node.Add(Node.Variable("a"), 3.0)), 1e-20);
         }
     }
 }

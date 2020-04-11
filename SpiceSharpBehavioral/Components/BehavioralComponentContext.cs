@@ -53,7 +53,7 @@ namespace SpiceSharp.Components.BehavioralComponents
             foreach (var variable in varr.Where(vn => vn.NodeType == NodeTypes.Current))
                 Branches.Add(variable, simulation.EntityBehaviors[variable.Name]);
             var p = component.GetParameterSet<BaseParameters>();
-            var deriver = new Deriver(varr);
+            var deriver = new Derivatives(varr);
             Derivatives = deriver.Derive(p.Function) ?? new Dictionary<VariableNode, Node>();
         }
     }

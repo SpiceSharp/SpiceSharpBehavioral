@@ -1,4 +1,6 @@
 ﻿using SpiceSharp;
+using SpiceSharpBehavioral.Builders;
+using System;
 
 namespace SpiceSharpBehavioral.Parsers.Nodes
 {
@@ -6,9 +8,25 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
     /// A constant node.
     /// </summary>
     /// <seealso cref="Node" />
-    public class ConstantNode : Node
+    public class ConstantNode : Node, IFormattable
     {
-        public static ConstantNode Constant(string literal) => new ConstantNode(NodeTypes.Constant, literal);
+        public static ConstantNode Constant(double literal) => new ConstantNode(literal);
+
+        /// <summary>
+        /// Gets or sets the relative tolerance.
+        /// </summary>
+        /// <value>
+        /// The relative tolerance.
+        /// </value>
+        public static double RelativeTolerance { get; set; } = 1e-6;
+
+        /// <summary>
+        /// Gets or sets the absolute tolerance.
+        /// </summary>
+        /// <value>
+        /// The absolute tolerance.
+        /// </value>
+        public static double AbsoluteTolerance { get; set; } = 1e-12;
 
         /// <summary>
         /// Gets the literal.
@@ -16,17 +34,16 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         /// <value>
         /// The literal.
         /// </value>
-        public string Literal { get; }
+        public double Literal { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConstantNode"/> class.
         /// </summary>
-        /// <param name="type">The type.</param>
         /// <param name="literal">The literal.</param>
-        protected ConstantNode(NodeTypes type, string literal)
-            : base(type, NodeProperties.Constant | NodeProperties.Terminal)
+        protected ConstantNode(double literal)
+            : base(NodeTypes.Constant, NodeProperties.Constant | NodeProperties.Terminal)
         {
-            Literal = literal.ThrowIfNull(nameof(literal));
+            Literal = literal;
         }
 
         /// <summary>
@@ -50,7 +67,7 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
                 return true;
             if (obj is ConstantNode cn)
             {
-                if (!Literal.Equals(cn.Literal))
+                if (!Functions.Equals(Literal, cn.Literal, RelativeTolerance, AbsoluteTolerance))
                     return false;
                 return true;
             }
@@ -63,6 +80,16 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         /// <returns>
         /// A <see cref="System.String" /> that represents this instance.
         /// </returns>
-        public override string ToString() => Literal;
+        public override string ToString() => Literal.ToString();
+
+        /// <summary>
+        /// Converts to string.
+        /// </summary>
+        /// <param name="format">The format.</param>
+        /// <param name="provider">The provider.</param>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
+        public string ToString(string format, IFormatProvider provider) => Literal.ToString(format, provider);
     }
 }

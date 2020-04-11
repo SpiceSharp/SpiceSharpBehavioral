@@ -228,7 +228,7 @@ namespace SpiceSharpBehavioral.Parsers
 
                 // A number
                 case TokenType.Number:
-                    result = Node.Constant(lexer.Content);
+                    result = Node.Constant(SpiceHelper.ParseNumber(lexer.Content));
                     lexer.ReadToken();
                     break;
 

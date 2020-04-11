@@ -104,7 +104,7 @@ namespace SpiceSharpBehavioral.Builders
                     break;
 
                 case ConstantNode cn:
-                    return Functions.ParseNumber(cn.Literal);
+                    return cn.Literal;
 
                 case VariableNode vn:
                     if (Variables != null && Variables.TryGetValue(vn, out var variable))
