@@ -67,28 +67,24 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
             var df = context.Derivatives;
 
             // TODO: Take this from parameters
-            var builder = new FunctionBuilder
-            {
-                Variables = new Dictionary<VariableNode, IVariable<double>>(),
-                FunctionDefinitions = FunctionBuilderHelper.Defaults
-            };
-
+            var variables = new Dictionary<VariableNode, IVariable<double>>();
             foreach (var pair in df)
             {
                 switch (pair.Key.NodeType)
                 {
-                    case NodeTypes.Voltage: builder.Variables.Add(pair.Key, state.GetSharedVariable(pair.Key.Name)); break;
+                    case NodeTypes.Voltage: variables.Add(pair.Key, state.GetSharedVariable(pair.Key.Name)); break;
                     case NodeTypes.Current:
                         var container = context.Branches[pair.Key];
                         if (container == context.Behaviors)
-                            builder.Variables.Add(pair.Key, _branch);
+                            variables.Add(pair.Key, _branch);
                         else
-                            builder.Variables.Add(pair.Key, container.GetValue<IBranchedBehavior<double>>().Branch);
+                            variables.Add(pair.Key, container.GetValue<IBranchedBehavior<double>>().Branch);
                         break;
                     default:
                         throw new Exception("Invalid variable");
                 }
             }
+            var builder = bp.BuilderFactory(variables);
 
             // Let's build the derivative functions and get their matrix locations/rhs locations
             _value = builder.Build(bp.Function);
@@ -98,7 +94,7 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
             int index = 0;
             foreach (var pair in df)
             {
-                var variable = builder.Variables[pair.Key];
+                var variable = variables[pair.Key];
                 var func = builder.Build(pair.Value);
                 Functions[index] = Tuple.Create(pair.Key, variable, func);
                 matLocs[index] = new MatrixLocation(rhsLocs, state.Map[variable]);

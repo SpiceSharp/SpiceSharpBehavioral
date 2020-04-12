@@ -62,22 +62,18 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
             var df = context.Derivatives;
 
             // TODO: Take this from parameters
-            var builder = new FunctionBuilder
-            {
-                Variables = new Dictionary<VariableNode, IVariable<double>>(),
-                FunctionDefinitions = FunctionBuilderHelper.Defaults
-            };
-
+            var variables = new Dictionary<VariableNode, IVariable<double>>();
             foreach (var pair in df)
             {
                 switch (pair.Key.NodeType)
                 {
-                    case NodeTypes.Voltage: builder.Variables.Add(pair.Key, state.GetSharedVariable(pair.Key.Name)); break;
-                    case NodeTypes.Current: builder.Variables.Add(pair.Key, context.Branches[pair.Key].GetValue<IBranchedBehavior<double>>().Branch); break;
+                    case NodeTypes.Voltage: variables.Add(pair.Key, state.GetSharedVariable(pair.Key.Name)); break;
+                    case NodeTypes.Current: variables.Add(pair.Key, context.Branches[pair.Key].GetValue<IBranchedBehavior<double>>().Branch); break;
                     default:
                         throw new Exception("Invalid variable");
                 }
             }
+            var builder = bp.BuilderFactory(variables);
 
             // Let's build the derivative functions and get their matrix locations/rhs locations
             _value = builder.Build(bp.Function);
@@ -87,7 +83,7 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
             int index = 0;
             foreach (var pair in df)
             {
-                var variable = builder.Variables[pair.Key];
+                var variable = variables[pair.Key];
                 var func = builder.Build(pair.Value);
                 Functions[index] = Tuple.Create(pair.Key, variable, func);
                 matLocs[index * 2] = new MatrixLocation(rhsLocs[0], state.Map[variable]);

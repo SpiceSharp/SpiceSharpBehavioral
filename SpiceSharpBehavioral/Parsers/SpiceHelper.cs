@@ -1,5 +1,6 @@
 ﻿using SpiceSharp;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SpiceSharpBehavioral.Parsers
 {
@@ -124,5 +125,74 @@ namespace SpiceSharpBehavioral.Parsers
             }
             return value;
         }
+
+        /// <summary>
+        /// Femto-...
+        /// </summary>
+        /// <param name="value">The value in femto-...</param>
+        /// <returns>The value.</returns>
+        [SuppressMessage("Microsoft.Design", "IDE1006", Justification = "This is to Spice notation.")]
+        public static double f(this double value) => value * 1e-15;
+
+        /// <summary>
+        /// Pico-...
+        /// </summary>
+        /// <param name="value">The value in pico-...</param>
+        /// <returns>The value.</returns>
+        [SuppressMessage("Microsoft.Design", "IDE1006", Justification = "This is to Spice notation.")]
+        public static double p(this double value) => value * 1e-12;
+
+        /// <summary>
+        /// Nano-...
+        /// </summary>
+        /// <param name="value">The value in nano-...</param>
+        /// <returns>The value.</returns>
+        [SuppressMessage("Microsoft.Design", "IDE1006", Justification = "This is to Spice notation.")]
+        public static double n(this double value) => value * 1e-9;
+
+        /// <summary>
+        /// Micro-...
+        /// </summary>
+        /// <param name="value">The value in micro-....</param>
+        /// <returns>The value.</returns>
+        [SuppressMessage("Microsoft.Design", "IDE1006", Justification = "This is to Spice notation.")]
+        public static double u(this double value) => value * 1e-6;
+
+        /// <summary>
+        /// Milli-...
+        /// </summary>
+        /// <param name="value">The value in milli-....</param>
+        /// <returns>The value.</returns>
+        [SuppressMessage("Microsoft.Design", "IDE1006", Justification = "This is to Spice notation.")]
+        public static double m(this double value) => value * 1e-6;
+
+        /// <summary>
+        /// Kilo-...
+        /// </summary>
+        /// <param name="value">The value in kilo-...</param>
+        /// <returns>The value.</returns>
+        [SuppressMessage("Microsoft.Design", "IDE1006", Justification = "This is to Spice notation.")]
+        public static double k(this double value) => value * 1e3;
+
+        /// <summary>
+        /// Mega-...
+        /// </summary>
+        /// <param name="value">The value in mega-...</param>
+        /// <returns>The value.</returns>
+        public static double Meg(this double value) => value * 1e6;
+
+        /// <summary>
+        /// Giga-...
+        /// </summary>
+        /// <param name="value">The value in giga-...</param>
+        /// <returns>The value.</returns>
+        public static double G(this double value) => value * 1e9;
+
+        /// <summary>
+        /// Tera-...
+        /// </summary>
+        /// <param name="value">The value in tera-...</param>
+        /// <returns>The value.</returns>
+        public static double T(this double value) => value * 1e9;
     }
 }

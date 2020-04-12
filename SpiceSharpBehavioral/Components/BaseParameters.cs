@@ -1,7 +1,10 @@
 ﻿using SpiceSharp.Attributes;
+using SpiceSharp.Simulations;
+using SpiceSharpBehavioral.Builders;
 using SpiceSharpBehavioral.Parsers;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
+using System.Collections.Generic;
 
 namespace SpiceSharp.Components.BehavioralComponents
 {
@@ -12,6 +15,21 @@ namespace SpiceSharp.Components.BehavioralComponents
     public class BaseParameters : ParameterSet
     {
         private bool _isDirty;
+
+        /// <summary>
+        /// Gets the default builder for building expressions.
+        /// </summary>
+        /// <value>
+        /// The default builder.
+        /// </value>
+        public static IBuilder<Func<double>> DefaultBuilderFactory(Dictionary<VariableNode, IVariable<double>> variables)
+        {
+            return new FunctionBuilder()
+            {
+                FunctionDefinitions = FunctionBuilderHelper.Defaults,
+                Variables = variables
+            };
+        }
 
         /// <summary>
         /// Gets or sets the expression.
@@ -72,5 +90,20 @@ namespace SpiceSharp.Components.BehavioralComponents
             }
         }
         private Func<string, Node> _parseAction = e => new Parser().Parse(e);
+
+        /// <summary>
+        /// Gets or sets the builder factory.
+        /// </summary>
+        /// <value>
+        /// The builder factory.
+        /// </value>
+        public BuilderFactoryMethod BuilderFactory { get; set; } = DefaultBuilderFactory;
+
+        /// <summary>
+        /// A delegate for creating an <see cref="IBuilder{T}"/>.
+        /// </summary>
+        /// <param name="variables">The variables.</param>
+        /// <returns>The value.</returns>
+        public delegate IBuilder<Func<double>> BuilderFactoryMethod(Dictionary<VariableNode, IVariable<double>> variables);
     }
 }
