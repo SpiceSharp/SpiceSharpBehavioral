@@ -4,7 +4,7 @@ using SpiceSharp.Simulations;
 using System;
 using System.Numerics;
 using SpiceSharp.Components.BehavioralComponents;
-using SpiceSharp.Attributes;
+using SpiceSharp.ParameterSets;
 using SpiceSharp.Components.CommonBehaviors;
 using SpiceSharpBehavioral.Parsers.Nodes;
 

@@ -1,6 +1,8 @@
 ﻿using SpiceSharp.Entities;
+using SpiceSharp.ParameterSets;
 using SpiceSharpBehavioral.Builders;
 using SpiceSharpBehavioral.Parsers.Nodes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,7 +13,8 @@ namespace SpiceSharp.Components.BehavioralComponents
     /// </summary>
     /// <seealso cref="Entity" />
     /// <seealso cref="IComponent" />
-    public abstract class BehavioralComponent : Entity, IComponent,
+    public abstract class BehavioralComponent : Entity,
+        IComponent,
         IParameterized<BaseParameters>
     {
         private readonly string[] _connections;
@@ -79,7 +82,8 @@ namespace SpiceSharp.Components.BehavioralComponents
         /// </summary>
         /// <param name="name">The name.</param>
         /// <param name="basePinCount">The base pin count.</param>
-        public BehavioralComponent(string name, int basePinCount)
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="name"/> is <c>null</c>.</exception>
+        protected BehavioralComponent(string name, int basePinCount)
             : base(name)
         {
             _connections = new string[basePinCount];

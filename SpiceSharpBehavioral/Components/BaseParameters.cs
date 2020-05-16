@@ -1,4 +1,4 @@
-﻿using SpiceSharp.Attributes;
+﻿using SpiceSharp.ParameterSets;
 using SpiceSharp.Simulations;
 using SpiceSharpBehavioral.Builders;
 using SpiceSharpBehavioral.Parsers;

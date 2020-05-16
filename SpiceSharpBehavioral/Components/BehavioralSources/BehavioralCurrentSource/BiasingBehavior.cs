@@ -1,11 +1,10 @@
 ﻿using SpiceSharp.Behaviors;
+using SpiceSharp.ParameterSets;
 using System;
 using SpiceSharp.Components.BehavioralComponents;
 using SpiceSharp.Algebra;
 using SpiceSharp.Simulations;
-using SpiceSharp.Attributes;
 using SpiceSharp.Components.CommonBehaviors;
-using SpiceSharpBehavioral.Builders;
 using System.Collections.Generic;
 using SpiceSharpBehavioral.Parsers.Nodes;
 
