@@ -10,7 +10,8 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
     /// <seealso cref="Node" />
     public class ConstantNode : Node, IFormattable
     {
-        public static ConstantNode Constant(double literal) => new ConstantNode(literal);
+        /// <include file='docs.xml' path='docs/members/Constant/*'/>
+        public static new ConstantNode Constant(double literal) => new ConstantNode(literal);
 
         /// <summary>
         /// Gets or sets the relative tolerance.

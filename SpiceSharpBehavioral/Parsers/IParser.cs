@@ -5,7 +5,6 @@ namespace SpiceSharpBehavioral.Parsers
     /// <summary>
     /// Describes a parser.
     /// </summary>
-    /// <typeparam name="T">The base value type.</typeparam>
     public interface IParser
     {
         /// <summary>

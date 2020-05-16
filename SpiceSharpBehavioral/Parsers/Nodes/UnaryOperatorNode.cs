@@ -8,9 +8,17 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
     /// <seealso cref="Node" />
     public class UnaryOperatorNode : Node
     {
-        public static UnaryOperatorNode Plus(Node argument) => new UnaryOperatorNode(NodeTypes.Plus, argument);
-        public static UnaryOperatorNode Minus(Node argument) => new UnaryOperatorNode(NodeTypes.Minus, argument);
-        public static UnaryOperatorNode Not(Node argument) => new UnaryOperatorNode(NodeTypes.Not, argument);
+        /// <include file='docs.xml' path='docs/members/Unary/*'/>
+        /// <include file='docs.xml' path='docs/members/Plus/*'/>
+        public static new UnaryOperatorNode Plus(Node argument) => new UnaryOperatorNode(NodeTypes.Plus, argument);
+
+        /// <include file='docs.xml' path='docs/members/Unary/*'/>
+        /// <include file='docs.xml' path='docs/members/Minus/*'/>
+        public static new UnaryOperatorNode Minus(Node argument) => new UnaryOperatorNode(NodeTypes.Minus, argument);
+
+        /// <include file='docs.xml' path='docs/members/Unary/*'/>
+        /// <include file='docs.xml' path='docs/members/Bang/*'/>
+        public static new UnaryOperatorNode Not(Node argument) => new UnaryOperatorNode(NodeTypes.Not, argument);
 
         /// <summary>
         /// Gets the argument.

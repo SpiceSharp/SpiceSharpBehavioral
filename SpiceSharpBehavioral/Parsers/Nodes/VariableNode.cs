@@ -8,9 +8,14 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
     /// <seealso cref="Node" />
     public class VariableNode : Node
     {
-        public static VariableNode Voltage(string name) => new VariableNode(NodeTypes.Voltage, name);
-        public static VariableNode Current(string name) => new VariableNode(NodeTypes.Current, name);
-        public static VariableNode Variable(string name) => new VariableNode(NodeTypes.Variable, name);
+        /// <include file='docs.xml' path='docs/members/Voltage/*'/>
+        public static new VariableNode Voltage(string name) => new VariableNode(NodeTypes.Voltage, name);
+
+        /// <include file='docs.xml' path='docs/members/Current/*'/>
+        public static new VariableNode Current(string name) => new VariableNode(NodeTypes.Current, name);
+
+        /// <include file='docs.xml' path='docs/members/Variable/*'/>
+        public static new VariableNode Variable(string name) => new VariableNode(NodeTypes.Variable, name);
 
         /// <summary>
         /// Gets the name of the variable.
@@ -67,12 +72,12 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         /// </returns>
         public override string ToString()
         {
-            switch (NodeType)
+            return NodeType switch
             {
-                case NodeTypes.Voltage: return "V({0})".FormatString(Name);
-                case NodeTypes.Current: return "I({0})".FormatString(Name);
-                default: return Name;
-            }
+                NodeTypes.Voltage => "V({0})".FormatString(Name),
+                NodeTypes.Current => "I({0})".FormatString(Name),
+                _ => Name,
+            };
         }
     }
 }

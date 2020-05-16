@@ -1,4 +1,5 @@
 ﻿using SpiceSharp;
+using System;
 
 namespace SpiceSharpBehavioral.Parsers.Nodes
 {
@@ -8,116 +9,60 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
     /// <seealso cref="Node" />
     public class BinaryOperatorNode : Node
     {
-        /// <summary>
-        /// Creates an addition of two arguments.
-        /// </summary>
-        /// <param name="left">The left argument.</param>
-        /// <param name="right">The right argument.</param>
-        /// <returns>The node representing the added result.</returns>
+        /// <include file='docs.xml' path='docs/members/Binary/*'/>
+        /// <include file='docs.xml' path='docs/members/Add/*'/>
         public static new BinaryOperatorNode Add(Node left, Node right) => new BinaryOperatorNode(NodeTypes.Add, left, right);
 
-        /// <summary>
-        /// Creates an subtraction of two arguments.
-        /// </summary>
-        /// <param name="left">The left argument.</param>
-        /// <param name="right">The right argument.</param>
-        /// <returns>The node representing the subtracted result.</returns>
+        /// <include file='docs.xml' path='docs/members/Binary/*'/>
+        /// <include file='docs.xml' path='docs/members/Subtract/*'/>
         public static new BinaryOperatorNode Subtract(Node left, Node right) => new BinaryOperatorNode(NodeTypes.Subtract, left, right);
 
-        /// <summary>
-        /// Creates an multiplication of two arguments.
-        /// </summary>
-        /// <param name="left">The left argument.</param>
-        /// <param name="right">The right argument.</param>
-        /// <returns>The node representing the multiplied result.</returns>
+        /// <include file='docs.xml' path='docs/members/Binary/*'/>
+        /// <include file='docs.xml' path='docs/members/Multiply/*'/>
         public static new BinaryOperatorNode Multiply(Node left, Node right) => new BinaryOperatorNode(NodeTypes.Multiply, left, right);
 
-        /// <summary>
-        /// Creates an division of two arguments.
-        /// </summary>
-        /// <param name="left">The left argument.</param>
-        /// <param name="right">The right argument.</param>
-        /// <returns>The node representing the divided result.</returns>
+        /// <include file='docs.xml' path='docs/members/Binary/*'/>
+        /// <include file='docs.xml' path='docs/members/Divide/*'/>
         public static new BinaryOperatorNode Divide(Node left, Node right) => new BinaryOperatorNode(NodeTypes.Divide, left, right);
 
-        /// <summary>
-        /// Creates an remainder of the division of two arguments.
-        /// </summary>
-        /// <param name="left">The left argument.</param>
-        /// <param name="right">The right argument.</param>
-        /// <returns>The node representing the modulo result.</returns>
+        /// <include file='docs.xml' path='docs/members/Binary/*'/>
+        /// <include file='docs.xml' path='docs/members/Modulo/*'/>
         public static new BinaryOperatorNode Modulo(Node left, Node right) => new BinaryOperatorNode(NodeTypes.Modulo, left, right);
 
-        /// <summary>
-        /// Creates an logical and of two arguments.
-        /// </summary>
-        /// <param name="left">The left argument.</param>
-        /// <param name="right">The right argument.</param>
-        /// <returns>The node representing the logical and result.</returns>
+        /// <include file='docs.xml' path='docs/members/Binary/*'/>
+        /// <include file='docs.xml' path='docs/members/And/*'/>
         public static new BinaryOperatorNode And(Node left, Node right) => new BinaryOperatorNode(NodeTypes.And, left, right);
 
-        /// <summary>
-        /// Creates an logical or of two arguments.
-        /// </summary>
-        /// <param name="left">The left argument.</param>
-        /// <param name="right">The right argument.</param>
-        /// <returns>The node representing the logical or result.</returns>
+        /// <include file='docs.xml' path='docs/members/Binary/*'/>
+        /// <include file='docs.xml' path='docs/members/Or/*'/>
         public static new BinaryOperatorNode Or(Node left, Node right) => new BinaryOperatorNode(NodeTypes.Or, left, right);
 
-        /// <summary>
-        /// Creates a equality comparison of two arguments.
-        /// </summary>
-        /// <param name="left">The left argument.</param>
-        /// <param name="right">The right argument.</param>
-        /// <returns>The node representing the compared (equality) result.</returns>
+        /// <include file='docs.xml' path='docs/members/Binary/*'/>
+        /// <include file='docs.xml' path='docs/members/Equals/*'/>
         public static new BinaryOperatorNode Equals(Node left, Node right) => new BinaryOperatorNode(NodeTypes.Equals, left, right);
 
-        /// <summary>
-        /// Creates an inequality comparison of two arguments.
-        /// </summary>
-        /// <param name="left">The left argument.</param>
-        /// <param name="right">The right argument.</param>
-        /// <returns>The node representing the compared (inequality) result.</returns>
+        /// <include file='docs.xml' path='docs/members/Binary/*'/>
+        /// <include file='docs.xml' path='docs/members/NotEquals/*'/>
         public static new BinaryOperatorNode NotEquals(Node left, Node right) => new BinaryOperatorNode(NodeTypes.NotEquals, left, right);
 
-        /// <summary>
-        /// Creates a less than comparison of two arguments.
-        /// </summary>
-        /// <param name="left">The left argument.</param>
-        /// <param name="right">The right argument.</param>
-        /// <returns>The node representing the compared (less than) result.</returns>
+        /// <include file='docs.xml' path='docs/members/Binary/*'/>
+        /// <include file='docs.xml' path='docs/members/LessThan/*'/>
         public static new BinaryOperatorNode LessThan(Node left, Node right) => new BinaryOperatorNode(NodeTypes.LessThan, left, right);
 
-        /// <summary>
-        /// Creates a greater than comparison of two arguments.
-        /// </summary>
-        /// <param name="left">The left argument.</param>
-        /// <param name="right">The right argument.</param>
-        /// <returns>The node representing the compared (greater than) result.</returns>
+        /// <include file='docs.xml' path='docs/members/Binary/*'/>
+        /// <include file='docs.xml' path='docs/members/GreaterThan/*'/>
         public static new BinaryOperatorNode GreaterThan(Node left, Node right) => new BinaryOperatorNode(NodeTypes.GreaterThan, left, right);
 
-        /// <summary>
-        /// Creates a less than or equal comparison of two arguments.
-        /// </summary>
-        /// <param name="left">The left argument.</param>
-        /// <param name="right">The right argument.</param>
-        /// <returns>The node representing the compared (less than or equal) result.</returns>
+        /// <include file='docs.xml' path='docs/members/Binary/*'/>
+        /// <include file='docs.xml' path='docs/members/LessThanOrEquals/*'/>
         public static new BinaryOperatorNode LessThanOrEqual(Node left, Node right) => new BinaryOperatorNode(NodeTypes.LessThanOrEqual, left, right);
 
-        /// <summary>
-        /// Creates a less than comparison of two arguments.
-        /// </summary>
-        /// <param name="left">The left argument.</param>
-        /// <param name="right">The right argument.</param>
-        /// <returns>The node representing the compared (greater than or equal) result.</returns>
+        /// <include file='docs.xml' path='docs/members/Binary/*'/>
+        /// <include file='docs.xml' path='docs/members/GreaterThanOrEquals/*'/>
         public static new BinaryOperatorNode GreaterThanOrEqual(Node left, Node right) => new BinaryOperatorNode(NodeTypes.GreaterThanOrEqual, left, right);
 
-        /// <summary>
-        /// Creates a power of two arguments.
-        /// </summary>
-        /// <param name="left">The left argument.</param>
-        /// <param name="right">The right argument.</param>
-        /// <returns>The node representing the power result.</returns>
+        /// <include file='docs.xml' path='docs/members/Binary/*'/>
+        /// <include file='docs.xml' path='docs/members/Power/*'/>
         public static new BinaryOperatorNode Power(Node left, Node right) => new BinaryOperatorNode(NodeTypes.Pow, left, right);
 
         /// <summary>
@@ -136,12 +81,7 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         /// </value>
         public Node Right { get; }
 
-        /// <summary>
-        /// Gets the properties.
-        /// </summary>
-        /// <value>
-        /// The properties.
-        /// </value>
+        /// <inheritdoc/>
         public override NodeProperties Properties { get; }
 
         /// <summary>
@@ -150,6 +90,7 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         /// <param name="type">The node type.</param>
         /// <param name="left">The left argument.</param>
         /// <param name="right">The right argument.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="left"/> or <paramref name="right"/> is <c>null</c>.</exception>
         protected BinaryOperatorNode(NodeTypes type, Node left, Node right)
             : base(type)
         {

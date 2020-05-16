@@ -8,7 +8,8 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
     /// <seealso cref="Node" />
     public class PropertyNode : Node
     {
-        public static PropertyNode Property(string name, string property) => new PropertyNode(name, property);
+        /// <include file='docs.xml' path='docs/members/Property/*'/>
+        public static new PropertyNode Property(string name, string property) => new PropertyNode(name, property);
 
         /// <summary>
         /// Gets the name of the entity.

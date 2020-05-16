@@ -11,7 +11,7 @@ namespace SpiceSharpBehavioralTests.Components
     [TestFixture]
     public class BehavioralCurrentSourceTests
     {
-        [TestCaseSource(typeof(BehavioralCurrentSourceTestData), nameof(BehavioralCurrentSourceTestData.Op))]
+        [TestCaseSource(nameof(Op))]
         public void When_DirectOutputOp_Expect_Reference(string expression, double dcVoltage, double dcCurrent, double expected)
         {
             var ckt = new Circuit(
@@ -28,7 +28,7 @@ namespace SpiceSharpBehavioralTests.Components
             op.Run(ckt);
         }
 
-        [TestCaseSource(typeof(BehavioralCurrentSourceTestData), nameof(BehavioralCurrentSourceTestData.Ac))]
+        [TestCaseSource(nameof(Ac))]
         public void When_Ac_Expect_Reference(string expression, double dcVoltage, double acVoltage, double dcCurrent, double acCurrent, Func<Complex, Complex> expected)
         {
             var ckt = new Circuit(
@@ -48,7 +48,7 @@ namespace SpiceSharpBehavioralTests.Components
             ac.Run(ckt);
         }
 
-        [TestCaseSource(typeof(BehavioralCurrentSourceTestData), nameof(BehavioralCurrentSourceTestData.ImpedanceOp))]
+        [TestCaseSource(nameof(ImpedanceOp))]
         public void When_UsedAsImpedanceOp_Expect_Reference(string expression, double dcVoltage, double resistance, double expected)
         {
             // Use the behavioral current source as an impedance description
@@ -65,10 +65,7 @@ namespace SpiceSharpBehavioralTests.Components
             };
             op.Run(ckt);
         }
-    }
 
-    public class BehavioralCurrentSourceTestData
-    {
         public static IEnumerable<TestCaseData> Op
         {
             get

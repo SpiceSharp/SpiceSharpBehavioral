@@ -9,7 +9,8 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
     /// <seealso cref="Node" />
     public class FunctionNode : Node
     {
-        public static FunctionNode Function(string name, IReadOnlyList<Node> arguments) => new FunctionNode(name, arguments);
+        /// <include file='docs.xml' path='docs/members/Function/*'/>
+        public static new FunctionNode Function(string name, IReadOnlyList<Node> arguments) => new FunctionNode(name, arguments);
 
         /// <summary>
         /// Gets the name of the function.

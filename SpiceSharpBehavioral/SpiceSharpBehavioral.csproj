@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard1.5;netstandard2.0;net45;netcoreapp2.0</TargetFrameworks>
-    <Version>1.1.5</Version>
+    <Version>3.0.0</Version>
     <Authors>Sven Boulanger</Authors>
 	  <Title>Spice#.Behavioral</Title>
     <Description>Spice#.Behavioral is a library that allows using behavioral components in the circuit simulator Spice#.</Description>
@@ -10,18 +10,21 @@
     <PackageLicenseUrl></PackageLicenseUrl>
     <RepositoryUrl>https://github.com/SpiceSharp/SpiceSharpBehavioral</RepositoryUrl>
     <PackageTags>circuit electronics netlist parser spice simulator simulation ode solver design behavioral modeling</PackageTags>
-    <PackageIconUrl>https://raw.githubusercontent.com/SpiceSharp/SpiceSharp/master/api/images/logo_full.svg?sanitize=true</PackageIconUrl>
-    <AssemblyVersion>1.1.5.0</AssemblyVersion>
+    <PackageIconUrl></PackageIconUrl>
+    <AssemblyVersion>3.0.0.0</AssemblyVersion>
     <PackageReleaseNotes>Refer to the GitHub release for release notes.</PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Company />
     <NeutralLanguage>en</NeutralLanguage>
-    <FileVersion>1.1.5.0</FileVersion>
+    <FileVersion>3.0.0.0</FileVersion>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Copyright />
     <LangVersion>latest</LangVersion>
+    <PackageIcon>logo_full.png</PackageIcon>
+    <Product>SpiceSharp.Behavioral</Product>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard1.5|AnyCPU'">
@@ -62,6 +65,13 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\api\images\logo_full.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,5 @@
 ﻿using SpiceSharp;
+using System;
 
 namespace SpiceSharpBehavioral.Parsers.Nodes
 {
@@ -8,7 +9,8 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
     /// <seealso cref="Node" />
     public class TernaryOperatorNode : Node
     {
-        public static TernaryOperatorNode Conditional(Node condition, Node ifTrue, Node ifFalse) => new TernaryOperatorNode(NodeTypes.Conditional, condition, ifTrue, ifFalse);
+        /// <include file='docs.xml' path='docs/members/Conditional/*'/>
+        public static new TernaryOperatorNode Conditional(Node condition, Node ifTrue, Node ifFalse) => new TernaryOperatorNode(NodeTypes.Conditional, condition, ifTrue, ifFalse);
 
         /// <summary>
         /// Gets the condition.
@@ -34,12 +36,7 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         /// </value>
         public Node IfFalse { get; }
 
-        /// <summary>
-        /// Gets the properties.
-        /// </summary>
-        /// <value>
-        /// The properties.
-        /// </value>
+        /// <inheritdoc/>
         public override NodeProperties Properties { get; }
 
         /// <summary>
@@ -49,6 +46,7 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         /// <param name="condition">The condition.</param>
         /// <param name="ifTrue">If true.</param>
         /// <param name="ifFalse">If false.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="condition"/>, <paramref name="ifTrue"/> or <paramref name="ifFalse"/> is <c>null</c>.</exception>
         protected TernaryOperatorNode(NodeTypes type, Node condition, Node ifTrue, Node ifFalse)
             : base(type)
         {
