@@ -51,7 +51,7 @@ namespace SpiceSharp.Components
             simulation.EntityBehaviors.Add(behaviors);
 
             // Create the context, and use it to create our behaviors
-            var context = new BehavioralComponentContext(this, simulation, LinkParameters, VariableNodes);
+            var context = new BehavioralComponentContext(this, simulation, behaviors, LinkParameters, VariableNodes);
             behaviors
                 .AddIfNo<IFrequencyBehavior>(simulation, () => new FrequencyBehavior(Name, context))
                 .AddIfNo<IBiasingBehavior>(simulation, () => new BiasingBehavior(Name, context));

@@ -29,24 +29,16 @@ namespace SpiceSharp.Components.BehavioralComponents
         public Dictionary<VariableNode, IBehaviorContainer> Branches { get; }
 
         /// <summary>
-        /// Gets the behaviors already created by the component.
-        /// </summary>
-        /// <value>
-        /// The behaviors.
-        /// </value>
-        public IBehaviorContainer Behaviors { get; }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="BehavioralComponentContext" /> class.
         /// </summary>
         /// <param name="component">The component creating the behavior.</param>
         /// <param name="simulation">The simulation for which a behavior is created.</param>
+        /// <param name="behaviors">The created behaviors.</param>
         /// <param name="linkParameters">Flag indicating that parameters should be linked. If false, only cloned parameters are returned by the context.</param>
         /// <param name="variables">The variables that need to be derived to.</param>
-        public BehavioralComponentContext(IComponent component, ISimulation simulation, bool linkParameters, IEnumerable<VariableNode> variables) 
-            : base(component, simulation, linkParameters)
+        public BehavioralComponentContext(IComponent component, ISimulation simulation, IBehaviorContainer behaviors, bool linkParameters, IEnumerable<VariableNode> variables) 
+            : base(component, simulation, behaviors, linkParameters)
         {
-            Behaviors = simulation.EntityBehaviors[component.Name];
             Branches = new Dictionary<VariableNode, IBehaviorContainer>();
 
             var varr = variables.ToArray();
