@@ -35,6 +35,5 @@ jobs:
           KEY: ${{ secrets.NUGET_APIKEY }}
         run: |
           cd SpiceSharpBehavioral\bin\Release
-          dotnet nuget add source https://api.nuget.org/v3/index.json
-          dotnet nuget push SpiceSharpBehavioral.*.nupkg -k $KEY
+          dotnet nuget push .\SpiceSharpBehavioral\bin\Release\SpiceSharpBehavioral.*.nupkg -k $KEY
       
