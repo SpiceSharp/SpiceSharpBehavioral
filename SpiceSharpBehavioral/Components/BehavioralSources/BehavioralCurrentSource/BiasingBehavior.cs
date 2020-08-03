@@ -7,6 +7,7 @@ using SpiceSharp.Simulations;
 using SpiceSharp.Components.CommonBehaviors;
 using System.Collections.Generic;
 using SpiceSharpBehavioral.Parsers.Nodes;
+using SpiceSharp.Attributes;
 
 namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
 {
@@ -15,7 +16,9 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
     /// </summary>
     /// <seealso cref="Behavior" />
     /// <seealso cref="IBiasingBehavior" />
-    public class BiasingBehavior : Behavior, IBiasingBehavior
+    [BehaviorFor(typeof(BehavioralCurrentSource), typeof(IBiasingBehavior))]
+    public class BiasingBehavior : Behavior,
+        IBiasingBehavior
     {
         private readonly OnePort<double> _variables;
         private readonly ElementSet<double> _elements;
@@ -47,11 +50,12 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
         /// <summary>
         /// Initializes a new instance of the <see cref="BiasingBehavior"/> class.
         /// </summary>
-        /// <param name="name">The name.</param>
         /// <param name="context">The context.</param>
-        public BiasingBehavior(string name, BehavioralComponentContext context) : base(name)
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="context"/> is <c>null</c>.</exception>
+        public BiasingBehavior(BehavioralBindingContext context)
+            : base(context)
         {
-            var bp = context.GetParameterSet<BaseParameters>();
+            var bp = context.GetParameterSet<Parameters>();
             var state = context.GetState<IBiasingSimulationState>();
             _variables = new OnePort<double>(
                 state.GetSharedVariable(context.Nodes[0]),
@@ -94,9 +98,7 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
             _elements = new ElementSet<double>(state.Solver, matLocs, rhsLocs);
         }
 
-        /// <summary>
-        /// Loads the Y-matrix and Rhs-vector.
-        /// </summary>
+        /// <inheritdoc/>
         void IBiasingBehavior.Load()
         {
             double[] values = new double[Functions.Length * 2 + 2];

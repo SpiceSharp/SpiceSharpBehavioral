@@ -10,7 +10,7 @@ namespace SpiceSharp.Components.BehavioralComponents
     /// A context for behavioral components.
     /// </summary>
     /// <seealso cref="ComponentBindingContext" />
-    public class BehavioralComponentContext : ComponentBindingContext
+    public class BehavioralBindingContext : ComponentBindingContext
     {
         /// <summary>
         /// Gets the derivatives w.r.t. to any voltage and current nodes.
@@ -29,22 +29,21 @@ namespace SpiceSharp.Components.BehavioralComponents
         public Dictionary<VariableNode, IBehaviorContainer> Branches { get; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BehavioralComponentContext" /> class.
+        /// Initializes a new instance of the <see cref="BehavioralBindingContext" /> class.
         /// </summary>
         /// <param name="component">The component creating the behavior.</param>
         /// <param name="simulation">The simulation for which a behavior is created.</param>
         /// <param name="behaviors">The created behaviors.</param>
-        /// <param name="linkParameters">Flag indicating that parameters should be linked. If false, only cloned parameters are returned by the context.</param>
-        /// <param name="variables">The variables that need to be derived to.</param>
-        public BehavioralComponentContext(IComponent component, ISimulation simulation, IBehaviorContainer behaviors, bool linkParameters, IEnumerable<VariableNode> variables) 
-            : base(component, simulation, behaviors, linkParameters)
+        public BehavioralBindingContext(IComponent component, ISimulation simulation, IBehaviorContainer behaviors) 
+            : base(component, simulation, behaviors)
         {
             Branches = new Dictionary<VariableNode, IBehaviorContainer>();
 
-            var varr = variables.ToArray();
+            var parameters = component.GetParameterSet<Parameters>();
+            var varr = parameters.VariableNodes.ToArray();
             foreach (var variable in varr.Where(vn => vn.NodeType == NodeTypes.Current))
                 Branches.Add(variable, simulation.EntityBehaviors[variable.Name]);
-            var p = component.GetParameterSet<BaseParameters>();
+            var p = component.GetParameterSet<Parameters>();
             var deriver = new Derivatives(varr);
             Derivatives = deriver.Derive(p.Function) ?? new Dictionary<VariableNode, Node>();
         }

@@ -7,6 +7,7 @@ using SpiceSharp.Components.BehavioralComponents;
 using SpiceSharp.ParameterSets;
 using SpiceSharp.Components.CommonBehaviors;
 using SpiceSharpBehavioral.Parsers.Nodes;
+using SpiceSharp.Attributes;
 
 namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
 {
@@ -15,13 +16,18 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
     /// </summary>
     /// <seealso cref="BiasingBehavior" />
     /// <seealso cref="IFrequencyBehavior" />
-    public class FrequencyBehavior : BiasingBehavior, IFrequencyBehavior, IBranchedBehavior<Complex>
+    /// <seealso cref="IBranchedBehavior{T}"/>
+    [BehaviorFor(typeof(BehavioralVoltageSource), typeof(IFrequencyBehavior), 1)]
+    public class FrequencyBehavior : BiasingBehavior,
+        IFrequencyBehavior,
+        IBranchedBehavior<Complex>
     {
         private readonly OnePort<Complex> _variables;
         private readonly IVariable<Complex> _branch;
         private readonly ElementSet<Complex> _elements, _coreElements;
         private readonly Complex[] _values;
 
+        /// <inheritdoc/>
         IVariable<Complex> IBranchedBehavior<Complex>.Branch => _branch;
 
         /// <summary>
@@ -45,10 +51,10 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         /// <summary>
         /// Initializes a new instance of the <see cref="FrequencyBehavior"/> class.
         /// </summary>
-        /// <param name="name">The name.</param>
         /// <param name="context">The context.</param>
-        public FrequencyBehavior(string name, BehavioralComponentContext context)
-            : base(name, context)
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="context"/> is <c>null</c>.</exception>
+        public FrequencyBehavior(BehavioralBindingContext context)
+            : base(context)
         {
             var state = context.GetState<IComplexSimulationState>();
             _variables = new OnePort<Complex>(
@@ -91,6 +97,7 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
             });
         }
 
+        /// <inheritdoc/>
         void IFrequencyBehavior.InitializeParameters()
         {
             for (var i = 0; i < Functions.Length; i++)
@@ -100,6 +107,7 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
             }
         }
 
+        /// <inheritdoc/>
         void IFrequencyBehavior.Load()
         {
             _elements.Add(_values);

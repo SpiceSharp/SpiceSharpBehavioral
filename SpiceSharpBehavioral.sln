@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmark", "Benchmark\Benc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpiceSharpBehavioralTests", "SpiceSharpBehavioralTests\SpiceSharpBehavioralTests.csproj", "{D18306C6-A966-4E4D-B0C9-01DE3CFF892F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpiceSharp", "..\SpiceSharp\SpiceSharp\SpiceSharp.csproj", "{062E9045-2D29-4B96-912A-B259495657F8}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,10 +27,6 @@ Global
 		{D18306C6-A966-4E4D-B0C9-01DE3CFF892F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D18306C6-A966-4E4D-B0C9-01DE3CFF892F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D18306C6-A966-4E4D-B0C9-01DE3CFF892F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{062E9045-2D29-4B96-912A-B259495657F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{062E9045-2D29-4B96-912A-B259495657F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{062E9045-2D29-4B96-912A-B259495657F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{062E9045-2D29-4B96-912A-B259495657F8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

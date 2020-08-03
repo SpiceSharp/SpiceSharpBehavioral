@@ -1,7 +1,4 @@
-﻿using SpiceSharp.Behaviors;
-using SpiceSharp.Components.BehavioralComponents;
-using SpiceSharp.Components.BehavioralVoltageSourceBehaviors;
-using SpiceSharp.Simulations;
+﻿using SpiceSharp.Components.BehavioralComponents;
 
 namespace SpiceSharp.Components
 {
@@ -14,14 +11,14 @@ namespace SpiceSharp.Components
         /// <summary>
         /// The behavioral voltage source base pin count
         /// </summary>
-        public const int BehavioralVoltageSourceBasePinCount = 2;
+        public const int BehavioralVoltageSourcePinCount = 2;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BehavioralVoltageSource"/> class.
         /// </summary>
         /// <param name="name">The name of the entity.</param>
         public BehavioralVoltageSource(string name)
-            : base(name, BehavioralVoltageSourceBasePinCount)
+            : base(name, BehavioralVoltageSourcePinCount)
         {
         }
 
@@ -37,22 +34,6 @@ namespace SpiceSharp.Components
         {
             Connect(pos, neg);
             Parameters.Expression = expression;
-        }
-
-        /// <summary>
-        /// Creates the behaviors.
-        /// </summary>
-        /// <param name="simulation">The simulation.</param>
-        public override void CreateBehaviors(ISimulation simulation)
-        {
-            var behaviors = new BehaviorContainer(Name);
-            simulation.EntityBehaviors.Add(behaviors);
-
-            // Create the context, and use it to create our behaviors
-            var context = new BehavioralComponentContext(this, simulation, behaviors, LinkParameters, VariableNodes);
-            behaviors
-                .AddIfNo<IFrequencyBehavior>(simulation, () => new FrequencyBehavior(Name, context))
-                .AddIfNo<IBiasingBehavior>(simulation, () => new BiasingBehavior(Name, context));
         }
     }
 }

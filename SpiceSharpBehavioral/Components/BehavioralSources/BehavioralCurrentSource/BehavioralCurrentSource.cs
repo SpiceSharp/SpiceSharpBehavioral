@@ -1,7 +1,4 @@
 ﻿using SpiceSharp.Components.BehavioralComponents;
-using SpiceSharp.Simulations;
-using SpiceSharp.Behaviors;
-using SpiceSharp.Components.BehavioralCurrentSourceBehaviors;
 using SpiceSharp.Attributes;
 
 namespace SpiceSharp.Components
@@ -16,14 +13,14 @@ namespace SpiceSharp.Components
         /// <summary>
         /// The behavioral current source base pin count
         /// </summary>
-        public const int BehavioralCurrentSourceBasePinCount = 2;
+        public const int BehavioralCurrentSourcePinCount = 2;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BehavioralCurrentSource"/> class.
         /// </summary>
         /// <param name="name">The name of the entity.</param>
         public BehavioralCurrentSource(string name)
-            : base(name, BehavioralCurrentSourceBasePinCount)
+            : base(name, BehavioralCurrentSourcePinCount)
         {
         }
 
@@ -39,22 +36,6 @@ namespace SpiceSharp.Components
         {
             Connect(pos, neg);
             Parameters.Expression = expression;
-        }
-
-        /// <summary>
-        /// Creates the behaviors for the specified simulation and registers them with the simulation.
-        /// </summary>
-        /// <param name="simulation">The simulation.</param>
-        public override void CreateBehaviors(ISimulation simulation)
-        {
-            var behaviors = new BehaviorContainer(Name);
-            simulation.EntityBehaviors.Add(behaviors);
-
-            // Create the context, and use it to create our behaviors
-            var context = new BehavioralComponentContext(this, simulation, behaviors, LinkParameters, VariableNodes);
-            behaviors
-                .AddIfNo<IFrequencyBehavior>(simulation, () => new FrequencyBehavior(Name, context))
-                .AddIfNo<IBiasingBehavior>(simulation, () => new BiasingBehavior(Name, context));
         }
     }
 }

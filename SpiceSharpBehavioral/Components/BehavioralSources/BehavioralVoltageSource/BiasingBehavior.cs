@@ -7,6 +7,7 @@ using SpiceSharp.Simulations;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
 using System.Collections.Generic;
+using SpiceSharp.Attributes;
 
 namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
 {
@@ -15,13 +16,18 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
     /// </summary>
     /// <seealso cref="Behavior" />
     /// <seealso cref="IBiasingBehavior" />
-    public class BiasingBehavior : Behavior, IBiasingBehavior, IBranchedBehavior<double>
+    /// <seealso cref="IBranchedBehavior{T}"/>
+    [BehaviorFor(typeof(BehavioralVoltageSource), typeof(IBiasingBehavior))]
+    public class BiasingBehavior : Behavior,
+        IBiasingBehavior,
+        IBranchedBehavior<double>
     {
         private readonly OnePort<double> _variables;
         private readonly IVariable<double> _branch;
         private readonly ElementSet<double> _elements, _coreElements;
         private readonly Func<double> _value;
 
+        /// <inheritdoc/>
         IVariable<double> IBranchedBehavior<double>.Branch => _branch;
 
         /// <summary>
@@ -50,12 +56,12 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         /// <summary>
         /// Initializes a new instance of the <see cref="BiasingBehavior"/> class.
         /// </summary>
-        /// <param name="name">The name.</param>
         /// <param name="context">The context.</param>
-        public BiasingBehavior(string name, BehavioralComponentContext context) 
-            : base(name)
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="context"/> is <c>null</c>.</exception>
+        public BiasingBehavior(BehavioralBindingContext context) 
+            : base(context)
         {
-            var bp = context.GetParameterSet<BaseParameters>();
+            var bp = context.GetParameterSet<Parameters>();
             var state = context.GetState<IBiasingSimulationState>();
             _variables = new OnePort<double>(
                 state.GetSharedVariable(context.Nodes[0]),
@@ -113,6 +119,7 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
             }, new[] { br });
         }
 
+        /// <inheritdoc/>
         void IBiasingBehavior.Load()
         {
             double[] values = new double[Functions.Length];

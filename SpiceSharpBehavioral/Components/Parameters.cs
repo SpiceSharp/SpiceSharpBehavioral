@@ -5,6 +5,7 @@ using SpiceSharpBehavioral.Parsers;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SpiceSharp.Components.BehavioralComponents
 {
@@ -12,9 +13,35 @@ namespace SpiceSharp.Components.BehavioralComponents
     /// Base parameters for a behavioral component.
     /// </summary>
     /// <seealso cref="ParameterSet" />
-    public class BaseParameters : ParameterSet
+    public class Parameters : ParameterSet
     {
         private bool _isDirty;
+        private readonly NodeFinder _nodeFinder = new NodeFinder();
+
+        /// <summary>
+        /// Gets the voltage nodes.
+        /// </summary>
+        /// <value>
+        /// The voltage nodes.
+        /// </value>
+        public IEnumerable<string> VoltageNodes => _nodeFinder.VoltageNodes(Function).Select(n => n.Name);
+
+        /// <summary>
+        /// Gets the current nodes.
+        /// </summary>
+        /// <value>
+        /// The current nodes.
+        /// </value>
+        public IEnumerable<string> CurrentNodes => _nodeFinder.CurrentNodes(Function).Select(n => n.Name);
+
+        /// <summary>
+        /// Gets all variable nodes.
+        /// </summary>
+        /// <value>
+        /// The variable nodes.
+        /// </value>
+        public IEnumerable<VariableNode> VariableNodes => _nodeFinder.Build(Function);
+
 
         /// <summary>
         /// Gets the default builder for building expressions.

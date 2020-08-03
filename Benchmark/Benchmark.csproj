@@ -52,10 +52,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\SpiceSharp\SpiceSharp\SpiceSharp.csproj">
-      <Project>{062e9045-2d29-4b96-912a-b259495657f8}</Project>
-      <Name>SpiceSharp</Name>
-    </ProjectReference>
     <ProjectReference Include="..\SpiceSharpBehavioral\SpiceSharpBehavioral.csproj">
       <Project>{d2fe5b10-b052-4219-bd10-e276a0c419cc}</Project>
       <Name>SpiceSharpBehavioral</Name>

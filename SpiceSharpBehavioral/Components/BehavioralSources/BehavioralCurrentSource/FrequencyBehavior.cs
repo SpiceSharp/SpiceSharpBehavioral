@@ -1,4 +1,5 @@
 ﻿using SpiceSharp.Algebra;
+using SpiceSharp.Attributes;
 using SpiceSharp.Behaviors;
 using SpiceSharp.Components.BehavioralComponents;
 using SpiceSharp.Components.CommonBehaviors;
@@ -14,7 +15,9 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
     /// </summary>
     /// <seealso cref="BiasingBehavior" />
     /// <seealso cref="IFrequencyBehavior" />
-    public class FrequencyBehavior : BiasingBehavior, IFrequencyBehavior
+    [BehaviorFor(typeof(BehavioralCurrentSource), typeof(IFrequencyBehavior), 1)]
+    public class FrequencyBehavior : BiasingBehavior,
+        IFrequencyBehavior
     {
         private readonly OnePort<Complex> _variables;
         private readonly ElementSet<Complex> _elements;
@@ -31,10 +34,10 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
         /// <summary>
         /// Initializes a new instance of the <see cref="FrequencyBehavior"/> class.
         /// </summary>
-        /// <param name="name">The name.</param>
         /// <param name="context">The context.</param>
-        public FrequencyBehavior(string name, BehavioralComponentContext context)
-            : base(name, context)
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="context"/> is <c>null</c>.</exception>
+        public FrequencyBehavior(BehavioralBindingContext context)
+            : base(context)
         {
             var state = context.GetState<IComplexSimulationState>();
             _variables = new OnePort<Complex>(
@@ -60,6 +63,7 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
             _elements = new ElementSet<Complex>(state.Solver, matLocs);
         }
 
+        /// <inheritdoc/>
         void IFrequencyBehavior.InitializeParameters()
         {
             for (var i = 0; i < Functions.Length; i++)
@@ -70,6 +74,7 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
             }
         }
 
+        /// <inheritdoc/>
         void IFrequencyBehavior.Load()
         {
             _elements.Add(_values);

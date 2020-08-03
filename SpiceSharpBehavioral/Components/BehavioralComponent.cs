@@ -1,10 +1,9 @@
-﻿using SpiceSharp.Entities;
+﻿using SpiceSharp.Behaviors;
+using SpiceSharp.Entities;
 using SpiceSharp.ParameterSets;
-using SpiceSharpBehavioral.Builders;
-using SpiceSharpBehavioral.Parsers.Nodes;
+using SpiceSharp.Simulations;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace SpiceSharp.Components.BehavioralComponents
 {
@@ -13,12 +12,12 @@ namespace SpiceSharp.Components.BehavioralComponents
     /// </summary>
     /// <seealso cref="Entity" />
     /// <seealso cref="IComponent" />
-    public abstract class BehavioralComponent : Entity,
+    public abstract class BehavioralComponent : Entity<BehavioralBindingContext>,
         IComponent,
-        IParameterized<BaseParameters>
+        IParameterized<Parameters>
     {
         private readonly string[] _connections;
-        private readonly NodeFinder _nodeFinder = new NodeFinder();
+        
 
         /// <summary>
         /// Gets the parameter set.
@@ -26,7 +25,7 @@ namespace SpiceSharp.Components.BehavioralComponents
         /// <value>
         /// The parameter set.
         /// </value>
-        public BaseParameters Parameters { get; } = new BaseParameters();
+        public Parameters Parameters { get; } = new Parameters();
 
         /// <summary>
         /// Gets or sets the model of the component.
@@ -36,29 +35,6 @@ namespace SpiceSharp.Components.BehavioralComponents
         /// </value>
         public string Model { get; set; }
 
-        /// <summary>
-        /// Gets the voltage nodes.
-        /// </summary>
-        /// <value>
-        /// The voltage nodes.
-        /// </value>
-        protected IEnumerable<string> VoltageNodes => _nodeFinder.VoltageNodes(Parameters.Function).Select(n => n.Name);
-
-        /// <summary>
-        /// Gets the current nodes.
-        /// </summary>
-        /// <value>
-        /// The current nodes.
-        /// </value>
-        protected IEnumerable<string> CurrentNodes => _nodeFinder.CurrentNodes(Parameters.Function).Select(n => n.Name);
-
-        /// <summary>
-        /// Gets all variable nodes.
-        /// </summary>
-        /// <value>
-        /// The variable nodes.
-        /// </value>
-        protected IEnumerable<VariableNode> VariableNodes => _nodeFinder.Build(Parameters.Function);
 
         /// <summary>
         /// Gets the nodes.
@@ -72,7 +48,7 @@ namespace SpiceSharp.Components.BehavioralComponents
             {
                 var nodes = new List<string>();
                 nodes.AddRange(_connections);
-                nodes.AddRange(VoltageNodes);
+                nodes.AddRange(Parameters.VoltageNodes);
                 return nodes.AsReadOnly();
             }
         }
@@ -106,6 +82,14 @@ namespace SpiceSharp.Components.BehavioralComponents
                 _connections[i] = nodes[i];
             }
             return this;
+        }
+
+        /// <inheritdoc/>
+        public override void CreateBehaviors(ISimulation simulation)
+        {
+            var behaviors = new BehaviorContainer(Name);
+            simulation.EntityBehaviors.Add(behaviors);
+            DI.Resolve(simulation, this, behaviors, LinkParameters);
         }
     }
 }
