@@ -55,9 +55,9 @@ Please use the library with care.
 
 | Platform | Status |
 |:---|-------:|
-| Windows | ![Windows Tests](https://github.com/SpiceSharp/SpiceSharp/workflows/Windows%20Tests/badge.svg) |
-| Linux (Mono) | ![Linux Tests](https://github.com/SpiceSharp/SpiceSharp/workflows/Linux%20Tests/badge.svg) |
-| MacOS (Mono) | ![MacOS Tests](https://github.com/SpiceSharp/SpiceSharp/workflows/MacOS%20Tests/badge.svg) |
+| Windows | ![Windows Tests](https://github.com/SpiceSharp/SpiceSharpBehavioral/workflows/Windows%20Tests/badge.svg) |
+| Linux (Mono) | ![Linux Tests](https://github.com/SpiceSharp/SpiceSharpBehavioral/workflows/Linux%20Tests/badge.svg) |
+| MacOS (Mono) | ![MacOS Tests](https://github.com/SpiceSharp/SpiceSharpBehavioral/workflows/MacOS%20Tests/badge.svg) |
 
 ## Aim of Spice#.Behavioral?
 
