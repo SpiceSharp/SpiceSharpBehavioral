@@ -53,10 +53,11 @@ Please use the library with care.
 
 ## Current build status
 
-|    | Status |
+| Platform | Status |
 |:---|-------:|
-|AppVeyor CI (Windows)|[![Build status](https://ci.appveyor.com/api/projects/status/1olsxasmk451200k/branch/master?svg=true)](https://ci.appveyor.com/project/SpiceSharp/spicesharpbehavioral/branch/master)|
-|Travis CI (Linux/iOS/Mono)|[![Build Status](https://travis-ci.org/SpiceSharp/SpiceSharpBehavioral.svg?branch=master)](https://travis-ci.org/SpiceSharp/SpiceSharpBehavioral)|
+| Windows | ![Windows Tests](https://github.com/SpiceSharp/SpiceSharp/workflows/Windows%20Tests/badge.svg) |
+| Linux (Mono) | ![Linux Tests](https://github.com/SpiceSharp/SpiceSharp/workflows/Linux%20Tests/badge.svg) |
+| MacOS (Mono) | ![MacOS Tests](https://github.com/SpiceSharp/SpiceSharp/workflows/MacOS%20Tests/badge.svg) |
 
 ## Aim of Spice#.Behavioral?
 
@@ -71,4 +72,4 @@ Advantages:
 Disadvantages:
 
 - General performance can be sub-optimal.
-- It may be unclear for the inexperienced user why a simulation may be unstable or badly behaving.
+- It may be unclear for inexperienced users why a simulation became unstable or badly behaving.
