@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 
-namespace SpiceSharpBehavioralTests.Components
+namespace SpiceSharpBehavioralTest.Components
 {
     [TestFixture]
     public class BehavioralCurrentSourceTests

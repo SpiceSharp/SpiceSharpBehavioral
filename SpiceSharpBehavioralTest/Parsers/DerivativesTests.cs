@@ -3,7 +3,7 @@ using SpiceSharpBehavioral.Builders;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using System.Collections.Generic;
 
-namespace SpiceSharpBehavioralTests.Parsers
+namespace SpiceSharpBehavioralTest.Parsers
 {
     [TestFixture]
     public class DerivativesTests

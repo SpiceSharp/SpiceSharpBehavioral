@@ -5,7 +5,7 @@ using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
 using System.Collections.Generic;
 
-namespace SpiceSharpBehavioralTests.Builders
+namespace SpiceSharpBehavioralTest.Builders
 {
     public class DoubleBuilderTestData
     {

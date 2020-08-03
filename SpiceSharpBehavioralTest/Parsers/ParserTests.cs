@@ -3,7 +3,7 @@ using SpiceSharpBehavioral.Parsers;
 using System.Collections.Generic;
 using SpiceSharpBehavioral.Parsers.Nodes;
 
-namespace SpiceSharpBehavioralTests.Parsers
+namespace SpiceSharpBehavioralTest.Parsers
 {
     [TestFixture]
     public class ParserTests

@@ -9,8 +9,8 @@
     <ProjectGuid>{D18306C6-A966-4E4D-B0C9-01DE3CFF892F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SpiceSharpBehavioralTests</RootNamespace>
-    <AssemblyName>SpiceSharpBehavioralTests</AssemblyName>
+    <RootNamespace>SpiceSharpBehavioralTest</RootNamespace>
+    <AssemblyName>SpiceSharpBehavioralTest</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -70,9 +70,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-	<PackageReference Include="SpiceSharp">
-	  <Version>3.0.0</Version>
-	</PackageReference>
+    <PackageReference Include="SpiceSharp">
+      <Version>3.0.0</Version>
+    </PackageReference>
     <PackageReference Include="NUnit">
       <Version>3.12.0</Version>
     </PackageReference>
