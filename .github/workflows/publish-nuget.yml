@@ -33,7 +33,5 @@ jobs:
       - name: Publish to NuGet
         env:
           KEY: ${{ secrets.NUGET_APIKEY }}
-        run: |
-          cd SpiceSharpBehavioral\bin\Release
-          dotnet nuget push .\SpiceSharpBehavioral\bin\Release\SpiceSharpBehavioral.*.nupkg -k $KEY
+        run: dotnet nuget push .\SpiceSharpBehavioral\bin\Release\SpiceSharpBehavioral.*.nupkg -k $KEY
       
