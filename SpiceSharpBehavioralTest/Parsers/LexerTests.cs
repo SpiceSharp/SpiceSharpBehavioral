@@ -2,7 +2,7 @@
 using SpiceSharpBehavioral.Parsers;
 using System.Collections.Generic;
 
-namespace SpiceSharpBehavioralTests.Parsers
+namespace SpiceSharpBehavioralTest.Parsers
 {
     [TestFixture]
     public class LexerTests

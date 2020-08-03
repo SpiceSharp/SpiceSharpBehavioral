@@ -5,7 +5,7 @@ using SpiceSharpBehavioral.Builders;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using System.Collections.Generic;
 
-namespace SpiceSharpBehavioralTests.Builders
+namespace SpiceSharpBehavioralTest.Builders
 {
     [TestFixture]
     public class DoubleBuilderTests
