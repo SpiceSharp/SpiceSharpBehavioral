@@ -3,13 +3,11 @@
     {
       "src": [
         {
-          "files": [ "**.csproj" ],
-          "src": "SpiceSharpBehavioral",
-          "exclude": [ "obj/**", "bin/**" ]
+          "files": [ "SpiceSharpBehavioral/bin/Debug/net45/SpiceSharpBehavioral.dll" ],
         }
       ],
       "force": false,
-      "dest": "SpiceSharpBehavioral/obj/api",
+      "dest": "SpiceSharpBehavioral/bin/api",
       "properties":
       {
         "TargetFramework": "net45"
@@ -19,8 +17,8 @@
   "build": {
     "content": [
       {
-        "files": [ "api/*.yml" ],
-        "src": "SpiceSharpBehavioral/obj"
+        "files": [ "api/*.yml", "*.yml" ],
+        "src": "SpiceSharpBehavioral/bin"
       },
       {
         "files": [
@@ -30,7 +28,7 @@
             "articles/*.md", "articles/*.yml",
             "articles/**/*.md", "articles/**/*.yml"
         ],
-        "exclude": [ "appveyor.yml", ".travis.yml", "docs/**", "SpiceSharpBehavioral/**", "SpiceSharpBehavioralTests/**" ]
+        "exclude": [ "appveyor.yml", ".travis.yml", "docs/**", "SpiceSharpBehavioral/**" ]
       }
     ],
     "resource": [
@@ -50,7 +48,7 @@
 	},
     "dest": "docs",
     "maxParallelism": 4,
-    "template": [ "default", "material/material" ],
+    "template": [ "default", "templates/material" ],
 	"force": true
   }
 }

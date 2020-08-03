@@ -1,16 +1,19 @@
-﻿namespace SpiceSharpBehavioral.Parsers
+﻿using SpiceSharpBehavioral.Parsers.Nodes;
+
+namespace SpiceSharpBehavioral.Parsers
 {
     /// <summary>
-    /// Describes a class that parses an expression.
+    /// Describes a parser.
     /// </summary>
-    /// <typeparam name="T">The return type of the parser.</typeparam>
-    public interface IParser<T>
+    public interface IParser
     {
         /// <summary>
-        /// Parses an expression.
+        /// Parses an expression using the specified lexer.
         /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <returns></returns>
-        T Parse(string expression);
+        /// <param name="lexer">The lexer.</param>
+        /// <returns>
+        /// The parse result.
+        /// </returns>
+        Node Parse(ILexer lexer);
     }
 }

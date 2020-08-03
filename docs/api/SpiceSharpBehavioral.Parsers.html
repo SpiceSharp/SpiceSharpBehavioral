@@ -10,19 +10,20 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Namespace SpiceSharpBehavioral.Parsers
    ">
-    <meta name="generator" content="docfx 2.47.0.0">
+    <meta name="generator" content="docfx 2.52.0.0">
     
     <link rel="shortcut icon" href="../api/images/favicon.ico">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../styles/docfx.css">
     <link rel="stylesheet" href="../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
+    <script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     
     
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -77,82 +78,27 @@
   <div class="markdown level0 remarks"></div>
     <h3 id="classes">Classes
   </h3>
-      <h4><a class="xref" href="SpiceSharpBehavioral.Parsers.Derivatives-1.html">Derivatives&lt;T&gt;</a></h4>
-      <section><p>Keeps track of derivatives</p>
+      <h4><a class="xref" href="SpiceSharpBehavioral.Parsers.Lexer.html">Lexer</a></h4>
+      <section><p>A lexer that will tokenize Spice expressions.</p>
 </section>
-      <h4><a class="xref" href="SpiceSharpBehavioral.Parsers.DoubleDerivatives.html">DoubleDerivatives</a></h4>
-      <section><p>A specific implementation of derivatives for doubles.</p>
+      <h4><a class="xref" href="SpiceSharpBehavioral.Parsers.Parser.html">Parser</a></h4>
+      <section><p>A parser that parses Spice expressions.</p>
 </section>
-      <h4><a class="xref" href="SpiceSharpBehavioral.Parsers.ExpressionTreeDerivativeParser.html">ExpressionTreeDerivativeParser</a></h4>
-      <section><p>This class can parse expressions into methods. It uses linq expressions to build the methods.
-This class will not work for platforms that do not support dynamic code generation.</p>
-</section>
-      <h4><a class="xref" href="SpiceSharpBehavioral.Parsers.ExpressionTreeDerivativePropertyEventArgs.html">ExpressionTreeDerivativePropertyEventArgs</a></h4>
-      <section><p>Event arguments for finding Spice properties for the <a class="xref" href="SpiceSharpBehavioral.Parsers.ExpressionTreeDerivativeParser.html">ExpressionTreeDerivativeParser</a>.</p>
-</section>
-      <h4><a class="xref" href="SpiceSharpBehavioral.Parsers.ExpressionTreeDerivatives.html">ExpressionTreeDerivatives</a></h4>
-      <section><p>A specific implementation of derivatives for expression trees.</p>
-</section>
-      <h4><a class="xref" href="SpiceSharpBehavioral.Parsers.ExpressionTreeParser.html">ExpressionTreeParser</a></h4>
-      <section><p>Allows parsing expressions into a method. The method signature should
-match the expression.</p>
-</section>
-      <h4><a class="xref" href="SpiceSharpBehavioral.Parsers.ExpressionTreeSpicePropertyEventArgs.html">ExpressionTreeSpicePropertyEventArgs</a></h4>
-      <section><p>Event arguments for finding spice properties for the <a class="xref" href="SpiceSharpBehavioral.Parsers.ExpressionTreeDerivativeParser.html">ExpressionTreeDerivativeParser</a>.</p>
-</section>
-      <h4><a class="xref" href="SpiceSharpBehavioral.Parsers.FunctionFoundEventArgs-1.html">FunctionFoundEventArgs&lt;T&gt;</a></h4>
-      <section><p>Event arguments used when a function is found.</p>
-</section>
-      <h4><a class="xref" href="SpiceSharpBehavioral.Parsers.ParserException.html">ParserException</a></h4>
-      <section><p>A parser exception</p>
-</section>
-      <h4><a class="xref" href="SpiceSharpBehavioral.Parsers.ShuntingYard.html">ShuntingYard</a></h4>
-      <section><p>An expression parser that provides methods for parsing expressions
-using the Dijkstra&apos;s Shunting Yard algorithm. It can convert an
-expression in infix expression into Reverse Polish Notation (RPN).</p>
-</section>
-      <h4><a class="xref" href="SpiceSharpBehavioral.Parsers.SimpleDerivativeParser.html">SimpleDerivativeParser</a></h4>
-      <section><p>This class can parse expressions into methods. It uses nested method calls to build the methods.
-This class will probably run on most platforms.</p>
-</section>
-      <h4><a class="xref" href="SpiceSharpBehavioral.Parsers.SimpleDerivativePropertyEventArgs.html">SimpleDerivativePropertyEventArgs</a></h4>
-      <section><p>Event arguments for finding properties of a <a class="xref" href="SpiceSharpBehavioral.Parsers.SimpleDerivativeParser.html">SimpleDerivativeParser</a>.</p>
-</section>
-      <h4><a class="xref" href="SpiceSharpBehavioral.Parsers.SimpleParser.html">SimpleParser</a></h4>
-      <section><p>Allows parsing an expression using only doubles.</p>
-</section>
-      <h4><a class="xref" href="SpiceSharpBehavioral.Parsers.SimpleSpicePropertyEventArgs.html">SimpleSpicePropertyEventArgs</a></h4>
-      <section><p>Event arguments for finding spice properties in a <a class="xref" href="SpiceSharpBehavioral.Parsers.SimpleParser.html">SimpleParser</a>.</p>
-</section>
-      <h4><a class="xref" href="SpiceSharpBehavioral.Parsers.SpiceParser.html">SpiceParser</a></h4>
-      <section><p>A class capable of parsing Spice-like arithmetic</p>
-</section>
-      <h4><a class="xref" href="SpiceSharpBehavioral.Parsers.SpiceProperty.html">SpiceProperty</a></h4>
-      <section><p>Event arguments for </p>
-</section>
-      <h4><a class="xref" href="SpiceSharpBehavioral.Parsers.SpicePropertyFoundEventArgs-1.html">SpicePropertyFoundEventArgs&lt;T&gt;</a></h4>
-      <section><p>Event arguments used when a Spice property is found.</p>
-</section>
-      <h4><a class="xref" href="SpiceSharpBehavioral.Parsers.StandardArithmeticParser.html">StandardArithmeticParser</a></h4>
-      <section><p>A class capable of applying the Shunting Yard algorithm for standard arithmetic rules.
-This means it has precedence and associativity built in for the unary operator positive,
-negative and not. It describes the binary operators addition, subtraction, multiplication,
-division, modulo, powers, equality, non-equality, or, and greater/less (or equal) than and
-the ternary operator. It also supports brackets and function calls.</p>
-</section>
-      <h4><a class="xref" href="SpiceSharpBehavioral.Parsers.VariableFoundEventArgs-1.html">VariableFoundEventArgs&lt;T&gt;</a></h4>
-      <section><p>Event arguments used when a variable was found.</p>
+      <h4><a class="xref" href="SpiceSharpBehavioral.Parsers.SpiceHelper.html">SpiceHelper</a></h4>
+      <section><p>Spice-specific helper methods.</p>
 </section>
     <h3 id="interfaces">Interfaces
   </h3>
-      <h4><a class="xref" href="SpiceSharpBehavioral.Parsers.IDerivatives.html">IDerivatives</a></h4>
-      <section><p>Interface for storing and managing derivatives.</p>
+      <h4><a class="xref" href="SpiceSharpBehavioral.Parsers.ILexer.html">ILexer</a></h4>
+      <section><p>Describes a lexer for Spice# expressions.</p>
 </section>
-      <h4><a class="xref" href="SpiceSharpBehavioral.Parsers.IParser-1.html">IParser&lt;T&gt;</a></h4>
-      <section><p>Describes a class that parses an expression.</p>
+      <h4><a class="xref" href="SpiceSharpBehavioral.Parsers.IParser.html">IParser</a></h4>
+      <section><p>Describes a parser.</p>
 </section>
-      <h4><a class="xref" href="SpiceSharpBehavioral.Parsers.ISpiceDerivativeParser-1.html">ISpiceDerivativeParser&lt;T&gt;</a></h4>
-      <section><p>Interface for parsers that can also derive to variables.</p>
+    <h3 id="enums">Enums
+  </h3>
+      <h4><a class="xref" href="SpiceSharpBehavioral.Parsers.TokenType.html">TokenType</a></h4>
+      <section><p>The token types (also function as a state).</p>
 </section>
 </article>
           </div>

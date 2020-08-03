@@ -10,19 +10,20 @@
     <meta name="viewport" content="width=device-width">
     <meta name="title" content="Class BehavioralVoltageSource
    ">
-    <meta name="generator" content="docfx 2.47.0.0">
+    <meta name="generator" content="docfx 2.52.0.0">
     
     <link rel="shortcut icon" href="../api/images/favicon.ico">
     <link rel="stylesheet" href="../styles/docfx.vendor.css">
     <link rel="stylesheet" href="../styles/docfx.css">
     <link rel="stylesheet" href="../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
     <meta property="docfx:navrel" content="../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
+    <script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     
     
     
-  </head>
-  <body data-spy="scroll" data-target="#affix" data-offset="120">
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
     <div id="wrapper">
       <header>
         
@@ -79,114 +80,41 @@
   <div class="inheritance">
     <h5>Inheritance</h5>
     <div class="level0"><span class="xref">System.Object</span></div>
-    <div class="level1"><span class="xref">SpiceSharp.Circuits.Entity</span></div>
-    <div class="level2"><span class="xref">SpiceSharp.Components.Component</span></div>
-    <div class="level3"><a class="xref" href="SpiceSharpBehavioral.Components.BehavioralBehaviors.BehavioralComponent.html">BehavioralComponent</a></div>
-    <div class="level4"><span class="xref">BehavioralVoltageSource</span></div>
+    <div class="level1"><a class="xref" href="SpiceSharp.Components.BehavioralComponents.BehavioralComponent.html">BehavioralComponent</a></div>
+    <div class="level2"><span class="xref">BehavioralVoltageSource</span></div>
   </div>
   <div classs="implements">
     <h5>Implements</h5>
+    <div><span class="xref">SpiceSharp.Components.IComponent</span></div>
+    <div><span class="xref">SpiceSharp.Entities.IEntity</span></div>
     <div><span class="xref">SpiceSharp.ICloneable</span></div>
-    <div><span class="xref">SpiceSharp.ICloneable</span>&lt;<span class="xref">SpiceSharp.Circuits.Entity</span>&gt;</div>
+    <div><span class="xref">SpiceSharp.ParameterSets.IParameterSetCollection</span></div>
+    <div><span class="xref">SpiceSharp.ParameterSets.IParameterSet</span></div>
+    <div><span class="xref">SpiceSharp.ParameterSets.IParameterized</span>&lt;<a class="xref" href="SpiceSharp.Components.BehavioralComponents.Parameters.html">Parameters</a>&gt;</div>
   </div>
   <div class="inheritedMembers">
     <h5>Inherited Members</h5>
     <div>
-      <a class="xref" href="SpiceSharpBehavioral.Components.BehavioralBehaviors.BehavioralComponent.html#SpiceSharpBehavioral_Components_BehavioralBehaviors_BehavioralComponent_CreateBehaviors_System_Type___SpiceSharp_Simulations_Simulation_SpiceSharp_Circuits_EntityCollection_">BehavioralComponent.CreateBehaviors(Type[], Simulation, EntityCollection)</a>
+      <a class="xref" href="SpiceSharp.Components.BehavioralComponents.BehavioralComponent.html#SpiceSharp_Components_BehavioralComponents_BehavioralComponent_Connect_System_String___">BehavioralComponent.Connect(String[])</a>
     </div>
     <div>
-      <a class="xref" href="SpiceSharpBehavioral.Components.BehavioralBehaviors.BehavioralComponent.html#SpiceSharpBehavioral_Components_BehavioralBehaviors_BehavioralComponent_Clone_SpiceSharp_Circuits_InstanceData_">BehavioralComponent.Clone(InstanceData)</a>
+      <a class="xref" href="SpiceSharp.Components.BehavioralComponents.BehavioralComponent.html#SpiceSharp_Components_BehavioralComponents_BehavioralComponent_CreateBehaviors_SpiceSharp_Simulations_ISimulation_">BehavioralComponent.CreateBehaviors(ISimulation)</a>
     </div>
     <div>
-      <span class="xref">SpiceSharp.Components.Component.Connect(System.String[])</span>
+      <a class="xref" href="SpiceSharp.Components.BehavioralComponents.BehavioralComponent.html#SpiceSharp_Components_BehavioralComponents_BehavioralComponent_Parameters">BehavioralComponent.Parameters</a>
     </div>
     <div>
-      <span class="xref">SpiceSharp.Components.Component.BindBehavior(SpiceSharp.Behaviors.IBehavior, SpiceSharp.Simulations.Simulation)</span>
+      <a class="xref" href="SpiceSharp.Components.BehavioralComponents.BehavioralComponent.html#SpiceSharp_Components_BehavioralComponents_BehavioralComponent_Model">BehavioralComponent.Model</a>
     </div>
     <div>
-      <span class="xref">SpiceSharp.Components.Component.BuildBindingContext(SpiceSharp.Simulations.Simulation)</span>
-    </div>
-    <div>
-      <span class="xref">SpiceSharp.Components.Component.GetNode(System.Int32)</span>
-    </div>
-    <div>
-      <span class="xref">SpiceSharp.Components.Component.ApplyConnections(SpiceSharp.Simulations.VariableSet)</span>
-    </div>
-    <div>
-      <span class="xref">SpiceSharp.Components.Component.GetNodeIndexes(SpiceSharp.Simulations.VariableSet)</span>
-    </div>
-    <div>
-      <span class="xref">SpiceSharp.Components.Component.CopyFrom(SpiceSharp.Circuits.Entity)</span>
-    </div>
-    <div>
-      <span class="xref">SpiceSharp.Components.Component.PinCount</span>
-    </div>
-    <div>
-      <span class="xref">SpiceSharp.Components.Component.Model</span>
-    </div>
-    <div>
-      <span class="xref">SpiceSharp.Circuits.Entity.RegisterBehaviorFactory(System.Type, SpiceSharp.Behaviors.BehaviorFactoryDictionary)</span>
-    </div>
-    <div>
-      <span class="xref">SpiceSharp.Circuits.Entity.SetPrincipalParameter&lt;T&gt;(T)</span>
-    </div>
-    <div>
-      <span class="xref">SpiceSharp.Circuits.Entity.SetParameter(System.String, System.Collections.Generic.IEqualityComparer&lt;System.String&gt;)</span>
-    </div>
-    <div>
-      <span class="xref">SpiceSharp.Circuits.Entity.SetParameter&lt;T&gt;(System.String, T, System.Collections.Generic.IEqualityComparer&lt;System.String&gt;)</span>
-    </div>
-    <div>
-      <span class="xref">SpiceSharp.Circuits.Entity.GetPrincipalParameter&lt;T&gt;()</span>
-    </div>
-    <div>
-      <span class="xref">SpiceSharp.Circuits.Entity.GetParameter&lt;T&gt;(System.String, System.Collections.Generic.IEqualityComparer&lt;System.String&gt;)</span>
-    </div>
-    <div>
-      <span class="xref">SpiceSharp.Circuits.Entity.Clone()</span>
-    </div>
-    <div>
-      <span class="xref">SpiceSharp.Circuits.Entity.SpiceSharp.ICloneable.Clone()</span>
-    </div>
-    <div>
-      <span class="xref">SpiceSharp.Circuits.Entity.SpiceSharp.ICloneable.CopyFrom(SpiceSharp.ICloneable)</span>
-    </div>
-    <div>
-      <span class="xref">SpiceSharp.Circuits.Entity.ParameterSets</span>
-    </div>
-    <div>
-      <span class="xref">SpiceSharp.Circuits.Entity.Name</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ToString()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetHashCode()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.GetType()</span>
-    </div>
-    <div>
-      <span class="xref">System.Object.MemberwiseClone()</span>
+      <a class="xref" href="SpiceSharp.Components.BehavioralComponents.BehavioralComponent.html#SpiceSharp_Components_BehavioralComponents_BehavioralComponent_Nodes">BehavioralComponent.Nodes</a>
     </div>
   </div>
   <h6><strong>Namespace</strong>: <a class="xref" href="SpiceSharp.Components.html">SpiceSharp.Components</a></h6>
   <h6><strong>Assembly</strong>: SpiceSharpBehavioral.dll</h6>
   <h5 id="SpiceSharp_Components_BehavioralVoltageSource_syntax">Syntax</h5>
   <div class="codewrapper">
-    <pre><code class="lang-csharp hljs">[Pin(0, &quot;V+&quot;)]
-[Pin(1, &quot;V-&quot;)]
-[VoltageDriver(0, 1)]
-public class BehavioralVoltageSource : BehavioralComponent, ICloneable, ICloneable&lt;Entity&gt;</code></pre>
+    <pre><code class="lang-csharp hljs">public class BehavioralVoltageSource : BehavioralComponent, IComponent, IEntity, ICloneable, IParameterSetCollection, IParameterSet, IParameterized&lt;Parameters&gt;</code></pre>
   </div>
   <h3 id="constructors">Constructors
   </h3>
@@ -212,7 +140,7 @@ public class BehavioralVoltageSource : BehavioralComponent, ICloneable, ICloneab
       <tr>
         <td><span class="xref">System.String</span></td>
         <td><span class="parametername">name</span></td>
-        <td><p>The name of the voltage source.</p>
+        <td><p>The name of the entity.</p>
 </td>
       </tr>
     </tbody>
@@ -239,7 +167,7 @@ public class BehavioralVoltageSource : BehavioralComponent, ICloneable, ICloneab
       <tr>
         <td><span class="xref">System.String</span></td>
         <td><span class="parametername">name</span></td>
-        <td><p>The name of the voltage source.</p>
+        <td><p>The name.</p>
 </td>
       </tr>
       <tr>
@@ -265,7 +193,7 @@ public class BehavioralVoltageSource : BehavioralComponent, ICloneable, ICloneab
   <h3 id="fields">Fields
   </h3>
   <h4 id="SpiceSharp_Components_BehavioralVoltageSource_BehavioralVoltageSourcePinCount" data-uid="SpiceSharp.Components.BehavioralVoltageSource.BehavioralVoltageSourcePinCount">BehavioralVoltageSourcePinCount</h4>
-  <div class="markdown level1 summary"><p>The behavioral voltage source pin count</p>
+  <div class="markdown level1 summary"><p>The behavioral voltage source base pin count</p>
 </div>
   <div class="markdown level1 conceptual"></div>
   <h5 class="decalaration">Declaration</h5>
@@ -289,14 +217,26 @@ public class BehavioralVoltageSource : BehavioralComponent, ICloneable, ICloneab
   </table>
   <h3 id="implements">Implements</h3>
   <div>
+      <span class="xref">SpiceSharp.Components.IComponent</span>
+  </div>
+  <div>
+      <span class="xref">SpiceSharp.Entities.IEntity</span>
+  </div>
+  <div>
       <span class="xref">SpiceSharp.ICloneable</span>
   </div>
   <div>
-      <span class="xref">SpiceSharp.ICloneable&lt;T&gt;</span>
+      <span class="xref">SpiceSharp.ParameterSets.IParameterSetCollection</span>
+  </div>
+  <div>
+      <span class="xref">SpiceSharp.ParameterSets.IParameterSet</span>
+  </div>
+  <div>
+      <span class="xref">SpiceSharp.ParameterSets.IParameterized&lt;&gt;</span>
   </div>
   <h3 id="seealso">See Also</h3>
   <div class="seealso">
-      <div><span class="xref">SpiceSharp.Components.Component</span></div>
+      <div><a class="xref" href="SpiceSharp.Components.BehavioralComponents.BehavioralComponent.html">BehavioralComponent</a></div>
   </div>
 </article>
           </div>
