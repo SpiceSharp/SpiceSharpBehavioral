@@ -72,6 +72,7 @@ namespace SpiceSharp.Components.BehavioralComponents
         /// <returns>
         /// The instance calling the method for chaining.
         /// </returns>
+        /// <exception cref="NodeMismatchException">Thrown if the the number of nodes does not match that of the component.</exception>
         public IComponent Connect(params string[] nodes)
         {
             if (nodes == null || nodes.Length != _connections.Length)
@@ -84,7 +85,11 @@ namespace SpiceSharp.Components.BehavioralComponents
             return this;
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Creates the behaviors and stores them in the specified container.
+        /// </summary>
+        /// <param name="simulation">The simulation.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="simulation"/> is <c>null</c>.</exception>
         public override void CreateBehaviors(ISimulation simulation)
         {
             var behaviors = new BehaviorContainer(Name);

@@ -98,7 +98,9 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
             _elements = new ElementSet<double>(state.Solver, matLocs, rhsLocs);
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Loads the Y-matrix and right hand side vector.
+        /// </summary>
         void IBiasingBehavior.Load()
         {
             double[] values = new double[Functions.Length * 2 + 2];

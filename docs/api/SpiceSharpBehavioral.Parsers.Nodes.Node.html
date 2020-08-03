@@ -1,0 +1,1910 @@
+﻿<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+  
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class Node
+   </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class Node
+   ">
+    <meta name="generator" content="docfx 2.52.0.0">
+    
+    <link rel="shortcut icon" href="../api/images/favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/docfx.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
+    <meta property="docfx:navrel" content="../toc.html">
+    <meta property="docfx:tocrel" content="toc.html">
+    <script type="text/javascript" async="" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    
+    
+    
+  </head>  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+        
+        <nav id="autocollapse" class="navbar navbar-inverse ng-scope" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../api/images/favicon.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-right" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search" autocomplete="off">
+                </div>
+              </form>
+            </div>
+          </div>
+        </nav>
+        
+        <div class="subnav navbar navbar-default">
+          <div class="container hide-when-search" id="breadcrumb">
+            <ul class="breadcrumb">
+              <li></li>
+            </ul>
+          </div>
+        </div>
+      </header>
+      <div role="main" class="container body-content hide-when-search">
+        
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <article class="content wrap" id="_content" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node">
+  
+  
+  <h1 id="SpiceSharpBehavioral_Parsers_Nodes_Node" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node" class="text-break">Class Node
+  </h1>
+  <div class="markdown level0 summary"><p>An abstract class representing an expression tree node.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><span class="xref">System.Object</span></div>
+    <div class="level1"><span class="xref">Node</span></div>
+      <div class="level2"><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.BinaryOperatorNode.html">BinaryOperatorNode</a></div>
+      <div class="level2"><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.ConstantNode.html">ConstantNode</a></div>
+      <div class="level2"><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.FunctionNode.html">FunctionNode</a></div>
+      <div class="level2"><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.PropertyNode.html">PropertyNode</a></div>
+      <div class="level2"><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.TernaryOperatorNode.html">TernaryOperatorNode</a></div>
+      <div class="level2"><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.UnaryOperatorNode.html">UnaryOperatorNode</a></div>
+      <div class="level2"><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.VariableNode.html">VariableNode</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <span class="xref">System.Object.ToString()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.Equals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.ReferenceEquals(System.Object, System.Object)</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetHashCode()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.GetType()</span>
+    </div>
+    <div>
+      <span class="xref">System.Object.MemberwiseClone()</span>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.html">SpiceSharpBehavioral.Parsers.Nodes</a></h6>
+  <h6><strong>Assembly</strong>: SpiceSharpBehavioral.dll</h6>
+  <h5 id="SpiceSharpBehavioral_Parsers_Nodes_Node_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public abstract class Node</code></pre>
+  </div>
+  <h5 id="SpiceSharpBehavioral_Parsers_Nodes_Node_remarks"><strong>Remarks</strong></h5>
+  <div class="markdown level0 remarks"><p>This framework is loosely based on Linq expressions.</p>
+</div>
+  <h3 id="constructors">Constructors
+  </h3>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node__ctor_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.#ctor*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node__ctor_SpiceSharpBehavioral_Parsers_Nodes_NodeTypes_SpiceSharpBehavioral_Parsers_Nodes_NodeProperties_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.#ctor(SpiceSharpBehavioral.Parsers.Nodes.NodeTypes,SpiceSharpBehavioral.Parsers.Nodes.NodeProperties)">Node(NodeTypes, NodeProperties)</h4>
+  <div class="markdown level1 summary"><p>Initializes a new instance of the <a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a> class.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">protected Node(NodeTypes type, NodeProperties properties = NodeProperties.None)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.NodeTypes.html">NodeTypes</a></td>
+        <td><span class="parametername">type</span></td>
+        <td><p>The type.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.NodeProperties.html">NodeProperties</a></td>
+        <td><span class="parametername">properties</span></td>
+        <td><p>The properties of the node.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="fields">Fields
+  </h3>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_One" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.One">One</h4>
+  <div class="markdown level1 summary"><p>A constant that represents one. Can be used for simplifications.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly Node One</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_Two" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Two">Two</h4>
+  <div class="markdown level1 summary"><p>A constant that represents two. Can be used for simplifications.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly Node Two</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_Zero" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Zero">Zero</h4>
+  <div class="markdown level1 summary"><p>A constant that represents zero. Can be used for simplifications.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static readonly Node Zero</code></pre>
+  </div>
+  <h5 class="fieldValue">Field Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="properties">Properties
+  </h3>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_NodeType_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.NodeType*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_NodeType" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.NodeType">NodeType</h4>
+  <div class="markdown level1 summary"><p>Gets the type of the node.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public NodeTypes NodeType { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.NodeTypes.html">NodeTypes</a></td>
+        <td><p>The type of the node.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_Properties_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Properties*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_Properties" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Properties">Properties</h4>
+  <div class="markdown level1 summary"><p>Gets the properties.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public virtual NodeProperties Properties { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.NodeProperties.html">NodeProperties</a></td>
+        <td><p>The properties.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+  </h3>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_Add_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Add*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_Add_SpiceSharpBehavioral_Parsers_Nodes_Node_SpiceSharpBehavioral_Parsers_Nodes_Node_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Add(SpiceSharpBehavioral.Parsers.Nodes.Node,SpiceSharpBehavioral.Parsers.Nodes.Node)">Add(Node, Node)</h4>
+  <div class="markdown level1 summary"><p>Creates an addition of two arguments.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static BinaryOperatorNode Add(Node left, Node right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">left</span></td>
+        <td><p>The left argument.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">right</span></td>
+        <td><p>The right argument.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.BinaryOperatorNode.html">BinaryOperatorNode</a></td>
+        <td><p>The node representing the added result.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_And_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.And*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_And_SpiceSharpBehavioral_Parsers_Nodes_Node_SpiceSharpBehavioral_Parsers_Nodes_Node_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.And(SpiceSharpBehavioral.Parsers.Nodes.Node,SpiceSharpBehavioral.Parsers.Nodes.Node)">And(Node, Node)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static BinaryOperatorNode And(Node left, Node right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">left</span></td>
+        <td><p>The left argument.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">right</span></td>
+        <td><p>The right argument.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.BinaryOperatorNode.html">BinaryOperatorNode</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_Conditional_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Conditional*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_Conditional_SpiceSharpBehavioral_Parsers_Nodes_Node_SpiceSharpBehavioral_Parsers_Nodes_Node_SpiceSharpBehavioral_Parsers_Nodes_Node_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Conditional(SpiceSharpBehavioral.Parsers.Nodes.Node,SpiceSharpBehavioral.Parsers.Nodes.Node,SpiceSharpBehavioral.Parsers.Nodes.Node)">Conditional(Node, Node, Node)</h4>
+  <div class="markdown level1 summary"><p>Creates a conditional value.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static TernaryOperatorNode Conditional(Node condition, Node ifTrue, Node ifFalse)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">condition</span></td>
+        <td><p>The condition that decides what the result should be.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">ifTrue</span></td>
+        <td><p>The value if the condition is true.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">ifFalse</span></td>
+        <td><p>The value if the condition is false.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.TernaryOperatorNode.html">TernaryOperatorNode</a></td>
+        <td><p>The node representing the conditional value.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_Constant_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Constant*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_Constant_System_Double_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Constant(System.Double)">Constant(Double)</h4>
+  <div class="markdown level1 summary"><p>Creates a constant.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static ConstantNode Constant(double literal)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Double</span></td>
+        <td><span class="parametername">literal</span></td>
+        <td><p>The value of the constant.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.ConstantNode.html">ConstantNode</a></td>
+        <td><p>The node representing the constant value.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_Current_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Current*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_Current_System_String_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Current(System.String)">Current(String)</h4>
+  <div class="markdown level1 summary"><p>Creates a node voltage.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static VariableNode Current(string name)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">name</span></td>
+        <td><p>The name of the node.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.VariableNode.html">VariableNode</a></td>
+        <td><p>The node representing the node voltage.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_Divide_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Divide*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_Divide_SpiceSharpBehavioral_Parsers_Nodes_Node_SpiceSharpBehavioral_Parsers_Nodes_Node_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Divide(SpiceSharpBehavioral.Parsers.Nodes.Node,SpiceSharpBehavioral.Parsers.Nodes.Node)">Divide(Node, Node)</h4>
+  <div class="markdown level1 summary"><p>Creates a division of two arguments.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static BinaryOperatorNode Divide(Node left, Node right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">left</span></td>
+        <td><p>The left argument.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">right</span></td>
+        <td><p>The right argument.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.BinaryOperatorNode.html">BinaryOperatorNode</a></td>
+        <td><p>The node representing the divided result.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_Equals_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Equals*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_Equals_SpiceSharpBehavioral_Parsers_Nodes_Node_SpiceSharpBehavioral_Parsers_Nodes_Node_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Equals(SpiceSharpBehavioral.Parsers.Nodes.Node,SpiceSharpBehavioral.Parsers.Nodes.Node)">Equals(Node, Node)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static BinaryOperatorNode Equals(Node left, Node right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">left</span></td>
+        <td><p>The left argument.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">right</span></td>
+        <td><p>The right argument.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.BinaryOperatorNode.html">BinaryOperatorNode</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_Function_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Function*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_Function_System_String_SpiceSharpBehavioral_Parsers_Nodes_Node___" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Function(System.String,SpiceSharpBehavioral.Parsers.Nodes.Node[])">Function(String, Node[])</h4>
+  <div class="markdown level1 summary"><p>Creates a function call.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static FunctionNode Function(string name, params Node[] arguments)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">name</span></td>
+        <td><p>The name of the function.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a>[]</td>
+        <td><span class="parametername">arguments</span></td>
+        <td><p>The arguments of the function.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.FunctionNode.html">FunctionNode</a></td>
+        <td><p>The node representing the function call.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_Function_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Function*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_Function_System_String_System_Collections_Generic_IReadOnlyList_SpiceSharpBehavioral_Parsers_Nodes_Node__" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Function(System.String,System.Collections.Generic.IReadOnlyList{SpiceSharpBehavioral.Parsers.Nodes.Node})">Function(String, IReadOnlyList&lt;Node&gt;)</h4>
+  <div class="markdown level1 summary"><p>Creates a function call.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static FunctionNode Function(string name, IReadOnlyList&lt;Node&gt; arguments)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">name</span></td>
+        <td><p>The name of the function.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.Collections.Generic.IReadOnlyList</span>&lt;<a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a>&gt;</td>
+        <td><span class="parametername">arguments</span></td>
+        <td><p>The arguments of the function.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.FunctionNode.html">FunctionNode</a></td>
+        <td><p>The node representing the function call.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_GreaterThan_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.GreaterThan*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_GreaterThan_SpiceSharpBehavioral_Parsers_Nodes_Node_SpiceSharpBehavioral_Parsers_Nodes_Node_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.GreaterThan(SpiceSharpBehavioral.Parsers.Nodes.Node,SpiceSharpBehavioral.Parsers.Nodes.Node)">GreaterThan(Node, Node)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static BinaryOperatorNode GreaterThan(Node left, Node right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">left</span></td>
+        <td><p>The left argument.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">right</span></td>
+        <td><p>The right argument.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.BinaryOperatorNode.html">BinaryOperatorNode</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_GreaterThanOrEqual_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.GreaterThanOrEqual*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_GreaterThanOrEqual_SpiceSharpBehavioral_Parsers_Nodes_Node_SpiceSharpBehavioral_Parsers_Nodes_Node_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.GreaterThanOrEqual(SpiceSharpBehavioral.Parsers.Nodes.Node,SpiceSharpBehavioral.Parsers.Nodes.Node)">GreaterThanOrEqual(Node, Node)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static BinaryOperatorNode GreaterThanOrEqual(Node left, Node right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">left</span></td>
+        <td><p>The left argument.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">right</span></td>
+        <td><p>The right argument.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.BinaryOperatorNode.html">BinaryOperatorNode</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_LessThan_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.LessThan*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_LessThan_SpiceSharpBehavioral_Parsers_Nodes_Node_SpiceSharpBehavioral_Parsers_Nodes_Node_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.LessThan(SpiceSharpBehavioral.Parsers.Nodes.Node,SpiceSharpBehavioral.Parsers.Nodes.Node)">LessThan(Node, Node)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static BinaryOperatorNode LessThan(Node left, Node right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">left</span></td>
+        <td><p>The left argument.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">right</span></td>
+        <td><p>The right argument.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.BinaryOperatorNode.html">BinaryOperatorNode</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_LessThanOrEqual_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.LessThanOrEqual*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_LessThanOrEqual_SpiceSharpBehavioral_Parsers_Nodes_Node_SpiceSharpBehavioral_Parsers_Nodes_Node_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.LessThanOrEqual(SpiceSharpBehavioral.Parsers.Nodes.Node,SpiceSharpBehavioral.Parsers.Nodes.Node)">LessThanOrEqual(Node, Node)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static BinaryOperatorNode LessThanOrEqual(Node left, Node right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">left</span></td>
+        <td><p>The left argument.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">right</span></td>
+        <td><p>The right argument.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.BinaryOperatorNode.html">BinaryOperatorNode</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_Minus_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Minus*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_Minus_SpiceSharpBehavioral_Parsers_Nodes_Node_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Minus(SpiceSharpBehavioral.Parsers.Nodes.Node)">Minus(Node)</h4>
+  <div class="markdown level1 summary"><p>Creates a unary minus operator for an argument.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static UnaryOperatorNode Minus(Node argument)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">argument</span></td>
+        <td><p>The argument.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.UnaryOperatorNode.html">UnaryOperatorNode</a></td>
+        <td><p>The node representing the unary minus result.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_Modulo_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Modulo*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_Modulo_SpiceSharpBehavioral_Parsers_Nodes_Node_SpiceSharpBehavioral_Parsers_Nodes_Node_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Modulo(SpiceSharpBehavioral.Parsers.Nodes.Node,SpiceSharpBehavioral.Parsers.Nodes.Node)">Modulo(Node, Node)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static BinaryOperatorNode Modulo(Node left, Node right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">left</span></td>
+        <td><p>The left argument.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">right</span></td>
+        <td><p>The right argument.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.BinaryOperatorNode.html">BinaryOperatorNode</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_Multiply_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Multiply*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_Multiply_SpiceSharpBehavioral_Parsers_Nodes_Node_SpiceSharpBehavioral_Parsers_Nodes_Node_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Multiply(SpiceSharpBehavioral.Parsers.Nodes.Node,SpiceSharpBehavioral.Parsers.Nodes.Node)">Multiply(Node, Node)</h4>
+  <div class="markdown level1 summary"><p>Creates a multiplication of two arguments.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static BinaryOperatorNode Multiply(Node left, Node right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">left</span></td>
+        <td><p>The left argument.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">right</span></td>
+        <td><p>The right argument.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.BinaryOperatorNode.html">BinaryOperatorNode</a></td>
+        <td><p>The node representing the multiplied result.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_Not_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Not*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_Not_SpiceSharpBehavioral_Parsers_Nodes_Node_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Not(SpiceSharpBehavioral.Parsers.Nodes.Node)">Not(Node)</h4>
+  <div class="markdown level1 summary"><p>Creates a unary bang (!) operator for an argument.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static UnaryOperatorNode Not(Node argument)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">argument</span></td>
+        <td><p>The argument.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.UnaryOperatorNode.html">UnaryOperatorNode</a></td>
+        <td><p>The node representing the unary bang result.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_NotEquals_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.NotEquals*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_NotEquals_SpiceSharpBehavioral_Parsers_Nodes_Node_SpiceSharpBehavioral_Parsers_Nodes_Node_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.NotEquals(SpiceSharpBehavioral.Parsers.Nodes.Node,SpiceSharpBehavioral.Parsers.Nodes.Node)">NotEquals(Node, Node)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static BinaryOperatorNode NotEquals(Node left, Node right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">left</span></td>
+        <td><p>The left argument.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">right</span></td>
+        <td><p>The right argument.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.BinaryOperatorNode.html">BinaryOperatorNode</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_Or_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Or*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_Or_SpiceSharpBehavioral_Parsers_Nodes_Node_SpiceSharpBehavioral_Parsers_Nodes_Node_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Or(SpiceSharpBehavioral.Parsers.Nodes.Node,SpiceSharpBehavioral.Parsers.Nodes.Node)">Or(Node, Node)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static BinaryOperatorNode Or(Node left, Node right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">left</span></td>
+        <td><p>The left argument.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">right</span></td>
+        <td><p>The right argument.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.BinaryOperatorNode.html">BinaryOperatorNode</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_Plus_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Plus*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_Plus_SpiceSharpBehavioral_Parsers_Nodes_Node_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Plus(SpiceSharpBehavioral.Parsers.Nodes.Node)">Plus(Node)</h4>
+  <div class="markdown level1 summary"><p>Creates a unary plus operator for an argument.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static UnaryOperatorNode Plus(Node argument)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">argument</span></td>
+        <td><p>The argument.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.UnaryOperatorNode.html">UnaryOperatorNode</a></td>
+        <td><p>The node representing the unary plus result.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_Power_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Power*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_Power_SpiceSharpBehavioral_Parsers_Nodes_Node_SpiceSharpBehavioral_Parsers_Nodes_Node_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Power(SpiceSharpBehavioral.Parsers.Nodes.Node,SpiceSharpBehavioral.Parsers.Nodes.Node)">Power(Node, Node)</h4>
+  <div class="markdown level1 summary"></div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static BinaryOperatorNode Power(Node left, Node right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">left</span></td>
+        <td><p>The left argument.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">right</span></td>
+        <td><p>The right argument.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.BinaryOperatorNode.html">BinaryOperatorNode</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_Property_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Property*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_Property_System_String_System_String_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Property(System.String,System.String)">Property(String, String)</h4>
+  <div class="markdown level1 summary"><p>Creates a node that returns the property of a behavior.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static PropertyNode Property(string name, string property)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">name</span></td>
+        <td><p>The name of the entity or behavior.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">property</span></td>
+        <td><p>The name of the property.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.PropertyNode.html">PropertyNode</a></td>
+        <td><p>The node representing the property value.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_Subtract_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Subtract*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_Subtract_SpiceSharpBehavioral_Parsers_Nodes_Node_SpiceSharpBehavioral_Parsers_Nodes_Node_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Subtract(SpiceSharpBehavioral.Parsers.Nodes.Node,SpiceSharpBehavioral.Parsers.Nodes.Node)">Subtract(Node, Node)</h4>
+  <div class="markdown level1 summary"><p>Creates a subtraction of two arguments.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static BinaryOperatorNode Subtract(Node left, Node right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">left</span></td>
+        <td><p>The left argument.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">right</span></td>
+        <td><p>The right argument.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.BinaryOperatorNode.html">BinaryOperatorNode</a></td>
+        <td><p>The node representing the subtracted result.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_Variable_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Variable*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_Variable_System_String_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Variable(System.String)">Variable(String)</h4>
+  <div class="markdown level1 summary"><p>Creates a variable.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static VariableNode Variable(string name)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">name</span></td>
+        <td><p>The name of the variable.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.VariableNode.html">VariableNode</a></td>
+        <td><p>The node representing the variable.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_Voltage_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Voltage*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_Voltage_System_String_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Voltage(System.String)">Voltage(String)</h4>
+  <div class="markdown level1 summary"><p>Creates a node voltage.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static VariableNode Voltage(string name)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">name</span></td>
+        <td><p>The name of the node.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.VariableNode.html">VariableNode</a></td>
+        <td><p>The node representing the node voltage.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_Voltage_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Voltage*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_Voltage_System_String_System_String_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.Voltage(System.String,System.String)">Voltage(String, String)</h4>
+  <div class="markdown level1 summary"><p>Creates a node voltage.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static BinaryOperatorNode Voltage(string name, string reference)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">name</span></td>
+        <td><p>The name of the node.</p>
+</td>
+      </tr>
+      <tr>
+        <td><span class="xref">System.String</span></td>
+        <td><span class="parametername">reference</span></td>
+        <td><p>The name of the reference node.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.BinaryOperatorNode.html">BinaryOperatorNode</a></td>
+        <td><p>The node representing the node voltage.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="operators">Operators
+  </h3>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_op_Addition_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.op_Addition*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_op_Addition_SpiceSharpBehavioral_Parsers_Nodes_Node_SpiceSharpBehavioral_Parsers_Nodes_Node_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.op_Addition(SpiceSharpBehavioral.Parsers.Nodes.Node,SpiceSharpBehavioral.Parsers.Nodes.Node)">Addition(Node, Node)</h4>
+  <div class="markdown level1 summary"><p>Implements the operator +.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Node operator +(Node left, Node right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">left</span></td>
+        <td><p>The left.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">right</span></td>
+        <td><p>The right.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><p>The result of the operator.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_op_Division_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.op_Division*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_op_Division_SpiceSharpBehavioral_Parsers_Nodes_Node_SpiceSharpBehavioral_Parsers_Nodes_Node_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.op_Division(SpiceSharpBehavioral.Parsers.Nodes.Node,SpiceSharpBehavioral.Parsers.Nodes.Node)">Division(Node, Node)</h4>
+  <div class="markdown level1 summary"><p>Implements the operator /.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Node operator /(Node left, Node right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">left</span></td>
+        <td><p>The left.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">right</span></td>
+        <td><p>The right.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><p>The result of the operator.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_op_Implicit_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.op_Implicit*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_op_Implicit_System_Double__SpiceSharpBehavioral_Parsers_Nodes_Node" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.op_Implicit(System.Double)~SpiceSharpBehavioral.Parsers.Nodes.Node">Implicit(Double to Node)</h4>
+  <div class="markdown level1 summary"><p>Performs an implicit conversion from <span class="xref">System.Double</span> to <a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static implicit operator Node(double literal)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">System.Double</span></td>
+        <td><span class="parametername">literal</span></td>
+        <td><p>The literal.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><p>The result of the conversion.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_op_Modulus_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.op_Modulus*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_op_Modulus_SpiceSharpBehavioral_Parsers_Nodes_Node_SpiceSharpBehavioral_Parsers_Nodes_Node_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.op_Modulus(SpiceSharpBehavioral.Parsers.Nodes.Node,SpiceSharpBehavioral.Parsers.Nodes.Node)">Modulus(Node, Node)</h4>
+  <div class="markdown level1 summary"><p>Implements the operator %.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Node operator %(Node left, Node right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">left</span></td>
+        <td><p>The left.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">right</span></td>
+        <td><p>The right.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><p>The result of the operator.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_op_Multiply_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.op_Multiply*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_op_Multiply_SpiceSharpBehavioral_Parsers_Nodes_Node_SpiceSharpBehavioral_Parsers_Nodes_Node_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.op_Multiply(SpiceSharpBehavioral.Parsers.Nodes.Node,SpiceSharpBehavioral.Parsers.Nodes.Node)">Multiply(Node, Node)</h4>
+  <div class="markdown level1 summary"><p>Implements the operator *.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Node operator *(Node left, Node right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">left</span></td>
+        <td><p>The left.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">right</span></td>
+        <td><p>The right.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><p>The result of the operator.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_op_Subtraction_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.op_Subtraction*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_op_Subtraction_SpiceSharpBehavioral_Parsers_Nodes_Node_SpiceSharpBehavioral_Parsers_Nodes_Node_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.op_Subtraction(SpiceSharpBehavioral.Parsers.Nodes.Node,SpiceSharpBehavioral.Parsers.Nodes.Node)">Subtraction(Node, Node)</h4>
+  <div class="markdown level1 summary"><p>Implements the operator -.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Node operator -(Node left, Node right)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">left</span></td>
+        <td><p>The left.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">right</span></td>
+        <td><p>The right.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><p>The result of the operator.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_op_UnaryNegation_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.op_UnaryNegation*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_op_UnaryNegation_SpiceSharpBehavioral_Parsers_Nodes_Node_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.op_UnaryNegation(SpiceSharpBehavioral.Parsers.Nodes.Node)">UnaryNegation(Node)</h4>
+  <div class="markdown level1 summary"><p>Implements the operator -.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Node operator -(Node arg)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">arg</span></td>
+        <td><p>The argument.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><p>The result of the operator.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <a id="SpiceSharpBehavioral_Parsers_Nodes_Node_op_UnaryPlus_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.op_UnaryPlus*"></a>
+  <h4 id="SpiceSharpBehavioral_Parsers_Nodes_Node_op_UnaryPlus_SpiceSharpBehavioral_Parsers_Nodes_Node_" data-uid="SpiceSharpBehavioral.Parsers.Nodes.Node.op_UnaryPlus(SpiceSharpBehavioral.Parsers.Nodes.Node)">UnaryPlus(Node)</h4>
+  <div class="markdown level1 summary"><p>Implements the operator +.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang-csharp hljs">public static Node operator +(Node arg)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><span class="parametername">arg</span></td>
+        <td><p>The argument.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="SpiceSharpBehavioral.Parsers.Nodes.Node.html">Node</a></td>
+        <td><p>The result of the operator.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+</article>
+          </div>
+          
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+              <!-- <p><a class="back-to-top" href="#top">Back to top</a><p> -->
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <div class="grad-bottom"></div>
+        <div class="footer">
+          <div class="container">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+            
+            <span>Generated by <strong>DocFX</strong></span>
+          </div>
+        </div>
+      </footer>
+    </div>
+    
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+  </body>
+</html>

@@ -27,7 +27,12 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         private readonly ElementSet<double> _elements, _coreElements;
         private readonly Func<double> _value;
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets the branch equation variable.
+        /// </summary>
+        /// <value>
+        /// The branch equation variable.
+        /// </value>
         IVariable<double> IBranchedBehavior<double>.Branch => _branch;
 
         /// <summary>
@@ -119,7 +124,9 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
             }, new[] { br });
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Loads the Y-matrix and right hand side vector.
+        /// </summary>
         void IBiasingBehavior.Load()
         {
             double[] values = new double[Functions.Length];

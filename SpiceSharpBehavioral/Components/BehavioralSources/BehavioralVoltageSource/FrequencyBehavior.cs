@@ -27,7 +27,12 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         private readonly ElementSet<Complex> _elements, _coreElements;
         private readonly Complex[] _values;
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets the branch equation variable.
+        /// </summary>
+        /// <value>
+        /// The branch equation variable.
+        /// </value>
         IVariable<Complex> IBranchedBehavior<Complex>.Branch => _branch;
 
         /// <summary>
@@ -97,7 +102,9 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
             });
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Initializes the parameters.
+        /// </summary>
         void IFrequencyBehavior.InitializeParameters()
         {
             for (var i = 0; i < Functions.Length; i++)
@@ -107,7 +114,9 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
             }
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Loads the Y-matrix and right hand side vector.
+        /// </summary>
         void IFrequencyBehavior.Load()
         {
             _elements.Add(_values);

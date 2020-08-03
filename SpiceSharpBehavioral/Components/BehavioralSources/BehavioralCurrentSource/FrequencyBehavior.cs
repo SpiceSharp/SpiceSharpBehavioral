@@ -63,7 +63,9 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
             _elements = new ElementSet<Complex>(state.Solver, matLocs);
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Initializes the parameters.
+        /// </summary>
         void IFrequencyBehavior.InitializeParameters()
         {
             for (var i = 0; i < Functions.Length; i++)
@@ -74,7 +76,9 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
             }
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Loads the Y-matrix and right hand side vector.
+        /// </summary>
         void IFrequencyBehavior.Load()
         {
             _elements.Add(_values);
