@@ -25,16 +25,16 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Restore dependencies
-        run: dotnet restore SpiceSharp\SpiceSharp.csproj
+        run: dotnet restore SpiceSharpBehavioral\SpiceSharpBehavioral.csproj
 
       - name: Compile Spice# in Release mode
-        run: msbuild SpiceSharp\SpiceSharp.csproj -p:Configuration=Release
+        run: msbuild SpiceSharpBehavioral\SpiceSharpBehavioral.csproj -p:Configuration=Release
 
       - name: Publish to NuGet
         env:
           KEY: ${{ secrets.NUGET_APIKEY }}
         run: |
-          cd SpiceSharp\bin\Release
+          cd SpiceSharpBehavioral\bin\Release
           dotnet nuget add source https://api.nuget.org/v3/index.json
-          dotnet nuget push SpiceSharp.*.nupkg -k $KEY
+          dotnet nuget push SpiceSharpBehavioral.*.nupkg -k $KEY
       
