@@ -1,85 +1,101 @@
-﻿using SpiceSharp.Components;
+﻿using NUnit.Framework;
 using SpiceSharp;
-using NUnit.Framework;
+using SpiceSharp.Components;
 using SpiceSharp.Simulations;
-using System.Numerics;
 using System;
+using System.Collections.Generic;
+using System.Numerics;
 
 namespace SpiceSharpBehavioralTests.Components
 {
     [TestFixture]
-    public class BehavioralVoltageSourceTests : Framework
+    public class BehavioralVoltageSourceTests
     {
-        [Test]
-        public void When_SimpleBehavioralVoltageGain_Expect_Reference()
+        [TestCaseSource(typeof(BehavioralVoltageSourceTestData), nameof(BehavioralVoltageSourceTestData.Op))]
+        public void When_DirectOutputOp_Expect_Reference(string expression, double dcVoltage, double dcCurrent, double expected)
         {
             var ckt = new Circuit(
-                new VoltageSource("V1", "in", "0", 1),
-                new BehavioralVoltageSource("E1", "out", "0", "V(in)*10"));
-
+                new VoltageSource("V1", "in", "0", dcVoltage),
+                new CurrentSource("I1", "in", "0", dcCurrent),
+                new BehavioralVoltageSource("B1", "out", "0", expression));
             var op = new OP("op");
 
-            AnalyzeOp(ckt, op, new[] { new RealVoltageExport(op, "out") }, new[] { 10.0 });
+            op.ExportSimulationData += (sender, args) =>
+            {
+                Assert.AreEqual(expected, args.GetVoltage("out"), 1e-12);
+            };
+            op.Run(ckt);
         }
 
-        [Test]
-        public void When_SimpleBehavioralCurrentGain_Expect_Reference()
+        [TestCaseSource(typeof(BehavioralVoltageSourceTestData), nameof(BehavioralVoltageSourceTestData.Ac))]
+        public void When_Ac_Expect_Reference(string expression, double dcVoltage, double acVoltage, double dcCurrent, double acCurrent, Func<Complex, Complex> expected)
         {
             var ckt = new Circuit(
-                new VoltageSource("V1", "in", "0", 1),
-                new Resistor("R1", "in", "0", 1),
-                new BehavioralVoltageSource("E1", "out", "0", "I(V1)*10"));
+                new VoltageSource("V1", "in", "0", dcVoltage).SetParameter("acmag", acVoltage),
+                new CurrentSource("I1", "in", "0", dcCurrent).SetParameter("acmag", acCurrent),
+                new BehavioralVoltageSource("B1", "out", "0", expression));
+            var ac = new AC("op", new DecadeSweep(1, 1e3, 2));
 
+            ac.ExportSimulationData += (sender, args) =>
+            {
+                var e = expected(args.Laplace);
+                var a = args.GetComplexVoltage("out");
+                Assert.AreEqual(e.Real, a.Real, 1e-12);
+                Assert.AreEqual(e.Imaginary, a.Imaginary, 1e-12);
+            };
+            ac.Run(ckt);
+        }
+
+        [TestCaseSource(typeof(BehavioralVoltageSourceTestData), nameof(BehavioralVoltageSourceTestData.AdmittanceOp))]
+        public void When_UsedAsAdmittanceOp_Expect_Reference(string expression, double dcVoltage, double resistance, double expected)
+        {
+            // Use the behavioral current source as an impedance description
+            var ckt = new Circuit(
+                new VoltageSource("V1", "in", "0", dcVoltage),
+                new Resistor("R1", "in", "out", resistance),
+                new BehavioralVoltageSource("B1", "out", "0", expression)
+                );
             var op = new OP("op");
 
-            AnalyzeOp(ckt, op, new[] { new RealVoltageExport(op, "out") }, new[] { -10.0 });
+            op.ExportSimulationData += (sender, args) =>
+            {
+                Assert.AreEqual(expected, args.GetVoltage("out"), 1e-12);
+            };
+            op.Run(ckt);
         }
+    }
 
-        [Test]
-        public void When_CurrentSourceMultiplier_Expect_Reference()
+    public class BehavioralVoltageSourceTestData
+    {
+        public static IEnumerable<TestCaseData> Op
         {
-            var ckt = new Circuit(
-                new CurrentSource("I1", "in", "0", 0.8),
-                new Resistor("R1", "in", "0", 1e3),
-                new BehavioralVoltageSource("E1", "out", "0", "I(I1)*2"));
-
-            var op = new OP("op");
-            AnalyzeOp(ckt, op, new[] { new RealVoltageExport(op, "out") }, new[] { 1.6 });
+            get
+            {
+                yield return new TestCaseData("v(in)*3", 2.0, 0.0, 6.0);
+                yield return new TestCaseData("v(in)*v(in)", 3.0, 0.0, 9.0);
+                yield return new TestCaseData("i(V1)*2", 0.0, 2.5, -5.0);
+                yield return new TestCaseData("v(in)*i(V1)", 2.0, 3.0, -6.0);
+            }
         }
-
-        [Test]
-        public void When_Subcircuit_Expect_Reference()
+        public static IEnumerable<TestCaseData> Ac
         {
-            var subckt = new Circuit(
-                new BehavioralVoltageSource("E1", "internal", "0", "V( in ) + 1"),
-                new Resistor("R1", "internal", "out", 1e3));
-            var ckt = new Circuit(
-                new VoltageSource("V1", "a", "0", 0.5),
-                new Resistor("R1", "b", "0", 1e3));
-
-            // Instantiate the subcircuit
-            var instance = new ComponentInstanceData(subckt, "x1");
-            instance.NodeMap.Add("0", "0");
-            instance.NodeMap.Add("in", "a");
-            instance.NodeMap.Add("out", "b");
-            ckt.Instantiate(instance);
-
-            // Do simulation
-            var op = new OP("op");
-            AnalyzeOp(ckt, op, new[] { new RealVoltageExport(op, "b") }, new[] { 0.75 });
+            get
+            {
+                yield return new TestCaseData("v(in)*3", 1.0, 0.0, 0.0, 0.0, new Func<Complex, Complex>(s => 0.0));
+                yield return new TestCaseData("v(in)*3", 0.0, 1.0, 0.0, 0.0, new Func<Complex, Complex>(s => 3.0));
+                yield return new TestCaseData("i(V1)*2", 0.0, 0.0, 1.0, 0.0, new Func<Complex, Complex>(s => 0.0));
+                yield return new TestCaseData("i(V1)*2", 0.0, 0.0, 0.0, 1.0, new Func<Complex, Complex>(s => -2.0));
+                yield return new TestCaseData("v(in)^2", 3.0, 1.0, 0.0, 0.0, new Func<Complex, Complex>(s => 6.0)); // Gain is (v^2)' = 2*v
+                yield return new TestCaseData("v(in)*i(V1)", 1.0, 2.0, 3.0, 4.0, new Func<Complex, Complex>(s => -10.0)); // Gain is (3.0
+            }
         }
-
-        [Test]
-        public void When_SmallSignalAnalysis_Expect_Reference()
+        public static IEnumerable<TestCaseData> AdmittanceOp
         {
-            var ckt = new Circuit(
-                new VoltageSource("V1", "in", "0", 3)
-                    .SetParameter("acmag", 1.0),
-                new BehavioralVoltageSource("E1", "out", "0", "V(in)^2+2"));
-
-            // Do simulation
-            var ac = new AC("ac");
-            AnalyzeAC(ckt, ac, new[] { new ComplexVoltageExport(ac, "out") }, new Func<Complex>[] { () => new Complex(6.0, 0.0) });
+            get
+            {
+                yield return new TestCaseData("i(B1)*1k", 1.0, 1.0e3, 0.5);
+                yield return new TestCaseData("asin(i(B1))", 1.0, 1.0, 0.51097342938856910952);
+            }
         }
     }
 }
