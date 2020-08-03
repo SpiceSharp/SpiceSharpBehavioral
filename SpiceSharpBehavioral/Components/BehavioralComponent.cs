@@ -94,7 +94,7 @@ namespace SpiceSharp.Components.BehavioralComponents
         {
             var behaviors = new BehaviorContainer(Name);
             simulation.EntityBehaviors.Add(behaviors);
-            DI.Resolve(simulation, this, behaviors, LinkParameters);
+            DI.Resolve(simulation, this, behaviors);
         }
     }
 }
