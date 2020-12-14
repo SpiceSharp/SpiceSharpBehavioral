@@ -17,8 +17,7 @@ namespace SpiceSharp.Components.BehavioralComponents
         IParameterized<Parameters>
     {
         private readonly string[] _connections;
-        
-
+ 
         /// <summary>
         /// Gets the parameter set.
         /// </summary>
@@ -94,7 +93,7 @@ namespace SpiceSharp.Components.BehavioralComponents
         {
             var behaviors = new BehaviorContainer(Name);
             simulation.EntityBehaviors.Add(behaviors);
-            DI.Resolve(simulation, this, behaviors);
+            Entities.DependencyInjection.DI.Resolve(simulation, this, behaviors);
         }
     }
 }
