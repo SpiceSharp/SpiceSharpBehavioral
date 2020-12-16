@@ -240,7 +240,7 @@ namespace SpiceSharpBehavioral.Parsers
                     {
                         // Function call!
                         string function = null;
-                        switch (name)
+                        switch (name.ToLowerInvariant())
                         {
                             case "vr":
                                 function = "real"; goto case "v";
