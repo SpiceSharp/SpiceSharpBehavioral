@@ -5,7 +5,6 @@ using SpiceSharp.Components.BehavioralComponents;
 using SpiceSharp.Algebra;
 using SpiceSharp.Simulations;
 using SpiceSharp.Components.CommonBehaviors;
-using System.Collections.Generic;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using SpiceSharp.Attributes;
 
@@ -62,36 +61,16 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
                 state.GetSharedVariable(context.Nodes[1]));
 
             // Build the functions using our variable
-            var df = context.Derivatives;
-
-            // TODO: Take this from parameters
-            var variables = new Dictionary<VariableNode, IVariable<double>>();
-            foreach (var pair in df)
-            {
-                switch (pair.Key.NodeType)
-                {
-                    case NodeTypes.Voltage: variables.Add(pair.Key, state.GetSharedVariable(pair.Key.Name)); break;
-                    case NodeTypes.Current: variables.Add(pair.Key, context.Branches[pair.Key].GetValue<IBranchedBehavior<double>>().Branch); break;
-                    default:
-                        throw new Exception("Invalid variable");
-                }
-            }
-            var builder = bp.BuilderFactory(variables);
-
-            // Let's build the derivative functions and get their matrix locations/rhs locations
-            _value = builder.Build(bp.Function);
-            Functions = new Tuple<VariableNode, IVariable<double>, Func<double>>[df.Count];
-            var matLocs = new MatrixLocation[df.Count * 2];
+            var df = context.CreateDerivatives(bp.BuilderFactory, bp.Function);
+            _value = df.Item1;
+            Functions = df.Item2;
+            var matLocs = new MatrixLocation[Functions.Length * 2];
             var rhsLocs = _variables.GetRhsIndices(state.Map);
-            int index = 0;
-            foreach (var pair in df)
+            for (int i = 0; i < Functions.Length; i++)
             {
-                var variable = variables[pair.Key];
-                var func = builder.Build(pair.Value);
-                Functions[index] = Tuple.Create(pair.Key, variable, func);
-                matLocs[index * 2] = new MatrixLocation(rhsLocs[0], state.Map[variable]);
-                matLocs[index * 2 + 1] = new MatrixLocation(rhsLocs[1], state.Map[variable]);
-                index++;
+                int col = state.Map[Functions[i].Item2];
+                matLocs[i * 2] = new MatrixLocation(rhsLocs[0], col);
+                matLocs[i * 2 + 1] = new MatrixLocation(rhsLocs[1], col);
             }
 
             // Get the matrix elements

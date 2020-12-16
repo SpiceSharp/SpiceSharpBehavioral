@@ -8,7 +8,7 @@ using SpiceSharp.ParameterSets;
 using SpiceSharp.Components.CommonBehaviors;
 using SpiceSharp.Attributes;
 
-namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
+namespace SpiceSharp.Components.BehavioralResistorBehaviors
 {
     /// <summary>
     /// Frequency behavior for a <see cref="BehavioralVoltageSource"/>.
@@ -16,7 +16,7 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
     /// <seealso cref="BiasingBehavior" />
     /// <seealso cref="IFrequencyBehavior" />
     /// <seealso cref="IBranchedBehavior{T}"/>
-    [BehaviorFor(typeof(BehavioralVoltageSource), typeof(IFrequencyBehavior), 1)]
+    [BehaviorFor(typeof(BehavioralResistor), typeof(IFrequencyBehavior), 1)]
     public class FrequencyBehavior : BiasingBehavior,
         IFrequencyBehavior,
         IBranchedBehavior<Complex>

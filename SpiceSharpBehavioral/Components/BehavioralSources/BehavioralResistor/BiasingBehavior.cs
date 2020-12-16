@@ -1,22 +1,23 @@
 ﻿using SpiceSharp.Algebra;
-using SpiceSharp.ParameterSets;
+using SpiceSharp.Attributes;
 using SpiceSharp.Behaviors;
 using SpiceSharp.Components.BehavioralComponents;
 using SpiceSharp.Components.CommonBehaviors;
 using SpiceSharp.Simulations;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
-using SpiceSharp.Attributes;
+using System.Collections.Generic;
+using System.Text;
 
-namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
+namespace SpiceSharp.Components.BehavioralResistorBehaviors
 {
     /// <summary>
-    /// Biasing behavior for a <see cref="BehavioralVoltageSource"/>.
+    /// Biasing behavior for a <see cref="BehavioralResistor"/>.
     /// </summary>
-    /// <seealso cref="Behavior" />
-    /// <seealso cref="IBiasingBehavior" />
+    /// <seealso cref="Behavior"/>
+    /// <seealso cref="IBiasingBehavior"/>
     /// <seealso cref="IBranchedBehavior{T}"/>
-    [BehaviorFor(typeof(BehavioralVoltageSource), typeof(IBiasingBehavior))]
+    [BehaviorFor(typeof(BehavioralResistor), typeof(IBiasingBehavior))]
     public class BiasingBehavior : Behavior,
         IBiasingBehavior,
         IBranchedBehavior<double>
@@ -40,13 +41,7 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         /// <value>
         /// The voltage.
         /// </value>
-        [ParameterName("v"), ParameterInfo("The instantaneous voltage")]
         public double Voltage { get; private set; }
-
-        /// <summary>
-        /// The functions that compute the derivatives.
-        /// </summary>
-        protected Tuple<VariableNode, IVariable<double>, Func<double>>[] Functions;
 
         /// <summary>
         /// Gets the current.
@@ -54,15 +49,19 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         /// <value>
         /// The current.
         /// </value>
-        [ParameterName("i"), ParameterName("c"), ParameterInfo("The instantaneous current")]
         public double Current => _branch.Value;
+
+        /// <summary>
+        /// The functions that compute the derivatives.
+        /// </summary>
+        protected Tuple<VariableNode, IVariable<double>, Func<double>>[] Functions;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BiasingBehavior"/> class.
         /// </summary>
         /// <param name="context">The context.</param>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="context"/> is <c>null</c>.</exception>
-        public BiasingBehavior(BehavioralBindingContext context) 
+        public BiasingBehavior(BehavioralBindingContext context)
             : base(context)
         {
             var bp = context.GetParameterSet<Parameters>();
@@ -72,15 +71,18 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
                 state.GetSharedVariable(context.Nodes[1]));
             _branch = state.CreatePrivateVariable(Name.Combine("branch"), Units.Ampere);
 
+
             // Let's build the derivative functions and get their matrix locations/rhs locations
-            var df = context.CreateDerivatives(bp.BuilderFactory, bp.Function, _branch);
+            var df = context.CreateDerivatives(bp.BuilderFactory,
+                Node.Multiply(Node.Current(Name), bp.Function),
+                _branch);
             _value = df.Item1;
             Functions = df.Item2;
             var matLocs = new MatrixLocation[Functions.Length];
             var rhsLocs = state.Map[_branch];
             for (var i = 0; i < Functions.Length; i++)
                 matLocs[i] = new MatrixLocation(rhsLocs, state.Map[Functions[i].Item2]);
-            
+
             // Get the matrix elements
             _elements = new ElementSet<double>(state.Solver, matLocs);
             int br = state.Map[_branch];

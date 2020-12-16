@@ -44,19 +44,15 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
                 state.GetSharedVariable(context.Nodes[0]),
                 state.GetSharedVariable(context.Nodes[1]));
 
-            var rows = _variables.GetRhsIndices(state.Map);
+            // Build the functions using our variable
+            var rhsLocs = _variables.GetRhsIndices(state.Map);
             var matLocs = new MatrixLocation[Functions.Length * 2];
             _values = new Complex[Functions.Length * 2];
             for (var i = 0; i < Functions.Length; i++)
             {
-                IVariable<Complex> variable = Functions[i].Item1.NodeType switch
-                {
-                    NodeTypes.Voltage => state.GetSharedVariable(Functions[i].Item1.Name),
-                    NodeTypes.Current => context.Branches[Functions[i].Item1].GetValue<IBranchedBehavior<Complex>>().Branch,
-                    _ => throw new Exception("Invalid variable"),
-                };
-                matLocs[i * 2] = new MatrixLocation(rows[0], state.Map[variable]);
-                matLocs[i * 2 + 1] = new MatrixLocation(rows[1], state.Map[variable]);
+                var variable = context.MapNode(state, Functions[i].Item1);
+                matLocs[i * 2] = new MatrixLocation(rhsLocs[0], state.Map[variable]);
+                matLocs[i * 2 + 1] = new MatrixLocation(rhsLocs[1], state.Map[variable]);
             }
 
             // Get the matrix elements

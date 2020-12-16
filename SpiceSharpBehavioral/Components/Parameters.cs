@@ -42,7 +42,6 @@ namespace SpiceSharp.Components.BehavioralComponents
         /// </value>
         public IEnumerable<VariableNode> VariableNodes => _nodeFinder.Build(Function);
 
-
         /// <summary>
         /// Gets the default builder for building expressions.
         /// </summary>
