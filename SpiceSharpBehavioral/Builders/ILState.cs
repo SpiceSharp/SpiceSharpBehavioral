@@ -101,8 +101,8 @@ namespace SpiceSharpBehavioral.Builders
 
                         case NodeTypes.Divide:
                             Push(bn.Left);
-                            Push(bn.Right); 
-                            Generator.Emit(OpCodes.Ldc_R8, Builder.FudgeFactor);
+                            Push(bn.Right);
+                            Push(Builder.FudgeFactor);
                             Generator.Emit(OpCodes.Call, _safeDiv);
                             return;
 
@@ -139,8 +139,8 @@ namespace SpiceSharpBehavioral.Builders
                         case NodeTypes.Equals:
                             Push(bn.Left);
                             Push(bn.Right);
-                            Generator.Emit(OpCodes.Ldc_R8, Builder.RelativeTolerance);
-                            Generator.Emit(OpCodes.Ldc_R8, Builder.AbsoluteTolerance);
+                            Push(Builder.RelativeTolerance);
+                            Push(Builder.AbsoluteTolerance);
                             Generator.Emit(OpCodes.Call, _equals);
                             PushCheck(OpCodes.Brtrue_S);
                             return;
@@ -148,8 +148,8 @@ namespace SpiceSharpBehavioral.Builders
                         case NodeTypes.NotEquals:
                             Push(bn.Left);
                             Push(bn.Right);
-                            Generator.Emit(OpCodes.Ldc_R8, Builder.RelativeTolerance);
-                            Generator.Emit(OpCodes.Ldc_R8, Builder.AbsoluteTolerance);
+                            Push(Builder.RelativeTolerance);
+                            Push(Builder.AbsoluteTolerance);
                             Generator.Emit(OpCodes.Call, _equals);
                             PushCheck(OpCodes.Brfalse_S);
                             return;
@@ -158,11 +158,9 @@ namespace SpiceSharpBehavioral.Builders
                             lblBypass = Generator.DefineLabel();
                             lblEnd = Generator.DefineLabel();
 
-                            Push(bn.Left);
-                            Generator.Emit(OpCodes.Ldc_R8, 0.5);
+                            Push(bn.Left); Push(0.5);
                             Generator.Emit(OpCodes.Ble_S, lblBypass);
-                            Push(bn.Right);
-                            Generator.Emit(OpCodes.Ldc_R8, 0.5);
+                            Push(bn.Right); Push(0.5);
                             Generator.Emit(OpCodes.Ble_S, lblBypass);
                             Generator.Emit(OpCodes.Ldc_R8, 1.0);
                             Generator.Emit(OpCodes.Br_S, lblEnd);
@@ -175,11 +173,9 @@ namespace SpiceSharpBehavioral.Builders
                             lblBypass = Generator.DefineLabel();
                             lblEnd = Generator.DefineLabel();
 
-                            Push(bn.Left);
-                            Generator.Emit(OpCodes.Ldc_R8, 0.5);
+                            Push(bn.Left); Push(0.5);
                             Generator.Emit(OpCodes.Bgt_S, lblBypass);
-                            Push(bn.Right);
-                            Generator.Emit(OpCodes.Ldc_R8, 0.5);
+                            Push(bn.Right); Push(0.5);
                             Generator.Emit(OpCodes.Bgt_S, lblBypass);
                             Generator.Emit(OpCodes.Ldc_R8, 0.0);
                             Generator.Emit(OpCodes.Br_S, lblEnd);
@@ -189,11 +185,9 @@ namespace SpiceSharpBehavioral.Builders
                             return;
 
                         case NodeTypes.Xor:
-                            Push(bn.Left);
-                            Generator.Emit(OpCodes.Ldc_R8, 0.5);
+                            Push(bn.Left); Push(0.5);
                             Generator.Emit(OpCodes.Cgt);
-                            Push(bn.Right);
-                            Generator.Emit(OpCodes.Ldc_R8, 0.5);
+                            Push(bn.Right); Push(0.5);
                             Generator.Emit(OpCodes.Cgt);
                             Generator.Emit(OpCodes.Xor);
                             PushCheck(OpCodes.Brtrue);
@@ -208,7 +202,7 @@ namespace SpiceSharpBehavioral.Builders
                     break;
 
                 case ConstantNode cn:
-                    Generator.Emit(OpCodes.Ldc_R8, cn.Literal);
+                    Push(cn.Literal);
                     return;
                 
                 case UnaryOperatorNode un:
@@ -234,6 +228,11 @@ namespace SpiceSharpBehavioral.Builders
                     break;
 
                 case VariableNode vn:
+                    if (Builder.Map != null && Builder.Map.TryGetValue(vn, out var mapped))
+                    {
+                        Push(mapped);
+                        return;
+                    }
                     if (Builder.Variables != null && Builder.Variables.TryGetValue(vn, out var variable))
                     {
                         Call(() => variable.Value);
@@ -242,10 +241,9 @@ namespace SpiceSharpBehavioral.Builders
                     break;
 
                 case TernaryOperatorNode tn:
-                    Push(tn.Condition);
-                    Push(0.5);
                     lblBypass = Generator.DefineLabel();
                     lblEnd = Generator.DefineLabel();
+                    Push(tn.Condition); Push(0.5);
                     Generator.Emit(OpCodes.Ble_S, lblBypass);
                     Push(tn.IfTrue);
                     Generator.Emit(OpCodes.Br_S, lblEnd);

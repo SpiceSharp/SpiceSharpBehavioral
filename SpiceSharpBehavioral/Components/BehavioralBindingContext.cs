@@ -47,9 +47,11 @@ namespace SpiceSharp.Components.BehavioralComponents
         public Tuple<Func<double>, Tuple<VariableNode, IVariable<double>, Func<double>>[]> CreateDerivatives(Parameters.BuilderFactoryMethod builderFactory, Node function, IVariable<double> ownBranch = null)
         {
             var state = GetState<IBiasingSimulationState>();
-            var comparer = new VariableNodeComparer(state.Comparer, Simulation.EntityBehaviors.Comparer);
+            var bp = GetParameterSet<Parameters>();
+            var comparer = new VariableNodeComparer(state.Comparer, Simulation.EntityBehaviors.Comparer, bp.VariableComparer);
 
             // Derive the function
+            var derivatives = new Derivatives();
             var nf = new NodeFinder();
             var variables = new Dictionary<VariableNode, IVariable<double>>();
             foreach (var variable in nf.Build(function).Where(v => v.NodeType == NodeTypes.Voltage || v.NodeType == NodeTypes.Current))
@@ -57,23 +59,21 @@ namespace SpiceSharp.Components.BehavioralComponents
                 if (variables.ContainsKey(variable))
                     continue;
                 variables.Add(variable, MapNode(state, variable, ownBranch));
+                derivatives.Variables.Add(variable);
             }
-
-            // Get the derivatives
-            var deriver = new Derivatives(variables.Keys.ToArray());
-            var df = deriver.Derive(function);
 
             // Build
             var builder = builderFactory(Simulation, variables);
+            var df = derivatives.Derive(function);
             var value = builder.Build(function);
-            var derivatives = new Tuple<VariableNode, IVariable<double>, Func<double>>[df?.Count ?? 0];
-            if (derivatives.Length > 0)
+            var dfdv = new Tuple<VariableNode, IVariable<double>, Func<double>>[df?.Count ?? 0];
+            if (dfdv.Length > 0)
             {
                 int index = 0;
                 foreach (var pair in df)
-                    derivatives[index++] = Tuple.Create(pair.Key, variables[pair.Key], builder.Build(pair.Value));
+                    dfdv[index++] = Tuple.Create(pair.Key, variables[pair.Key], builder.Build(pair.Value));
             }
-            return Tuple.Create(value, derivatives);
+            return Tuple.Create(value, dfdv);
         }
 
         /// <summary>

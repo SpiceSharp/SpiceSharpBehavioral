@@ -45,6 +45,14 @@ namespace SpiceSharp.Components.BehavioralComponents
         public IEnumerable<VariableNode> VariableNodes => _nodeFinder.Build(Function);
 
         /// <summary>
+        /// Gets or sets the variable comparer.
+        /// </summary>
+        /// <value>
+        /// The variable comparer.
+        /// </value>
+        public IEqualityComparer<string> VariableComparer { get; set; } = StringComparer.OrdinalIgnoreCase;
+
+        /// <summary>
         /// Gets the default builder for building expressions.
         /// </summary>
         /// <param name="simulation">The simulation for which to create variables.</param>

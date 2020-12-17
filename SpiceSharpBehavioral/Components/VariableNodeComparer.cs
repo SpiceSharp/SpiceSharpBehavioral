@@ -11,16 +11,19 @@ namespace SpiceSharp.Components.BehavioralComponents
     {
         private readonly IEqualityComparer<string> _nodeComparer;
         private readonly IEqualityComparer<string> _entityComparer;
+        private readonly IEqualityComparer<string> _variableComparer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VariableNodeComparer"/> class.
         /// </summary>
         /// <param name="nodeComparer">The name comparer for voltage nodes.</param>
         /// <param name="entityComparer">The name comparer for entities.</param>
-        public VariableNodeComparer(IEqualityComparer<string> nodeComparer, IEqualityComparer<string> entityComparer)
+        /// <param name="variableComparer">The name comparer for variables.</param>
+        public VariableNodeComparer(IEqualityComparer<string> nodeComparer, IEqualityComparer<string> entityComparer, IEqualityComparer<string> variableComparer)
         {
             _nodeComparer = nodeComparer ?? EqualityComparer<string>.Default;
             _entityComparer = entityComparer ?? EqualityComparer<string>.Default;
+            _variableComparer = variableComparer ?? EqualityComparer<string>.Default;
         }
 
         /// <summary>
@@ -46,6 +49,8 @@ namespace SpiceSharp.Components.BehavioralComponents
                     return _nodeComparer.Equals(x.Name, y.Name);
                 case NodeTypes.Current:
                     return _entityComparer.Equals(x.Name, y.Name);
+                case NodeTypes.Variable:
+                    return _variableComparer.Equals(x.Name, y.Name);
                 default:
                     return true;
             }
@@ -69,6 +74,12 @@ namespace SpiceSharp.Components.BehavioralComponents
                         return obj.NodeType.GetHashCode() ^ obj.Name.GetHashCode();
 
                 case NodeTypes.Current:
+                    if (_entityComparer.Equals(obj.Name, obj.Name.ToLower()))
+                        return obj.NodeType.GetHashCode() ^ obj.Name.ToLower().GetHashCode();
+                    else
+                        return obj.NodeType.GetHashCode() ^ obj.Name.GetHashCode();
+
+                case NodeTypes.Variable:
                     if (_entityComparer.Equals(obj.Name, obj.Name.ToLower()))
                         return obj.NodeType.GetHashCode() ^ obj.Name.ToLower().GetHashCode();
                     else

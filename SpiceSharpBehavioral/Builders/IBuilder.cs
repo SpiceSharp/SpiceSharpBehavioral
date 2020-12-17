@@ -1,4 +1,5 @@
 ﻿using SpiceSharpBehavioral.Parsers.Nodes;
+using System.Collections.Generic;
 
 namespace SpiceSharpBehavioral.Builders
 {

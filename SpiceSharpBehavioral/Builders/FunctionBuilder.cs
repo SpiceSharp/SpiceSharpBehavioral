@@ -43,6 +43,9 @@ namespace SpiceSharpBehavioral.Builders
         /// </value>
         public Dictionary<string, ApplyFunction> FunctionDefinitions { get; set; }
 
+        /// <inheritdoc/>
+        public Dictionary<VariableNode, Node> Map { get; set; }
+
         /// <summary>
         /// Gets or sets the variables.
         /// </summary>

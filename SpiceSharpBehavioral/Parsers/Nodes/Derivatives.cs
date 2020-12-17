@@ -11,6 +11,14 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
     public class Derivatives
     {
         /// <summary>
+        /// Gets or sets the variable map.
+        /// </summary>
+        /// <value>
+        /// The variable map.
+        /// </value>
+        public Dictionary<VariableNode, Node> Map { get; set; }
+
+        /// <summary>
         /// Gets the map.
         /// </summary>
         /// <value>
@@ -159,6 +167,8 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
                     return a.Count > 0 ? a : null;
                 
                 case VariableNode vn:
+                    if (Map != null && Map.TryGetValue(vn, out var mapped))
+                        return Derive(mapped);
                     if (Variables.Contains(vn))
                     {
                         a = new Dictionary<VariableNode, Node>

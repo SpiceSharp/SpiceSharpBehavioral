@@ -95,7 +95,7 @@ namespace SpiceSharp.Components.BehavioralResistorBehaviors
         {
             for (var i = 0; i < Functions.Length; i++)
             {
-                var value = Functions[i].Item3.Invoke();
+                var value = Functions[i].Item3();
                 _values[i] = -value;
             }
         }

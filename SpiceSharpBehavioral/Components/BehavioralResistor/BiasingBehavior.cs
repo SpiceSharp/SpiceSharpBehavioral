@@ -54,7 +54,7 @@ namespace SpiceSharp.Components.BehavioralResistorBehaviors
         /// <summary>
         /// The functions that compute the derivatives.
         /// </summary>
-        protected Tuple<VariableNode, IVariable<double>, Func<double>>[] Functions;
+        protected readonly Tuple<VariableNode, IVariable<double>, Func<double>>[] Functions;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BiasingBehavior"/> class.
@@ -70,7 +70,6 @@ namespace SpiceSharp.Components.BehavioralResistorBehaviors
                 state.GetSharedVariable(context.Nodes[0]),
                 state.GetSharedVariable(context.Nodes[1]));
             _branch = state.CreatePrivateVariable(Name.Combine("branch"), Units.Ampere);
-
 
             // Let's build the derivative functions and get their matrix locations/rhs locations
             var df = context.CreateDerivatives(bp.BuilderFactory,

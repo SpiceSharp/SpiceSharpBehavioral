@@ -121,11 +121,11 @@ namespace SpiceSharpBehavioral.Builders
         /// Builds the node.
         /// </summary>
         /// <param name="node">The node.</param>
-        /// <returns></returns>
-        /// <exception cref="Exception">Unrecognized node</exception>
+        /// <returns>The built value.</returns>
+        /// <exception cref="SpiceSharpException">Unrecognized node</exception>
         protected virtual double BuildNode(Node node)
         {
-            throw new Exception("Unrecognized expression node {0}".FormatString(node));
+            throw new SpiceSharpException("Unrecognized expression node {0}".FormatString(node));
         }
     }
 }

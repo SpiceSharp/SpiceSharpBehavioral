@@ -14,8 +14,7 @@ namespace SpiceSharpBehavioralTest.Components
             var ckt = new Circuit(
                 new VoltageSource("V1", "in", "0", 0.0),
                 new Resistor("R1", "in", "out", 1e3),
-                new BehavioralResistor("R2", "out", "0", "1k")
-                );
+                new BehavioralResistor("R2", "out", "0", "1k"));
             var dc = new DC("DC", "V1", -5, 5, 0.5);
 
             dc.ExportSimulationData += (sender, args) =>
@@ -25,6 +24,24 @@ namespace SpiceSharpBehavioralTest.Components
                 Assert.AreEqual(input, output * 2, 1e-9);
             };
             dc.Run(ckt);
+        }
+
+        [Test]
+        public void When_SimpleResistorFrequency_Expect_References()
+        {
+            var ckt = new Circuit(
+                new VoltageSource("V1", "in", "0", 0.0).SetParameter("acmag", 1.0),
+                new Resistor("R1", "in", "out", 1e3),
+                new BehavioralResistor("R2", "out", "0", "1k"));
+            var ac = new AC("ac", new DecadeSweep(1, 1e3, 2));
+
+            ac.ExportSimulationData += (sender, args) =>
+            {
+                var output = args.GetComplexVoltage("out");
+                Assert.AreEqual(0.5, output.Real, 1e-9);
+                Assert.AreEqual(0.0, output.Imaginary, 1e-9);
+            };
+            ac.Run(ckt);
         }
     }
 }
