@@ -42,6 +42,8 @@ namespace SpiceSharpBehavioralTest.Builders
                 yield return new TestCaseData(Node.Or(1.0, 0.0), 1.0).SetName("{m}(1|0)");
                 yield return new TestCaseData(Node.And(1.0, 0.0), 0.0).SetName("{m}(1&0)");
                 yield return new TestCaseData(Node.Xor(1.0, 0.0), 1.0).SetName("{m}(1^0)");
+                yield return new TestCaseData(Node.Conditional(1.0, 0.25, 0.75), 0.25).SetName("{m}(1 ? 0.25 : 0.75)");
+                yield return new TestCaseData(Node.Conditional(0.0, 0.25, 0.75), 0.75).SetName("{m}(0 ? 0.25 : 0.75)");
             }
         }
         public static IEnumerable<TestCaseData> FunctionNodes

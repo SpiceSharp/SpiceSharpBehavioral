@@ -252,7 +252,7 @@ namespace SpiceSharpBehavioral.Builders
                     Generator.MarkLabel(lblBypass);
                     Push(tn.IfFalse);
                     Generator.MarkLabel(lblEnd);
-                    break;
+                    return;
             }
 
             throw new Exception("Unrecognized node {0}".FormatString(node));
