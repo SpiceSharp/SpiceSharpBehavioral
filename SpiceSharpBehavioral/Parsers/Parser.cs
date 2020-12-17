@@ -295,7 +295,10 @@ namespace SpiceSharpBehavioral.Parsers
                                 lexer.ReadToken();
                                 while (lexer.Token != TokenType.RightParenthesis)
                                 {
+                                    // Read the argument
                                     arguments.Add(ParseConditional(lexer));
+
+                                    // Continue with another argument
                                     if (lexer.Token == TokenType.Comma)
                                         lexer.ReadToken();
                                     else if (lexer.Token != TokenType.RightParenthesis)
@@ -310,8 +313,8 @@ namespace SpiceSharpBehavioral.Parsers
                     }
                     else
                     {
-                        result = Node.Variable(lexer.Content);
-                        lexer.ReadToken();
+                        result = Node.Variable(name);
+                        // We already read the next token, no need to do it here again...
                     }
                     break;
 

@@ -38,6 +38,10 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         public static new BinaryOperatorNode Or(Node left, Node right) => new BinaryOperatorNode(NodeTypes.Or, left, right);
 
         /// <include file='docs.xml' path='docs/members/Binary/*'/>
+        /// <include file='docs.xml' path='docs/members/Xor/*'/>
+        public static new BinaryOperatorNode Xor(Node left, Node right) => new BinaryOperatorNode(NodeTypes.Xor, left, right);
+
+        /// <include file='docs.xml' path='docs/members/Binary/*'/>
         /// <include file='docs.xml' path='docs/members/Equals/*'/>
         public static new BinaryOperatorNode Equals(Node left, Node right) => new BinaryOperatorNode(NodeTypes.Equals, left, right);
 
@@ -147,8 +151,9 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
                 NodeTypes.Multiply => "*",
                 NodeTypes.Divide => "/",
                 NodeTypes.Modulo => "%",
-                NodeTypes.And => "&&",
-                NodeTypes.Or => "||",
+                NodeTypes.And => "&",
+                NodeTypes.Or => "|",
+                NodeTypes.Xor => "^",
                 NodeTypes.GreaterThan => ">",
                 NodeTypes.LessThan => "<",
                 NodeTypes.GreaterThanOrEqual => ">=",

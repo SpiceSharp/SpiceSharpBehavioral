@@ -60,16 +60,31 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
             switch (node)
             {
                 case UnaryOperatorNode un:
+                    if (un.NodeType == NodeTypes.Not)
+                        return null;
                     a = Derive(un.Argument);
                     switch (un.NodeType)
                     {
                         case NodeTypes.Plus: return Apply(a, n => Node.Plus(n));
                         case NodeTypes.Minus: return Apply(a, n => Node.Minus(n));
-                        case NodeTypes.Not: return null;
                     }
                     break;
 
                 case BinaryOperatorNode bn:
+                    switch (bn.NodeType)
+                    {
+                        case NodeTypes.And:
+                        case NodeTypes.Or:
+                        case NodeTypes.Xor:
+                        case NodeTypes.GreaterThan:
+                        case NodeTypes.GreaterThanOrEqual:
+                        case NodeTypes.LessThan:
+                        case NodeTypes.LessThanOrEqual:
+                        case NodeTypes.Equals:
+                        case NodeTypes.NotEquals:
+                            return null;
+                    }
+
                     a = Derive(bn.Left);
                     b = Derive(bn.Right);
                     switch (bn.NodeType)
@@ -91,13 +106,6 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
                                 n1 => n1,
                                 n2 => n2 * -bn,
                                 (n1, n2) => n1 - n2 * bn);
-                        case NodeTypes.GreaterThan:
-                        case NodeTypes.GreaterThanOrEqual:
-                        case NodeTypes.LessThan:
-                        case NodeTypes.LessThanOrEqual:
-                        case NodeTypes.Equals:
-                        case NodeTypes.NotEquals:
-                            return null;
                     }
                     break;
 

@@ -45,6 +45,9 @@ namespace SpiceSharpBehavioralTest.Parsers
                 yield return new TestCaseData(Node.Not(v1), null).SetName("{m}(!v1)");
                 yield return new TestCaseData(Node.Add(v1, v2), new Dictionary<VariableNode, Node> { { v1, Node.One }, { v2, Node.One } }).SetName("{m}(v1+v2)");
                 yield return new TestCaseData(Node.Subtract(v1, i1), new Dictionary<VariableNode, Node> { { v1, Node.One }, { i1, -Node.One } }).SetName("{m}(v1-i1)");
+                yield return new TestCaseData(Node.And(v1, v2), null).SetName("{m}(v1&v2)");
+                yield return new TestCaseData(Node.Or(v1, v2), null).SetName("{m}(v1|v2)");
+                yield return new TestCaseData(Node.Xor(v1, v2), null).SetName("{m}(v1^v2)");
                 yield return new TestCaseData(Node.Power(v1, v2), new Dictionary<VariableNode, Node>
                     {
                         { v1, v2 * Node.Power(v1, v2 - Node.One) },
@@ -69,6 +72,12 @@ namespace SpiceSharpBehavioralTest.Parsers
                         { v1, v2 * Node.Function("pwr", v1, v2 - Node.One) },
                         { v2, Node.Function("log", v1) * Node.Function("pwr", v1, v2) }
                     }).SetName("{m}(pwr v1, v2)");
+                yield return new TestCaseData(Node.Equals(v1, v2), null).SetName("{m}(v1==v2)");
+                yield return new TestCaseData(Node.NotEquals(v1, v2), null).SetName("{m}(v1==v2)");
+                yield return new TestCaseData(Node.LessThan(v1, v2), null).SetName("{m}(v1==v2)");
+                yield return new TestCaseData(Node.LessThanOrEqual(v1, v2), null).SetName("{m}(v1==v2)");
+                yield return new TestCaseData(Node.GreaterThan(v1, v2), null).SetName("{m}(v1==v2)");
+                yield return new TestCaseData(Node.GreaterThanOrEqual(v1, v2), null).SetName("{m}(v1==v2)");
             }
         }
     }

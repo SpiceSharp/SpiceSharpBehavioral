@@ -77,6 +77,9 @@ namespace SpiceSharpBehavioral.Builders
                         case NodeTypes.GreaterThanOrEqual: return Build(bn.Left) >= Build(bn.Right) ? 1.0 : 0.0;
                         case NodeTypes.Equals: return Functions.Equals(Build(bn.Left), Build(bn.Right), RelativeTolerance, AbsoluteTolerance) ? 1.0 : 0.0;
                         case NodeTypes.NotEquals: return Functions.Equals(Build(bn.Left), Build(bn.Right), RelativeTolerance, AbsoluteTolerance) ? 0.0 : 1.0;
+                        case NodeTypes.And: return Build(bn.Left) > 0.5 && Build(bn.Right) > 0.5 ? 1.0 : 0.0;
+                        case NodeTypes.Or: return Build(bn.Left) > 0.5 || Build(bn.Right) > 0.5 ? 1.0 : 0.0;
+                        case NodeTypes.Xor: return Build(bn.Left) > 0.5 ^ Build(bn.Right) > 0.5 ? 1.0 : 0.0;
                         case NodeTypes.Pow: return Functions.Power(Build(bn.Left), Build(bn.Right));
                     }
                     break;
@@ -86,12 +89,12 @@ namespace SpiceSharpBehavioral.Builders
                     {
                         case NodeTypes.Plus: return Build(un.Argument);
                         case NodeTypes.Minus: return -Build(un.Argument);
-                        case NodeTypes.Not: return Build(un.Argument) > 0 ? 0.0 : 1.0;
+                        case NodeTypes.Not: return Build(un.Argument) > 0.5 ? 0.0 : 1.0;
                     }
                     break;
 
                 case TernaryOperatorNode tn:
-                    return Build(tn.Condition) > 0.0 ? Build(tn.IfTrue) : Build(tn.IfFalse);
+                    return Build(tn.Condition) > 0.5 ? Build(tn.IfTrue) : Build(tn.IfFalse);
 
                 case FunctionNode fn:
                     if (FunctionDefinitions != null && FunctionDefinitions.TryGetValue(fn.Name, out var definition))

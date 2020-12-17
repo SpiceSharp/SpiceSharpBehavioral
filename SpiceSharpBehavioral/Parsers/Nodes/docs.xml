@@ -1,79 +1,91 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <docs>
-  <members>
-    <Unary>
-      <param name="argument">The argument.</param>
-    </Unary>
-    <Binary>
-      <param name="left">The left argument.</param>
-      <param name="right">The right argument.</param>
-    </Binary>
-    <Plus>
-      <summary>Creates a unary plus operator for an argument.</summary>
-      <returns>The node representing the unary plus result.</returns>
-    </Plus>
-    <Minus>
-      <summary>Creates a unary minus operator for an argument.</summary>
-      <returns>The node representing the unary minus result.</returns>
-    </Minus>
-    <Bang>
-      <summary>Creates a unary bang (!) operator for an argument.</summary>
-      <returns>The node representing the unary bang result.</returns>
-    </Bang>
-    <Add>
-      <summary>Creates an addition of two arguments.</summary>
-      <returns>The node representing the added result.</returns>
-    </Add>
-    <Subtract>
-      <summary>Creates a subtraction of two arguments.</summary>
-      <returns>The node representing the subtracted result.</returns>
-    </Subtract>
-    <Multiply>
-      <summary>Creates a multiplication of two arguments.</summary>
-      <returns>The node representing the multiplied result.</returns>
-    </Multiply>
-    <Divide>
-      <summary>Creates a division of two arguments.</summary>
-      <returns>The node representing the divided result.</returns>
-    </Divide>
-    <Property>
-      <summary>Creates a node that returns the property of a behavior.</summary>
-      <param name="name">The name of the entity or behavior.</param>
-      <param name="property">The name of the property.</param>
-      <returns>The node representing the property value.</returns>
-    </Property>
-    <Conditional>
-      <summary>Creates a conditional value.</summary>
-      <param name="condition">The condition that decides what the result should be.</param>
-      <param name="ifTrue">The value if the condition is true.</param>
-      <param name="ifFalse">The value if the condition is false.</param>
-      <returns>The node representing the conditional value.</returns>
-    </Conditional>
-    <Voltage>
-      <summary>Creates a node voltage.</summary>
-      <param name="name">The name of the node.</param>
-      <returns>The node representing the node voltage.</returns>
-    </Voltage>
-    <Current>
-      <summary>Creates a current.</summary>
-      <param name="name">The name of the entity that conducts the current.</param>
-      <returns>The node representing the current.</returns>
-    </Current>
-    <Variable>
-      <summary>Creates a variable.</summary>
-      <param name="name">The name of the variable.</param>
-      <returns>The node representing the variable.</returns>
-    </Variable>
-    <Constant>
-      <summary>Creates a constant.</summary>
-      <param name="literal">The value of the constant.</param>
-      <returns>The node representing the constant value.</returns>
-    </Constant>
-    <Function>
-      <summary>Creates a function call.</summary>
-      <param name="name">The name of the function.</param>
-      <param name="arguments">The arguments of the function.</param>
-      <returns>The node representing the function call.</returns>
-    </Function>
-  </members>
+	<members>
+		<Unary>
+			<param name="argument">The argument.</param>
+		</Unary>
+		<Binary>
+			<param name="left">The left argument.</param>
+			<param name="right">The right argument.</param>
+		</Binary>
+		<Plus>
+			<summary>Creates a unary plus operator for an argument.</summary>
+			<returns>The node representing the unary plus result.</returns>
+		</Plus>
+		<Minus>
+			<summary>Creates a unary minus operator for an argument.</summary>
+			<returns>The node representing the unary minus result.</returns>
+		</Minus>
+		<Bang>
+			<summary>Creates a unary bang (!) operator for an argument.</summary>
+			<returns>The node representing the unary bang result.</returns>
+		</Bang>
+		<Add>
+			<summary>Creates an addition of two arguments.</summary>
+			<returns>The node representing the added result.</returns>
+		</Add>
+		<Subtract>
+			<summary>Creates a subtraction of two arguments.</summary>
+			<returns>The node representing the subtracted result.</returns>
+		</Subtract>
+		<Multiply>
+			<summary>Creates a multiplication of two arguments.</summary>
+			<returns>The node representing the multiplied result.</returns>
+		</Multiply>
+		<Divide>
+			<summary>Creates a division of two arguments.</summary>
+			<returns>The node representing the divided result.</returns>
+		</Divide>
+		<Property>
+			<summary>Creates a node that returns the property of a behavior.</summary>
+			<param name="name">The name of the entity or behavior.</param>
+			<param name="property">The name of the property.</param>
+			<returns>The node representing the property value.</returns>
+		</Property>
+		<Conditional>
+			<summary>Creates a conditional value.</summary>
+			<param name="condition">The condition that decides what the result should be.</param>
+			<param name="ifTrue">The value if the condition is true.</param>
+			<param name="ifFalse">The value if the condition is false.</param>
+			<returns>The node representing the conditional value.</returns>
+		</Conditional>
+		<And>
+			<summary>Creates an and-operator of two arguments.</summary>
+			<returns>The node representing the combined result.</returns>
+		</And>
+		<Or>
+			<summary>Creates an or-operator of two arguments.</summary>
+			<returns>The node representing the combined result.</returns>
+		</Or>
+		<Xor>
+			<summary>Creates an exclusive or-operator of two arguments.</summary>
+			<returns>the node representing the combined result.</returns>
+		</Xor>
+		<Voltage>
+			<summary>Creates a node voltage.</summary>
+			<param name="name">The name of the node.</param>
+			<returns>The node representing the node voltage.</returns>
+		</Voltage>
+		<Current>
+			<summary>Creates a current.</summary>
+			<param name="name">The name of the entity that conducts the current.</param>
+			<returns>The node representing the current.</returns>
+		</Current>
+		<Variable>
+			<summary>Creates a variable.</summary>
+			<param name="name">The name of the variable.</param>
+			<returns>The node representing the variable.</returns>
+		</Variable>
+		<Constant>
+			<summary>Creates a constant.</summary>
+			<param name="literal">The value of the constant.</param>
+			<returns>The node representing the constant value.</returns>
+		</Constant>
+		<Function>
+			<summary>Creates a function call.</summary>
+			<param name="name">The name of the function.</param>
+			<param name="arguments">The arguments of the function.</param>
+			<returns>The node representing the function call.</returns>
+		</Function>
+	</members>
 </docs>

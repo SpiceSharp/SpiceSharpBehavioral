@@ -1,5 +1,6 @@
 ﻿using SpiceSharp.Behaviors;
 using SpiceSharp.Simulations;
+using SpiceSharpBehavioral;
 using SpiceSharpBehavioral.Builders;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
@@ -51,7 +52,7 @@ namespace SpiceSharp.Components.BehavioralComponents
             // Derive the function
             var nf = new NodeFinder();
             var variables = new Dictionary<VariableNode, IVariable<double>>();
-            foreach (var variable in nf.Build(function))
+            foreach (var variable in nf.Build(function).Where(v => v.NodeType == NodeTypes.Voltage || v.NodeType == NodeTypes.Current))
             {
                 if (variables.ContainsKey(variable))
                     continue;
@@ -63,12 +64,15 @@ namespace SpiceSharp.Components.BehavioralComponents
             var df = deriver.Derive(function);
 
             // Build
-            var builder = builderFactory(variables);
+            var builder = builderFactory(Simulation, variables);
             var value = builder.Build(function);
-            var derivatives = new Tuple<VariableNode, IVariable<double>, Func<double>>[df.Count];
-            int index = 0;
-            foreach (var pair in df)
-                derivatives[index++] = Tuple.Create(pair.Key, variables[pair.Key], builder.Build(pair.Value));
+            var derivatives = new Tuple<VariableNode, IVariable<double>, Func<double>>[df?.Count ?? 0];
+            if (derivatives.Length > 0)
+            {
+                int index = 0;
+                foreach (var pair in df)
+                    derivatives[index++] = Tuple.Create(pair.Key, variables[pair.Key], builder.Build(pair.Value));
+            }
             return Tuple.Create(value, derivatives);
         }
 
@@ -99,7 +103,7 @@ namespace SpiceSharp.Components.BehavioralComponents
                         return container.GetValue<IBranchedBehavior<T>>().Branch;
 
                 default:
-                    throw new SpiceSharpException($"Could not determine the variable {Entity.Name}");
+                    throw new SpiceSharpException($"Could not determine the variable {node.Name}");
             }
         }
     }

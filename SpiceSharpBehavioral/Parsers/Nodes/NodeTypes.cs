@@ -64,6 +64,11 @@
         And,
 
         /// <summary>
+        /// Exclusive or.
+        /// </summary>
+        Xor,
+
+        /// <summary>
         /// Equality operator.
         /// </summary>
         Equals,

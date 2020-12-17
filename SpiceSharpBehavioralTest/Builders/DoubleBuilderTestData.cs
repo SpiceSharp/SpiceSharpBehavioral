@@ -25,6 +25,7 @@ namespace SpiceSharpBehavioralTest.Builders
                 // Operators
                 yield return new TestCaseData(Node.Minus(4.0), -4.0).SetName("{m}(-4)");
                 yield return new TestCaseData(Node.Plus(2.0), 2.0).SetName("{m}(+2)");
+                yield return new TestCaseData(Node.Not(0.6), 0.0).SetName("{m}(!0.6)");
                 yield return new TestCaseData(Node.Add(1.0, 1.0), 2.0).SetName("{m}(1 + 1)");
                 yield return new TestCaseData(Node.Subtract(2.0, 5.0), -3.0).SetName("{m}(2 - 5)");
                 yield return new TestCaseData(Node.Modulo(5.0, 2.0), 1.0).SetName("{m}(5 % 2)");
@@ -39,6 +40,9 @@ namespace SpiceSharpBehavioralTest.Builders
                 yield return new TestCaseData(Node.LessThanOrEqual(5.0, 5.0), 1.0).SetName("{m}(5<=5)");
                 yield return new TestCaseData(Node.Equals(1.0, 2.0), 0.0).SetName("{m}(1==2)");
                 yield return new TestCaseData(Node.NotEquals(1.0, 2.0), 1.0).SetName("{m}(1!=2)");
+                yield return new TestCaseData(Node.Or(1.0, 0.0), 1.0).SetName("{m}(1|0)");
+                yield return new TestCaseData(Node.And(1.0, 0.0), 0.0).SetName("{m}(1&0)");
+                yield return new TestCaseData(Node.Xor(1.0, 0.0), 1.0).SetName("{m}(1^0)");
             }
         }
         public static IEnumerable<TestCaseData> FunctionNodes

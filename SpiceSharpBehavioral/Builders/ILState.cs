@@ -76,34 +76,133 @@ namespace SpiceSharpBehavioral.Builders
             switch (node)
             {
                 case BinaryOperatorNode bn:
-                    Push(bn.Left);
-                    Push(bn.Right);
 
                     // Execution
                     switch (bn.NodeType)
                     {
-                        case NodeTypes.Add: Generator.Emit(OpCodes.Add); return;
-                        case NodeTypes.Subtract: Generator.Emit(OpCodes.Sub); return;
-                        case NodeTypes.Multiply: Generator.Emit(OpCodes.Mul); return;
-                        case NodeTypes.Divide: Generator.Emit(OpCodes.Ldc_R8, Builder.FudgeFactor); Generator.Emit(OpCodes.Call, _safeDiv); return;
-                        case NodeTypes.Modulo: Generator.Emit(OpCodes.Rem); return;
-                        case NodeTypes.GreaterThan: PushCheck(OpCodes.Bgt_S); return;
-                        case NodeTypes.LessThan: PushCheck(OpCodes.Blt_S); return;
-                        case NodeTypes.GreaterThanOrEqual: PushCheck(OpCodes.Bge_S); return;
-                        case NodeTypes.LessThanOrEqual: PushCheck(OpCodes.Ble_S); return;
+                        case NodeTypes.Add:
+                            Push(bn.Left);
+                            Push(bn.Right);
+                            Generator.Emit(OpCodes.Add);
+                            return;
+
+                        case NodeTypes.Subtract:
+                            Push(bn.Left);
+                            Push(bn.Right);
+                            Generator.Emit(OpCodes.Sub);
+                            return;
+
+                        case NodeTypes.Multiply:
+                            Push(bn.Left);
+                            Push(bn.Right); 
+                            Generator.Emit(OpCodes.Mul);
+                            return;
+
+                        case NodeTypes.Divide:
+                            Push(bn.Left);
+                            Push(bn.Right); 
+                            Generator.Emit(OpCodes.Ldc_R8, Builder.FudgeFactor);
+                            Generator.Emit(OpCodes.Call, _safeDiv);
+                            return;
+
+                        case NodeTypes.Modulo:
+                            Push(bn.Left);
+                            Push(bn.Right);
+                            Generator.Emit(OpCodes.Rem);
+                            return;
+
+                        case NodeTypes.GreaterThan:
+                            Push(bn.Left);
+                            Push(bn.Right); 
+                            PushCheck(OpCodes.Bgt_S);
+                            return;
+
+                        case NodeTypes.LessThan:
+                            Push(bn.Left);
+                            Push(bn.Right);
+                            PushCheck(OpCodes.Blt_S);
+                            return;
+
+                        case NodeTypes.GreaterThanOrEqual:
+                            Push(bn.Left);
+                            Push(bn.Right); 
+                            PushCheck(OpCodes.Bge_S);
+                            return;
+
+                        case NodeTypes.LessThanOrEqual:
+                            Push(bn.Left);
+                            Push(bn.Right);
+                            PushCheck(OpCodes.Ble_S);
+                            return;
+
                         case NodeTypes.Equals:
+                            Push(bn.Left);
+                            Push(bn.Right);
                             Generator.Emit(OpCodes.Ldc_R8, Builder.RelativeTolerance);
                             Generator.Emit(OpCodes.Ldc_R8, Builder.AbsoluteTolerance);
                             Generator.Emit(OpCodes.Call, _equals);
                             PushCheck(OpCodes.Brtrue_S);
                             return;
+
                         case NodeTypes.NotEquals:
+                            Push(bn.Left);
+                            Push(bn.Right);
                             Generator.Emit(OpCodes.Ldc_R8, Builder.RelativeTolerance);
                             Generator.Emit(OpCodes.Ldc_R8, Builder.AbsoluteTolerance);
                             Generator.Emit(OpCodes.Call, _equals);
                             PushCheck(OpCodes.Brfalse_S);
                             return;
-                        case NodeTypes.Pow: Generator.Emit(OpCodes.Call, _power); return;
+
+                        case NodeTypes.And:
+                            var lblBypass = Generator.DefineLabel();
+                            var lblEnd = Generator.DefineLabel();
+
+                            Push(bn.Left);
+                            Generator.Emit(OpCodes.Ldc_R8, 0.5);
+                            Generator.Emit(OpCodes.Ble_S, lblBypass);
+                            Push(bn.Right);
+                            Generator.Emit(OpCodes.Ldc_R8, 0.5);
+                            Generator.Emit(OpCodes.Ble_S, lblBypass);
+                            Generator.Emit(OpCodes.Ldc_R8, 1.0);
+                            Generator.Emit(OpCodes.Br_S, lblEnd);
+                            Generator.MarkLabel(lblBypass);
+                            Generator.Emit(OpCodes.Ldc_R8, 0.0);
+                            Generator.MarkLabel(lblEnd);
+                            return;
+
+                        case NodeTypes.Or:
+                            lblBypass = Generator.DefineLabel();
+                            lblEnd = Generator.DefineLabel();
+
+                            Push(bn.Left);
+                            Generator.Emit(OpCodes.Ldc_R8, 0.5);
+                            Generator.Emit(OpCodes.Bgt_S, lblBypass);
+                            Push(bn.Right);
+                            Generator.Emit(OpCodes.Ldc_R8, 0.5);
+                            Generator.Emit(OpCodes.Bgt_S, lblBypass);
+                            Generator.Emit(OpCodes.Ldc_R8, 0.0);
+                            Generator.Emit(OpCodes.Br_S, lblEnd);
+                            Generator.MarkLabel(lblBypass);
+                            Generator.Emit(OpCodes.Ldc_R8, 1.0);
+                            Generator.MarkLabel(lblEnd);
+                            return;
+
+                        case NodeTypes.Xor:
+                            Push(bn.Left);
+                            Generator.Emit(OpCodes.Ldc_R8, 0.5);
+                            Generator.Emit(OpCodes.Cgt);
+                            Push(bn.Right);
+                            Generator.Emit(OpCodes.Ldc_R8, 0.5);
+                            Generator.Emit(OpCodes.Cgt);
+                            Generator.Emit(OpCodes.Xor);
+                            PushCheck(OpCodes.Brtrue);
+                            return;
+
+                        case NodeTypes.Pow:
+                            Push(bn.Left);
+                            Push(bn.Right);
+                            Generator.Emit(OpCodes.Call, _power);
+                            return;
                     }
                     break;
 
@@ -117,6 +216,10 @@ namespace SpiceSharpBehavioral.Builders
                     {
                         case NodeTypes.Plus: return;
                         case NodeTypes.Minus: Generator.Emit(OpCodes.Neg); return;
+                        case NodeTypes.Not:
+                            Generator.Emit(OpCodes.Ldc_R8, 0.5);
+                            PushCheck(OpCodes.Ble_S);
+                            return;
                     }
                     break;
 

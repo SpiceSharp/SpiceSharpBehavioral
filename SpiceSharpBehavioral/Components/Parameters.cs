@@ -1,5 +1,7 @@
 ﻿using SpiceSharp.ParameterSets;
 using SpiceSharp.Simulations;
+using SpiceSharp.Simulations.Variables;
+using SpiceSharpBehavioral;
 using SpiceSharpBehavioral.Builders;
 using SpiceSharpBehavioral.Parsers;
 using SpiceSharpBehavioral.Parsers.Nodes;
@@ -45,11 +47,36 @@ namespace SpiceSharp.Components.BehavioralComponents
         /// <summary>
         /// Gets the default builder for building expressions.
         /// </summary>
+        /// <param name="simulation">The simulation for which to create variables.</param>
+        /// <param name="variables">The variables that are defined by the behavioral component. You should probably not touch these...</param>
         /// <value>
         /// The default builder.
         /// </value>
-        public static IBuilder<Func<double>> DefaultBuilderFactory(Dictionary<VariableNode, IVariable<double>> variables)
+        public static IBuilder<Func<double>> DefaultBuilderFactory(ISimulation simulation, Dictionary<VariableNode, IVariable<double>> variables)
         {
+            var scalar = new SIUnitDefinition("scalar", new SIUnits());
+
+            // Time variable
+            if (simulation.TryGetState<IIntegrationMethod>(out var method))
+            {
+                variables.Add(Node.Variable("time"), new FuncVariable<double>("time", () => method.Time, new SIUnitDefinition("s", new SIUnits(1, 0, 0, 0, 0, 0, 0))));
+            }
+            
+            // Iteration control
+            if (simulation.TryGetState<IIterationSimulationState>(out var iterState))
+            {
+                variables.Add(Node.Variable("gmin"), new FuncVariable<double>("gmin", () => iterState.Gmin, new SIUnitDefinition("Mho", new SIUnits(3, -2, -1, 2, 0, 0, 0))));
+                variables.Add(Node.Variable("sourcefactor"), new FuncVariable<double>("sourcefactor", () => iterState.SourceFactor, scalar));
+            }
+
+            // Some standard constants
+            variables.Add(Node.Variable("pi"), new ConstantVariable("pi", Math.PI, scalar));
+            variables.Add(Node.Variable("e"), new ConstantVariable("e", Math.Exp(1.0), scalar));
+            variables.Add(Node.Variable("boltz"), new ConstantVariable("boltz", Constants.Boltzmann, new SIUnitDefinition("J/K", new SIUnits(-2, 2, 1, 0, -1, 0, 0))));
+            variables.Add(Node.Variable("planck"), new ConstantVariable("planck", 6.626207004e-34, new SIUnitDefinition("Js", new SIUnits(-1, 2, 1, 0, 0, 0, 0))));
+            variables.Add(Node.Variable("echarge"), new ConstantVariable("echarge", Constants.Charge, Units.Coulomb));
+            variables.Add(Node.Variable("kelvin"), new ConstantVariable("kelvin", -Constants.CelsiusKelvin, new SIUnitDefinition("K", new SIUnits(0, 0, 0, 0, 1, 0, 0))));
+            
             return new FunctionBuilder()
             {
                 FunctionDefinitions = FunctionBuilderHelper.Defaults,
@@ -128,8 +155,9 @@ namespace SpiceSharp.Components.BehavioralComponents
         /// <summary>
         /// A delegate for creating an <see cref="IBuilder{T}"/>.
         /// </summary>
-        /// <param name="variables">The variables.</param>
+        /// <param name="simulation">The simulation for which the variables need to be created.</param>
+        /// <param name="variables">The variables needed for building.</param>
         /// <returns>The value.</returns>
-        public delegate IBuilder<Func<double>> BuilderFactoryMethod(Dictionary<VariableNode, IVariable<double>> variables);
+        public delegate IBuilder<Func<double>> BuilderFactoryMethod(ISimulation simulation, Dictionary<VariableNode, IVariable<double>> variables);
     }
 }
