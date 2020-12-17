@@ -69,15 +69,26 @@ namespace SpiceSharpBehavioralTest.Parsers
                     Node.Function("pwr", v1, v2),
                     new Dictionary<VariableNode, Node>
                     {
-                        { v1, v2 * Node.Function("pwr", v1, v2 - Node.One) },
+                        { v1, Node.Function("sgn", v1) * v2 * Node.Function("pwr", v1, v2 - Node.One) },
                         { v2, Node.Function("log", v1) * Node.Function("pwr", v1, v2) }
-                    }).SetName("{m}(pwr v1, v2)");
+                    }).SetName("{m}(pwr v1 v2)");
                 yield return new TestCaseData(Node.Equals(v1, v2), null).SetName("{m}(v1==v2)");
                 yield return new TestCaseData(Node.NotEquals(v1, v2), null).SetName("{m}(v1==v2)");
                 yield return new TestCaseData(Node.LessThan(v1, v2), null).SetName("{m}(v1==v2)");
                 yield return new TestCaseData(Node.LessThanOrEqual(v1, v2), null).SetName("{m}(v1==v2)");
                 yield return new TestCaseData(Node.GreaterThan(v1, v2), null).SetName("{m}(v1==v2)");
                 yield return new TestCaseData(Node.GreaterThanOrEqual(v1, v2), null).SetName("{m}(v1==v2)");
+
+                yield return new TestCaseData(Node.Function("atan2", v1, v2), new Dictionary<VariableNode, Node>
+                {
+                    { v1, v2 / (Node.Function("square", v1) + Node.Function("square", v2)) },
+                    { v2, -v1 / (Node.Function("square", v1) + Node.Function("square", v2)) }
+                }).SetName("{m}(atan2 v1 v2)");
+                yield return new TestCaseData(Node.Function("hypot", v1, v2), new Dictionary<VariableNode, Node>
+                {
+                    { v1, 0.5 * v1 / Node.Function("hypot", v1, v2) },
+                    { v2, 0.5 * v2 / Node.Function("hypot", v1, v2) }
+                }).SetName("{m}(hypot v1 v2)");
             }
         }
     }

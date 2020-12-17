@@ -56,6 +56,12 @@ namespace SpiceSharp.Components.BehavioralComponents
         {
             var scalar = new SIUnitDefinition("scalar", new SIUnits());
 
+            // Temperature
+            if (simulation.TryGetState<ITemperatureSimulationState>(out var tempState))
+            {
+                variables.Add(Node.Variable("temperature"), new FuncVariable<double>("temperature", () => tempState.Temperature, new SIUnitDefinition("K", new SIUnits(0, 0, 0, 0, 1, 0, 0))));
+            }
+
             // Time variable
             if (simulation.TryGetState<IIntegrationMethod>(out var method))
             {

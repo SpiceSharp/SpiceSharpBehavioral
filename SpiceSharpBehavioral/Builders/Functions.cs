@@ -71,7 +71,7 @@ namespace SpiceSharpBehavioral.Builders
         }
 
         /// <summary>
-        /// Raises a number to a power. The function is made symmetrical.
+        /// Raises a number to a power. The function is made symmetrical. Also known as "pwr".
         /// </summary>
         /// <param name="left">The left argument.</param>
         /// <param name="right">The right argument.</param>
@@ -79,7 +79,7 @@ namespace SpiceSharpBehavioral.Builders
         public static double Power(double left, double right) => Math.Pow(Math.Abs(left), right);
 
         /// <summary>
-        /// Raises a number to a power. The function is made antisymmetrical.
+        /// Raises a number to a power. The function is made antisymmetrical. Also known as "pwrs".
         /// </summary>
         /// <param name="left">The left argument.</param>
         /// <param name="right">The right argument.</param>
@@ -235,5 +235,13 @@ namespace SpiceSharpBehavioral.Builders
                 return 1.0;
             return 0.0;
         }
+
+        /// <summary>
+        /// Returns the hypothenuse (sqrt(x^2+y^2)).
+        /// </summary>
+        /// <param name="y">The first argument.</param>
+        /// <param name="x">The second argument.</param>
+        /// <returns>The hypothenuse.</returns>
+        public static double Hypot(double y, double x) => Math.Sqrt(x * x + y * y);
     }
 }

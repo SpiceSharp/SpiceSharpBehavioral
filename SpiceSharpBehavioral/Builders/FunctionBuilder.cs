@@ -9,7 +9,7 @@ namespace SpiceSharpBehavioral.Builders
     /// A function builder.
     /// </summary>
     /// <seealso cref="IBuilder{T}" />
-    public partial class FunctionBuilder : IBuilder<Func<double>>
+    public class FunctionBuilder : IBuilder<Func<double>>
     {
         /// <summary>
         /// Gets or sets the fudge factor.

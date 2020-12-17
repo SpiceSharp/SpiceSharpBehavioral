@@ -13,6 +13,7 @@ namespace SpiceSharpBehavioral.Builders
     /// </summary>
     public static class FunctionBuilderHelper
     {
+        private static readonly Random _rnd = new Random();
         private static readonly MethodInfo
             _safeDiv = ((Func<double, double, double, double>)Functions.SafeDivide).GetMethodInfo(),
             _sgn = ((Func<double, int>)Math.Sign).GetMethodInfo(),
@@ -29,8 +30,10 @@ namespace SpiceSharpBehavioral.Builders
             { "abs", Abs },
             { "sgn", Sgn },
             { "sqrt", Sqrt },
+            { "pow", Pow },
             { "pwr", Pwr },
-            { "log", Log },
+            { "log", Log }, { "ln", Log },
+            { "pwrs", Pwrs },
             { "log10", Log10 },
             { "exp", Exp },
             { "sin", Sin },
@@ -39,9 +42,11 @@ namespace SpiceSharpBehavioral.Builders
             { "sinh", Sinh },
             { "cosh", Cosh },
             { "tanh", Tanh },
-            { "asin", Asin },
-            { "acos", Acos },
-            { "atan", Atan },
+            { "asin", Asin }, { "arcsin", Asin },
+            { "acos", Acos }, { "arccos", Acos },
+            { "atan", Atan }, { "arctan", Atan },
+            { "atan2", Atan2 },
+            { "hypot", Hypot },
             { "u", U }, { "du(0)", Zero },
             { "u2", U2 }, { "du2(0)", DU2 },
             { "uramp", URamp }, { "duramp(0)", DURampDerivative },
@@ -51,9 +56,12 @@ namespace SpiceSharpBehavioral.Builders
             { "round", Round },
             { "square", Square },
             { "pwl", Pwl }, { "dpwl(0)", PwlDerivative },
+            { "table", Pwl }, { "dtable(0)", PwlDerivative },
+            { "tbl", Pwl }, { "dtbl(0)", PwlDerivative },
             { "min", Min },
             { "max", Max },
-            { "rnd", Random }
+            { "rnd", Random }, { "rand", Random },
+            { "if", If }
         };
 
         private static IReadOnlyList<Node> Check(this IReadOnlyList<Node> nodes, int expected)
@@ -75,24 +83,13 @@ namespace SpiceSharpBehavioral.Builders
         }
 
         // No-argument functions
-        private static void Random(ILState ils, IReadOnlyList<Node> arguments)
-        {
-            Random rnd = new Random();
-            ils.Call(rnd.NextDouble);
-        }
+        private static void Random(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(_rnd.NextDouble);
 
         // One-argument functions
         private static void Zero(ILState ils, IReadOnlyList<Node> arguments) => ils.Push(0.0);
         private static void Abs(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Abs, arguments);
         private static void Sgn(ILState ils, IReadOnlyList<Node> arguments) { ils.Call(null, _sgn, arguments.Check(1)); ils.Generator.Emit(OpCodes.Conv_R8); }
         private static void Sqrt(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Sqrt, arguments);
-        private static void DSqrt0(ILState ils, IReadOnlyList<Node> arguments)
-        {
-            ils.Push(0.5);
-            ils.Call(Functions.Sqrt, arguments);
-            ils.Push(ils.Builder.FudgeFactor);
-            ils.Generator.Emit(OpCodes.Call, _safeDiv);
-        }
         private static void URamp(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Ramp, arguments);
         private static void DURampDerivative(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.RampDerivative, arguments);
         private static void U(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Step, arguments);
@@ -116,7 +113,9 @@ namespace SpiceSharpBehavioral.Builders
         private static void Nint(ILState ils, IReadOnlyList<Node> arguments) { ils.Push(arguments.Check(1)[0]); ils.Push(0); ils.Generator.Emit(OpCodes.Call, _round); }
 
         // Two-argument functions
-        private static void Pwr(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Power2, arguments);
+        private static void Pow(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Pow, arguments);
+        private static void Pwr(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Power, arguments);
+        private static void Pwrs(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Power2, arguments);
         private static void Min(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Min, arguments);
         private static void Max(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Max, arguments);
         private static void Round(ILState ils, IReadOnlyList<Node> arguments) 
@@ -125,6 +124,24 @@ namespace SpiceSharpBehavioral.Builders
             ils.Push(arguments[1]); 
             ils.Generator.Emit(OpCodes.Conv_I4); 
             ils.Generator.Emit(OpCodes.Call, _round); 
+        }
+        private static void Atan2(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Atan2, arguments);
+        private static void Hypot(ILState ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Hypot, arguments);
+
+        // Three-argument functions
+        private static void If(ILState ils, IReadOnlyList<Node> arguments)
+        {
+            arguments.Check(3);
+            ils.Push(arguments[0]);
+            ils.Push(0.5);
+            var lblElse = ils.Generator.DefineLabel();
+            var lblEnd = ils.Generator.DefineLabel();
+            ils.Generator.Emit(OpCodes.Ble_S, lblElse);
+            ils.Push(arguments[1]);
+            ils.Generator.Emit(OpCodes.Br_S, lblEnd);
+            ils.Generator.MarkLabel(lblElse);
+            ils.Push(arguments[2]);
+            ils.Generator.MarkLabel(lblEnd);
         }
 
         // N-argument functions

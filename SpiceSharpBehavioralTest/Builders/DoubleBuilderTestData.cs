@@ -8,8 +8,7 @@ using System.Collections.Generic;
 namespace SpiceSharpBehavioralTest.Builders
 {
     public class DoubleBuilderTestData
-    {
-        public static IEnumerable<TestCaseData> Single
+    {        public static IEnumerable<TestCaseData> Single
         {
             get
             {
@@ -53,6 +52,10 @@ namespace SpiceSharpBehavioralTest.Builders
                 yield return new TestCaseData(Node.Function("abs", Node.Add(Node.Multiply(Node.Minus(2.0), 6.0), 7.0)), 5.0).SetName("{m}(abs -2*6+7)");
                 yield return new TestCaseData(Node.Function("min", Node.Minus(2.0), Node.Multiply(6.0, 2.0)), -2.0).SetName("{m}(min -2, 6*2)");
                 yield return new TestCaseData(Node.Function("pwl", 2.0, 0.0, 1.0, 3.0, 4.0), 3.0).SetName("{m}(pwl 2,0,1,3,4)");
+                yield return new TestCaseData(Node.Function("table", 2.0, 0.0, 1.0, 3.0, 4.0), 3.0).SetName("{m}(table 2,0,1,3,4)");
+                yield return new TestCaseData(Node.Function("tbl", 2.0, 0.0, 1.0, 3.0, 4.0), 3.0).SetName("{m}(tbl 2,0,1,3,4)");
+                yield return new TestCaseData(Node.Function("if", 1.0, 0.25, 0.75), 0.25).SetName("{m}(if 1 0.25 0.75)");
+                yield return new TestCaseData(Node.Function("if", 0.0, 0.25, 0.75), 0.75).SetName("{m}(if 0 0.25 0.75)");
 
                 foreach (var data in Single)
                 {
@@ -60,6 +63,7 @@ namespace SpiceSharpBehavioralTest.Builders
                     var arg = (double)data.Arguments[1];
                     yield return new TestCaseData(Node.Function("abs", node), Math.Abs(arg)).SetName("{{m}}(abs {0})".FormatString(arg));
                     yield return new TestCaseData(Node.Function("sqrt", node), Functions.Sqrt(arg)).SetName("{{m}}(sqrt {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("ln", node), Functions.Log(arg)).SetName("{{m}}(ln {0})".FormatString(arg));
                     yield return new TestCaseData(Node.Function("log", node), Functions.Log(arg)).SetName("{{m}}(log {0})".FormatString(arg));
                     yield return new TestCaseData(Node.Function("log10", node), Functions.Log10(arg)).SetName("{{m}}(log10 {0})".FormatString(arg));
                     yield return new TestCaseData(Node.Function("exp", node), Math.Exp(arg)).SetName("{{m}}(exp {0})".FormatString(arg));
@@ -79,6 +83,11 @@ namespace SpiceSharpBehavioralTest.Builders
                     yield return new TestCaseData(Node.Function("floor", node), Math.Floor(arg)).SetName("{{m}}(floor {0})".FormatString(arg));
                     yield return new TestCaseData(Node.Function("nint", node), Math.Round(arg, 0)).SetName("{{m}}(nint {0})".FormatString(arg));
                     yield return new TestCaseData(Node.Function("square", node), arg * arg).SetName("{{m}}(square {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("pow", node, node + 1.5), Math.Pow(arg, arg + 1.5)).SetName("{{m}}(pow {0} {1})".FormatString(arg, arg + 1.5));
+                    yield return new TestCaseData(Node.Function("pwr", node, node + 1.5), Functions.Power(arg, arg + 1.5)).SetName("{{m}}(pwr {0} {1})".FormatString(arg, arg + 1.5));
+                    yield return new TestCaseData(Node.Function("pwrs", node, node + 1.5), Functions.Power2(arg, arg + 1.5)).SetName("{{m}}(pwrs {0} {1})".FormatString(arg, arg + 1.5));
+                    yield return new TestCaseData(Node.Function("atan2", node, node - 5.0), Math.Atan2(arg, arg - 5)).SetName("{{m}}(atan2 {0} {1})".FormatString(arg, arg - 5));
+                    yield return new TestCaseData(Node.Function("hypot", node, node - 5.0), Functions.Hypot(arg, arg - 5)).SetName("{{m}}(hypot {0} {1})".FormatString(arg, arg - 5));
                 }
             }
         }

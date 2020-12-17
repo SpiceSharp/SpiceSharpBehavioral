@@ -73,6 +73,7 @@ namespace SpiceSharpBehavioral.Builders
         /// <param name="node">The node.</param>
         public void Push(Node node)
         {
+            Label lblBypass, lblEnd;
             switch (node)
             {
                 case BinaryOperatorNode bn:
@@ -154,8 +155,8 @@ namespace SpiceSharpBehavioral.Builders
                             return;
 
                         case NodeTypes.And:
-                            var lblBypass = Generator.DefineLabel();
-                            var lblEnd = Generator.DefineLabel();
+                            lblBypass = Generator.DefineLabel();
+                            lblEnd = Generator.DefineLabel();
 
                             Push(bn.Left);
                             Generator.Emit(OpCodes.Ldc_R8, 0.5);
@@ -217,7 +218,7 @@ namespace SpiceSharpBehavioral.Builders
                         case NodeTypes.Plus: return;
                         case NodeTypes.Minus: Generator.Emit(OpCodes.Neg); return;
                         case NodeTypes.Not:
-                            Generator.Emit(OpCodes.Ldc_R8, 0.5);
+                            Push(0.5);
                             PushCheck(OpCodes.Ble_S);
                             return;
                     }
@@ -238,6 +239,19 @@ namespace SpiceSharpBehavioral.Builders
                         Call(() => variable.Value);
                         return;
                     }
+                    break;
+
+                case TernaryOperatorNode tn:
+                    Push(tn.Condition);
+                    Push(0.5);
+                    lblBypass = Generator.DefineLabel();
+                    lblEnd = Generator.DefineLabel();
+                    Generator.Emit(OpCodes.Ble_S, lblBypass);
+                    Push(tn.IfTrue);
+                    Generator.Emit(OpCodes.Br_S, lblEnd);
+                    Generator.MarkLabel(lblBypass);
+                    Push(tn.IfFalse);
+                    Generator.MarkLabel(lblEnd);
                     break;
             }
 
