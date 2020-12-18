@@ -7,8 +7,9 @@ using System.Collections.Generic;
 
 namespace SpiceSharpBehavioralTest.Builders
 {
-    public class DoubleBuilderTestData
-    {        public static IEnumerable<TestCaseData> Single
+    public class BuilderTestData
+    {        
+        public static IEnumerable<TestCaseData> Single
         {
             get
             {

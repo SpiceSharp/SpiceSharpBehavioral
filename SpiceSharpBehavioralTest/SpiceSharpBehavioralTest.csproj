@@ -53,9 +53,11 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Builders\DoubleBuilderTestData.cs" />
-    <Compile Include="Builders\DoubleBuilderTests.cs" />
-    <Compile Include="Builders\FunctionBuilderTests.cs" />
+    <Compile Include="Builders\ComplexBuilderTests.cs" />
+    <Compile Include="Builders\BuilderTestData.cs" />
+    <Compile Include="Builders\ComplexFunctionBuilderTests.cs" />
+    <Compile Include="Builders\RealBuilderTests.cs" />
+    <Compile Include="Builders\RealFunctionBuilderTests.cs" />
     <Compile Include="Components\BehavioralCapacitorTests.cs" />
     <Compile Include="Components\BehavioralCurrentSourceTests.cs" />
     <Compile Include="Components\BehavioralResistorTests.cs" />

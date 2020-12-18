@@ -8,21 +8,21 @@ using System.Collections.Generic;
 namespace SpiceSharpBehavioralTest.Builders
 {
     [TestFixture]
-    public class FunctionBuilderTests
+    public class RealFunctionBuilderTests
     {
-        [TestCaseSource(typeof(DoubleBuilderTestData), nameof(DoubleBuilderTestData.Nodes))]
+        [TestCaseSource(typeof(BuilderTestData), nameof(BuilderTestData.Nodes))]
         public void When_BuildNode_Expect_Reference(Node node, double expected)
         {
-            var builder = new FunctionBuilder();
+            var builder = new RealFunctionBuilder();
             Assert.AreEqual(expected, builder.Build(node).Invoke(), 1e-20);
         }
 
-        [TestCaseSource(typeof(DoubleBuilderTestData), nameof(DoubleBuilderTestData.FunctionNodes))]
+        [TestCaseSource(typeof(BuilderTestData), nameof(BuilderTestData.FunctionNodes))]
         public void When_BuildNodeFunctions_Expect_Reference(Node node, double expected)
         {
-            var builder = new FunctionBuilder
+            var builder = new RealFunctionBuilder
             {
-                FunctionDefinitions = FunctionBuilderHelper.Defaults
+                FunctionDefinitions = RealFunctionBuilderHelper.Defaults
             };
             Assert.AreEqual(expected, builder.Build(node).Invoke(), 1e-20);
         }
@@ -30,9 +30,9 @@ namespace SpiceSharpBehavioralTest.Builders
         [Test]
         public void When_BuildRandomNode_Expect_NoException()
         {
-            var builder = new FunctionBuilder
+            var builder = new RealFunctionBuilder
             {
-                FunctionDefinitions = FunctionBuilderHelper.Defaults
+                FunctionDefinitions = RealFunctionBuilderHelper.Defaults
             };
             var func = builder.Build(Node.Function("rnd", new Node[0]));
             func();
@@ -41,9 +41,9 @@ namespace SpiceSharpBehavioralTest.Builders
         [Test]
         public void When_FunctionCall_Expect_Reference()
         {
-            var builder = new FunctionBuilder();
+            var builder = new RealFunctionBuilder();
             var func1 = builder.Build(Node.Add(1.0, 2.0));
-            builder.FunctionDefinitions = new Dictionary<string, ApplyFunction>
+            builder.FunctionDefinitions = new Dictionary<string, ApplyFunction<double>>
             {
                 { "f", (fbi, args) => fbi.Call(func1.Invoke) }
             };
@@ -54,7 +54,7 @@ namespace SpiceSharpBehavioralTest.Builders
         [Test]
         public void When_BuildVariable_Expect_Reference()
         {
-            var builder = new FunctionBuilder();
+            var builder = new RealFunctionBuilder();
             var variable = new GetSetVariable<double>("a", Units.Volt);
             builder.Variables = new Dictionary<VariableNode, IVariable<double>> { { VariableNode.Variable("a"), variable } };
 

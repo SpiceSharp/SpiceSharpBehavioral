@@ -8,16 +8,16 @@ using System.Collections.Generic;
 namespace SpiceSharpBehavioralTest.Builders
 {
     [TestFixture]
-    public class DoubleBuilderTests
+    public class RealBuilderTests
     {
-        [TestCaseSource(typeof(DoubleBuilderTestData), nameof(DoubleBuilderTestData.Nodes))]
+        [TestCaseSource(typeof(BuilderTestData), nameof(BuilderTestData.Nodes))]
         public void When_BuildNode_Expect_Reference(Node node, double expected)
         {
             var builder = new DoubleBuilder();
             Assert.AreEqual(expected, builder.Build(node), 1e-20);
         }
 
-        [TestCaseSource(typeof(DoubleBuilderTestData), nameof(DoubleBuilderTestData.FunctionNodes))]
+        [TestCaseSource(typeof(BuilderTestData), nameof(BuilderTestData.FunctionNodes))]
         public void When_BuildNodeFunctions_Expect_Reference(Node node, double expected)
         {
             var builder = new DoubleBuilder();

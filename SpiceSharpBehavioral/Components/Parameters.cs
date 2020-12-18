@@ -91,9 +91,9 @@ namespace SpiceSharp.Components.BehavioralComponents
             variables.Add(Node.Variable("echarge"), new ConstantVariable("echarge", Constants.Charge, Units.Coulomb));
             variables.Add(Node.Variable("kelvin"), new ConstantVariable("kelvin", -Constants.CelsiusKelvin, new SIUnitDefinition("K", new SIUnits(0, 0, 0, 0, 1, 0, 0))));
             
-            return new FunctionBuilder()
+            return new RealFunctionBuilder()
             {
-                FunctionDefinitions = FunctionBuilderHelper.Defaults,
+                FunctionDefinitions = RealFunctionBuilderHelper.Defaults,
                 Variables = variables
             };
         }

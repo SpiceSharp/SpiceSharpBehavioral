@@ -1,5 +1,6 @@
 ﻿using SpiceSharp;
 using System;
+using System.Numerics;
 
 namespace SpiceSharpBehavioral.Builders
 {
@@ -15,7 +16,7 @@ namespace SpiceSharpBehavioral.Builders
         /// <param name="right">The right argument.</param>
         /// <param name="fudgeFactor">The fudge factor.</param>
         /// <returns>
-        /// The division.
+        ///     The division.
         /// </returns>
         public static double SafeDivide(double left, double right, double fudgeFactor)
         {
@@ -29,6 +30,29 @@ namespace SpiceSharpBehavioral.Builders
         }
 
         /// <summary>
+        /// Divides two complex numbers while avoiding division by 0 using a fudge factor.
+        /// </summary>
+        /// <param name="left">The left argument.</param>
+        /// <param name="right">The right argument.</param>
+        /// <param name="fudgeFactor">The fudge factor.</param>
+        /// <returns>
+        ///     The division.
+        /// </returns>
+        public static Complex SafeDivide(Complex left, Complex right, double fudgeFactor)
+        {
+            if (Math.Abs(right.Imaginary) < fudgeFactor)
+            {
+                if (right.Real < 0)
+                    right -= fudgeFactor;
+                else
+                    right += fudgeFactor;
+            }
+            if (right.Real.Equals(0.0) && right.Imaginary.Equals(0.0))
+                return double.PositiveInfinity;
+            return left / right;
+        }
+
+        /// <summary>
         /// Checks if two numbers are equal.
         /// </summary>
         /// <param name="left">The left argument.</param>
@@ -36,7 +60,7 @@ namespace SpiceSharpBehavioral.Builders
         /// <param name="relTol">The relative tolerance.</param>
         /// <param name="absTol">The absolute tolerance.</param>
         /// <returns>
-        /// <c>true</c> if the two numbers are within tolerance; otherwise <c>false</c>.
+        ///     <c>true</c> if the two numbers are within tolerance; otherwise <c>false</c>.
         /// </returns>
         public static bool Equals(double left, double right, double relTol, double absTol)
         {
@@ -44,6 +68,23 @@ namespace SpiceSharpBehavioral.Builders
             if (Math.Abs(left - right) <= tol)
                 return true;
             return false;
+        }
+
+        /// <summary>
+        /// Checks if two complex numbers are equal.
+        /// </summary>
+        /// <param name="left">The left argument.</param>
+        /// <param name="right">The right argument.</param>
+        /// <param name="relTol">The relative tolerance.</param>
+        /// <param name="absTol">The absolute tolerance.</param>
+        /// <returns>
+        ///     <c>true</c> if the two numbers are within tolerance; otherwise <c>false</c>.
+        /// </returns>
+        public static bool Equals(Complex left, Complex right, double relTol, double absTol)
+        {
+            if (!Equals(left.Real, right.Real) || !Equals(left.Imaginary, right.Imaginary))
+                return false;
+            return true;
         }
 
         /// <summary>
@@ -77,6 +118,14 @@ namespace SpiceSharpBehavioral.Builders
         /// <param name="right">The right argument.</param>
         /// <returns>The result.</returns>
         public static double Power(double left, double right) => Math.Pow(Math.Abs(left), right);
+
+        /// <summary>
+        /// Raises a number to a power. The function is made radially symmetrical. Also known as "pwr".
+        /// </summary>
+        /// <param name="left">The left argument.</param>
+        /// <param name="right">The right argument.</param>
+        /// <returns>The result.</returns>
+        public static Complex Power(Complex left, Complex right) => Complex.Pow(left.Magnitude, right);
 
         /// <summary>
         /// Raises a number to a power. The function is made antisymmetrical. Also known as "pwrs".
