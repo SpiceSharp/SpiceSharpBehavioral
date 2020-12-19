@@ -61,6 +61,5 @@ namespace SpiceSharpBehavioralTest.Builders
             variable.Value = 2.0;
             Assert.AreEqual(5.0, builder.Build(Node.Variable("a") + 3.0).Invoke(), 1e-20);
         }
-
     }
 }

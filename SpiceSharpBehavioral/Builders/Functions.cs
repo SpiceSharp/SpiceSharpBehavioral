@@ -100,15 +100,39 @@ namespace SpiceSharpBehavioral.Builders
         }
 
         /// <summary>
+        /// Takes the natural logarithm.
+        /// </summary>
+        /// <param name="arg">The argument.</param>
+        /// <returns>The natural logarithm.</returns>
+        public static Complex Log(Complex arg)
+        {
+            if (arg.Imaginary.Equals(0.0))
+                return Log(arg.Real);
+            return Complex.Log(arg);
+        }
+
+        /// <summary>
         /// Takes the logarithm base 10.
         /// </summary>
         /// <param name="arg">The argument.</param>
-        /// <returns>The logarithm baes 10.</returns>
+        /// <returns>The logarithm base 10.</returns>
         public static double Log10(double arg)
         {
             if (arg < 0)
                 return double.PositiveInfinity;
             return Math.Log10(arg);
+        }
+
+        /// <summary>
+        /// Takes the logarithm base 10.
+        /// </summary>
+        /// <param name="arg">The argument.</param>
+        /// <returns>The logarithm base 10.</returns>
+        public static Complex Log10(Complex arg)
+        {
+            if (arg.Imaginary.Equals(0.0))
+                return Log10(arg.Real);
+            return Complex.Log10(arg);
         }
 
         /// <summary>
@@ -142,6 +166,22 @@ namespace SpiceSharpBehavioral.Builders
         }
 
         /// <summary>
+        /// Raises a number to a power. The function is made antisymmetrical around the imaginary axis. Also known as "pwrs".
+        /// </summary>
+        /// <param name="left">The left argument.</param>
+        /// <param name="right">The right argument.</param>
+        /// <returns>The result.</returns>
+        public static Complex Power2(Complex left, Complex right)
+        {
+            if (left.Imaginary.Equals(0.0) && right.Imaginary.Equals(0.0))
+                return Power2(left.Real, right.Real);
+            if (left.Real < 0)
+                return -Complex.Pow(-left.Real, right);
+            else
+                return Complex.Pow(left.Real, right);
+        }
+
+        /// <summary>
         /// The step function.
         /// </summary>
         /// <param name="arg">The argument.</param>
@@ -155,6 +195,13 @@ namespace SpiceSharpBehavioral.Builders
             else
                 return 0.5; /* Ick! */
         }
+
+        /// <summary>
+        /// The step function.
+        /// </summary>
+        /// <param name="arg">The argument.</param>
+        /// <returns>The result.</returns>
+        public static Complex Step(Complex arg) => Step(arg.Real);
 
         /// <summary>
         /// The step function with an initial ramp.
@@ -172,10 +219,17 @@ namespace SpiceSharpBehavioral.Builders
         }
 
         /// <summary>
+        /// The step function with an initial ramp.
+        /// </summary>
+        /// <param name="arg">The argument.</param>
+        /// <returns>The result.</returns>
+        public static Complex Step2(Complex arg) => Step2(arg.Real);
+
+        /// <summary>
         /// The derivative of <see cref="Step2(double)"/>.
         /// </summary>
         /// <param name="arg">The argument.</param>
-        /// <returns></returns>
+        /// <returns>The derivative of the step function with initial ramp.</returns>
         public static double Step2Derivative(double arg)
         {
             if (arg <= 0.0)
@@ -185,6 +239,13 @@ namespace SpiceSharpBehavioral.Builders
             else
                 return 0.0;
         }
+
+        /// <summary>
+        /// The derivative of <see cref="Step2(double)"/>.
+        /// </summary>
+        /// <param name="arg">The argument.</param>
+        /// <returns>The derivative of the step function with initial ramp.</returns>
+        public static Complex Step2Derivative(Complex arg) => Step2Derivative(arg.Real);
 
         /// <summary>
         /// The ramp function.
@@ -199,16 +260,30 @@ namespace SpiceSharpBehavioral.Builders
         }
 
         /// <summary>
-        /// The derivative of <see cref="RampDerivative(double)"/>
+        /// The ramp function.
         /// </summary>
         /// <param name="arg">The argument.</param>
-        /// <returns></returns>
+        /// <returns>The result.</returns>
+        public static Complex Ramp(Complex arg) => Ramp(arg.Real);
+
+        /// <summary>
+        /// The derivative of <see cref="Ramp(double)"/>
+        /// </summary>
+        /// <param name="arg">The argument.</param>
+        /// <returns>The derivative of a ramp.</returns>
         public static double RampDerivative(double arg)
         {
             if (arg < 0)
                 return 0.0;
             return 1.0;
         }
+
+        /// <summary>
+        /// The derivative of <see cref="Ramp(Complex)"/> over the real part.
+        /// </summary>
+        /// <param name="arg">The argument.</param>
+        /// <returns>The derivative of a ramp.</returns>
+        public static Complex RampDerivative(Complex arg) => RampDerivative(arg.Real);
 
         /// <summary>
         /// Piece-wise linear interpolation.
@@ -260,6 +335,13 @@ namespace SpiceSharpBehavioral.Builders
         public static double Square(double arg) => arg * arg;
 
         /// <summary>
+        /// Squares a value.
+        /// </summary>
+        /// <param name="arg">The argument.</param>
+        /// <returns>The result.</returns>
+        public static Complex Square(Complex arg) => arg * arg;
+
+        /// <summary>
         /// Calculates the square root of a number.
         /// </summary>
         /// <param name="arg">The argument.</param>
@@ -269,6 +351,18 @@ namespace SpiceSharpBehavioral.Builders
             if (arg < 0.0)
                 return double.PositiveInfinity;
             return Math.Sqrt(arg);
+        }
+
+        /// <summary>
+        /// Calculates the square root of a number.
+        /// </summary>
+        /// <param name="arg">The argument.</param>
+        /// <returns>The result.</returns>
+        public static Complex Sqrt(Complex arg)
+        {
+            if (arg.Imaginary.Equals(0.0))
+                return Sqrt(arg.Real);
+            return Complex.Sqrt(arg);
         }
 
         /// <summary>
@@ -292,5 +386,84 @@ namespace SpiceSharpBehavioral.Builders
         /// <param name="x">The second argument.</param>
         /// <returns>The hypothenuse.</returns>
         public static double Hypot(double y, double x) => Math.Sqrt(x * x + y * y);
+
+        /// <summary>
+        /// Returns the hypothenuse (sqrt(|x|^2+|y|^2)).
+        /// </summary>
+        /// <param name="y">The first argument.</param>
+        /// <param name="x">The second argument.</param>
+        /// <returns>The hypothenuse.</returns>
+        public static Complex Hypot(Complex y, Complex x)
+        {
+            return Math.Sqrt(
+                y.Real * y.Real + y.Imaginary * y.Imaginary +
+                x.Real * x.Real + x.Imaginary * x.Imaginary);
+        }
+
+        /// <summary>
+        /// Returns the rounded value of the complex number.
+        /// </summary>
+        /// <param name="a">The number.</param>
+        /// <param name="n">The number of decimals.</param>
+        /// <returns></returns>
+        public static Complex Round(Complex a, int n)
+        {
+            return new Complex(Math.Round(a.Real, n), Math.Round(a.Imaginary, n));
+        }
+
+        /// <summary>
+        /// Returns the floor.
+        /// </summary>
+        /// <param name="a">The argument.</param>
+        /// <returns>The floor value.</returns>
+        public static Complex Floor(Complex a)
+        {
+            return new Complex(
+                Math.Floor(a.Real),
+                Math.Floor(a.Imaginary));
+        }
+
+        /// <summary>
+        /// Returns the ceiling.
+        /// </summary>
+        /// <param name="a">The argument.</param>
+        /// <returns>The ceiling value.</returns>
+        public static Complex Ceiling(Complex a)
+        {
+            return new Complex(
+                Math.Ceiling(a.Real),
+                Math.Ceiling(a.Imaginary));
+        }
+
+        /// <summary>
+        /// Takes the absolute value of a complex number.
+        /// </summary>
+        /// <param name="a">The complex number.</param>
+        /// <returns>The absolute value.</returns>
+        public static Complex Abs(Complex a) => a.Magnitude;
+
+        /// <summary>
+        /// The minimum of two complex numbers (only uses the real parts).
+        /// </summary>
+        /// <param name="a">The first argument.</param>
+        /// <param name="b">The second argument.</param>
+        /// <returns>The smallest real part of either arguments.</returns>
+        public static Complex Min(Complex a, Complex b) => Math.Min(a.Real, b.Real);
+
+        /// <summary>
+        /// The maximum of two complex numbers (only uses the real parts).
+        /// </summary>
+        /// <param name="a">The first argument.</param>
+        /// <param name="b">The second argument.</param>
+        /// <returns>The largest real part of either arguments.</returns>
+        public static Complex Max(Complex a, Complex b) => Math.Max(a.Real, b.Real);
+
+        /// <summary>
+        /// The complex version for atan2 (only uses the real parts).
+        /// </summary>
+        /// <param name="y">The first argument.</param>
+        /// <param name="x">The second argument.</param>
+        /// <returns>The angle in a 2D plane.</returns>
+        public static Complex Atan2(Complex y, Complex x) => Math.Atan2(y.Real, x.Real);
     }
 }

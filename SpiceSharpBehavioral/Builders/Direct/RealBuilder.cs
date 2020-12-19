@@ -10,7 +10,7 @@ namespace SpiceSharpBehavioral.Builders
     /// A builder that can compute values.
     /// </summary>
     /// <seealso cref="IBuilder{T}" />
-    public class DoubleBuilder : IBuilder<double>
+    public class RealBuilder : IBuilder<double>
     {
         /// <summary>
         /// Gets the functions.

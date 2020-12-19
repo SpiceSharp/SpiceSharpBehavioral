@@ -10,7 +10,7 @@ namespace SpiceSharpBehavioral.Builders
     /// <summary>
     /// An IL state for complex values.
     /// </summary>
-    public class ComplexILState : ILState<Complex>
+    public class ComplexILState : ILState<Complex>, IILComplexState
     {
         private static readonly MethodInfo _safeDiv = ((Func<Complex, Complex, double, Complex>)Functions.SafeDivide).GetMethodInfo();
         private static readonly MethodInfo _equals = ((Func<Complex, Complex, double, double, bool>)Functions.Equals).GetMethodInfo();
@@ -216,10 +216,7 @@ namespace SpiceSharpBehavioral.Builders
             Generator.Emit(OpCodes.Newobj, _cplx);
         }
 
-        /// <summary>
-        /// Get the real part of a complex value on the stack.
-        /// </summary>
-        /// <param name="node">The node (optional).</param>
+        /// <inheritdoc/>
         public void PushReal(Node node = null)
         {
             if (node != null)
@@ -229,9 +226,7 @@ namespace SpiceSharpBehavioral.Builders
             Generator.Emit(OpCodes.Call, _realPart);
         }
 
-        /// <summary>
-        /// Convert a real value on the stack to a complex value.
-        /// </summary>
+        /// <inheritdoc/>
         public void RealToComplex()
         {
             PushDouble(0.0);

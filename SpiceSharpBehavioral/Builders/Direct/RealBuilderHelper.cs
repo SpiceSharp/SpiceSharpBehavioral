@@ -6,9 +6,9 @@ using System.Collections.Generic;
 namespace SpiceSharpBehavioral.Builders
 {
     /// <summary>
-    /// Helper methods for a <see cref="DoubleBuilder"/>.
+    /// Helper methods for a <see cref="RealBuilder"/>.
     /// </summary>
-    public static class DoubleBuilderHelper
+    public static class RealBuilderHelper
     {
         private static readonly Random _rnd = new Random();
 

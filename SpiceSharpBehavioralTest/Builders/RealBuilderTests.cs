@@ -13,22 +13,24 @@ namespace SpiceSharpBehavioralTest.Builders
         [TestCaseSource(typeof(BuilderTestData), nameof(BuilderTestData.Nodes))]
         public void When_BuildNode_Expect_Reference(Node node, double expected)
         {
-            var builder = new DoubleBuilder();
+            var builder = new RealBuilder();
             Assert.AreEqual(expected, builder.Build(node), 1e-20);
         }
 
         [TestCaseSource(typeof(BuilderTestData), nameof(BuilderTestData.FunctionNodes))]
         public void When_BuildNodeFunctions_Expect_Reference(Node node, double expected)
         {
-            var builder = new DoubleBuilder();
-            builder.FunctionDefinitions = DoubleBuilderHelper.Defaults;
+            var builder = new RealBuilder
+            {
+                FunctionDefinitions = RealBuilderHelper.Defaults
+            };
             Assert.AreEqual(expected, builder.Build(node), 1e-20);
         }
 
         [Test]
         public void When_BuildVariable_Expect_Reference()
         {
-            var builder = new DoubleBuilder();
+            var builder = new RealBuilder();
             var variable = new GetSetVariable<double>("a", Units.Volt);
             builder.Variables = new Dictionary<VariableNode, IVariable<double>> { { VariableNode.Variable("a"), variable } };
 

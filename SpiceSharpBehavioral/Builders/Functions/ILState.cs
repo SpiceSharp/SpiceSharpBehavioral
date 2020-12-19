@@ -140,7 +140,7 @@ namespace SpiceSharpBehavioral.Builders
                     index = _referenceMap.Count;
                     _referenceMap.Add(target, index);
                 }
-
+                
                 // Add the target
                 Generator.Emit(OpCodes.Ldarg_0);
                 PushInt(index);

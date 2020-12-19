@@ -103,7 +103,8 @@ namespace SpiceSharpBehavioral.Builders
                         var args = new Complex[fn.Arguments.Count];
                         for (var i = 0; i < args.Length; i++)
                             args[i] = Build(fn.Arguments[i]);
-                        return definition.Invoke(args);
+                        var result = definition.Invoke(args);
+                        return result;
                     }
                     break;
 
