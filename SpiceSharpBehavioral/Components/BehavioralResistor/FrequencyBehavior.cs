@@ -7,6 +7,9 @@ using SpiceSharp.Components.BehavioralComponents;
 using SpiceSharp.ParameterSets;
 using SpiceSharp.Components.CommonBehaviors;
 using SpiceSharp.Attributes;
+using SpiceSharpBehavioral;
+using System.Collections.Generic;
+using SpiceSharpBehavioral.Parsers.Nodes;
 
 namespace SpiceSharp.Components.BehavioralResistorBehaviors
 {
@@ -24,7 +27,7 @@ namespace SpiceSharp.Components.BehavioralResistorBehaviors
         private readonly OnePort<Complex> _variables;
         private readonly IVariable<Complex> _branch;
         private readonly ElementSet<Complex> _elements, _coreElements;
-        private readonly Complex[] _values;
+        private readonly Func<Complex>[] _derivatives;
 
         /// <summary>
         /// Gets the branch equation variable.
@@ -60,19 +63,31 @@ namespace SpiceSharp.Components.BehavioralResistorBehaviors
         public FrequencyBehavior(BehavioralBindingContext context)
             : base(context)
         {
+            var bp = context.GetParameterSet<Parameters>();
             var state = context.GetState<IComplexSimulationState>();
             _variables = new OnePort<Complex>(
                 state.GetSharedVariable(context.Nodes[0]),
                 state.GetSharedVariable(context.Nodes[1]));
             _branch = state.CreatePrivateVariable(Name.Combine("branch"), Units.Ampere);
 
-            var rhsLocs = state.Map[_branch];
-            var matLocs = new MatrixLocation[Functions.Length * 2];
-            _values = new Complex[Functions.Length * 2];
-            for (var i = 0; i < Functions.Length; i++)
+            // Build the functions
+            var nVariables = new Dictionary<VariableNode, IVariable<Complex>>(Derivatives.Comparer);
+            foreach (var variable in Derivatives.Keys)
             {
-                var variable = context.MapNode(state, Functions[i].Item1, _branch);
-                matLocs[i] = new MatrixLocation(rhsLocs, state.Map[variable]);
+                var orig = DerivativeVariables[variable];
+                nVariables.Add(variable, new FuncVariable<Complex>(orig.Name, () => orig.Value, orig.Unit));
+            }
+            var builder = context.CreateBuilder(bp.ComplexBuilderFactory, nVariables);
+            _derivatives = new Func<Complex>[Derivatives.Count];
+            var rhsLocs = state.Map[_branch];
+            var matLocs = new MatrixLocation[Derivatives.Count];
+            int index = 0;
+            foreach (var pair in Derivatives)
+            {
+                _derivatives[index] = builder.Build(pair.Value);
+                var variable = context.MapNode(state, pair.Key, _branch);
+                matLocs[index] = new MatrixLocation(rhsLocs, state.Map[variable]);
+                index++;
             }
 
             // Get the matrix elements
@@ -89,15 +104,10 @@ namespace SpiceSharp.Components.BehavioralResistorBehaviors
         }
 
         /// <summary>
-        /// Initializes the parameters.
+        /// Initializes the frequency behavior.
         /// </summary>
         void IFrequencyBehavior.InitializeParameters()
         {
-            for (var i = 0; i < Functions.Length; i++)
-            {
-                var value = Functions[i].Item3();
-                _values[i] = -value;
-            }
         }
 
         /// <summary>
@@ -105,7 +115,10 @@ namespace SpiceSharp.Components.BehavioralResistorBehaviors
         /// </summary>
         void IFrequencyBehavior.Load()
         {
-            _elements.Add(_values);
+            var values = new Complex[_derivatives.Length];
+            for (var i = 0; i < _derivatives.Length; i++)
+                values[i] = -_derivatives[i]();
+            _elements.Add(values);
             _coreElements.Add(1.0, -1.0, 1.0, -1.0);
         }
     }

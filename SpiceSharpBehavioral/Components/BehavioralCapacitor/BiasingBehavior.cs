@@ -6,6 +6,7 @@ using SpiceSharpBehavioral.Builders;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
 {
@@ -20,14 +21,19 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
         protected readonly OnePort<double> Variables;
 
         /// <summary>
-        /// The function.
+        /// Gets the variables that are associated with each variable node.
         /// </summary>
-        protected readonly Func<double> Value;
+        protected Dictionary<VariableNode, IVariable<double>> DerivativeVariables { get; }
+
+        /// <summary>
+        /// The function that computes the value.
+        /// </summary>
+        protected readonly Node Function;
 
         /// <summary>
         /// The functions that compute the derivatives.
         /// </summary>
-        protected readonly Tuple<VariableNode, IVariable<double>, Func<double>>[] Functions;
+        protected readonly Dictionary<VariableNode, Node> Derivatives;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BiasingBehavior"/> class.
@@ -52,9 +58,9 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
                     { Node.Variable("x"), Node.Voltage(context.Nodes[0]) - Node.Voltage(context.Nodes[1]) }
                 }
             };
-            var df = context.CreateDerivatives(bp.BuilderFactory, replacer.Build(bp.Function));
-            Value = df.Item1;
-            Functions = df.Item2;
+            Function = replacer.Build(bp.Function);
+            Derivatives = context.CreateDerivatives(Function);
+            DerivativeVariables = Derivatives.Keys.ToDictionary(d => d, d => context.MapNode(state, d), Derivatives.Comparer);
         }
     }
 }

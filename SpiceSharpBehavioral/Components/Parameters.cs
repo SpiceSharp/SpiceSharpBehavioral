@@ -8,6 +8,7 @@ using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 
 namespace SpiceSharp.Components.BehavioralComponents
 {
@@ -60,7 +61,7 @@ namespace SpiceSharp.Components.BehavioralComponents
         /// <value>
         /// The default builder.
         /// </value>
-        public static IBuilder<Func<double>> DefaultBuilderFactory(ISimulation simulation, Dictionary<VariableNode, IVariable<double>> variables)
+        public static IFunctionBuilder<double> DefaultRealBuilderFactory(ISimulation simulation, Dictionary<VariableNode, IVariable<double>> variables)
         {
             var scalar = new SIUnitDefinition("scalar", new SIUnits());
 
@@ -84,16 +85,56 @@ namespace SpiceSharp.Components.BehavioralComponents
             }
 
             // Some standard constants
-            variables.Add(Node.Variable("pi"), new ConstantVariable("pi", Math.PI, scalar));
-            variables.Add(Node.Variable("e"), new ConstantVariable("e", Math.Exp(1.0), scalar));
-            variables.Add(Node.Variable("boltz"), new ConstantVariable("boltz", Constants.Boltzmann, new SIUnitDefinition("J/K", new SIUnits(-2, 2, 1, 0, -1, 0, 0))));
-            variables.Add(Node.Variable("planck"), new ConstantVariable("planck", 6.626207004e-34, new SIUnitDefinition("Js", new SIUnits(-1, 2, 1, 0, 0, 0, 0))));
-            variables.Add(Node.Variable("echarge"), new ConstantVariable("echarge", Constants.Charge, Units.Coulomb));
-            variables.Add(Node.Variable("kelvin"), new ConstantVariable("kelvin", -Constants.CelsiusKelvin, new SIUnitDefinition("K", new SIUnits(0, 0, 0, 0, 1, 0, 0))));
+            variables.Add(Node.Variable("pi"), new ConstantVariable<double>("pi", Math.PI, scalar));
+            variables.Add(Node.Variable("e"), new ConstantVariable<double>("e", Math.Exp(1.0), scalar));
+            variables.Add(Node.Variable("boltz"), new ConstantVariable<double>("boltz", Constants.Boltzmann, new SIUnitDefinition("J/K", new SIUnits(-2, 2, 1, 0, -1, 0, 0))));
+            variables.Add(Node.Variable("planck"), new ConstantVariable<double>("planck", 6.626207004e-34, new SIUnitDefinition("Js", new SIUnits(-1, 2, 1, 0, 0, 0, 0))));
+            variables.Add(Node.Variable("echarge"), new ConstantVariable<double>("echarge", Constants.Charge, Units.Coulomb));
+            variables.Add(Node.Variable("kelvin"), new ConstantVariable<double>("kelvin", -Constants.CelsiusKelvin, new SIUnitDefinition("K", new SIUnits(0, 0, 0, 0, 1, 0, 0))));
             
             return new RealFunctionBuilder()
             {
                 FunctionDefinitions = RealFunctionBuilderHelper.Defaults,
+                Variables = variables
+            };
+        }
+
+        /// <summary>
+        /// Gets the default builder for building expressions.
+        /// </summary>
+        /// <param name="simulation">The simulation for which to create variables.</param>
+        /// <param name="variables">The variables that are defined by the behavioral component. You should probably not touch these...</param>
+        /// <value>
+        /// The default builder.
+        /// </value>
+        public static IFunctionBuilder<Complex> DefaultComplexBuilderFactory(ISimulation simulation, Dictionary<VariableNode, IVariable<Complex>> variables)
+        {
+            var scalar = new SIUnitDefinition("scalar", new SIUnits());
+
+            // Temperature
+            if (simulation.TryGetState<ITemperatureSimulationState>(out var tempState))
+            {
+                variables.Add(Node.Variable("temperature"), new FuncVariable<Complex>("temperature", () => tempState.Temperature, new SIUnitDefinition("K", new SIUnits(0, 0, 0, 0, 1, 0, 0))));
+            }
+
+            // Iteration control
+            if (simulation.TryGetState<IIterationSimulationState>(out var iterState))
+            {
+                variables.Add(Node.Variable("gmin"), new FuncVariable<Complex>("gmin", () => iterState.Gmin, new SIUnitDefinition("Mho", new SIUnits(3, -2, -1, 2, 0, 0, 0))));
+                variables.Add(Node.Variable("sourcefactor"), new FuncVariable<Complex>("sourcefactor", () => iterState.SourceFactor, scalar));
+            }
+
+            // Some standard constants
+            variables.Add(Node.Variable("pi"), new ConstantVariable<Complex>("pi", Math.PI, scalar));
+            variables.Add(Node.Variable("e"), new ConstantVariable<Complex>("e", Math.Exp(1.0), scalar));
+            variables.Add(Node.Variable("boltz"), new ConstantVariable<Complex>("boltz", Constants.Boltzmann, new SIUnitDefinition("J/K", new SIUnits(-2, 2, 1, 0, -1, 0, 0))));
+            variables.Add(Node.Variable("planck"), new ConstantVariable<Complex>("planck", 6.626207004e-34, new SIUnitDefinition("Js", new SIUnits(-1, 2, 1, 0, 0, 0, 0))));
+            variables.Add(Node.Variable("echarge"), new ConstantVariable<Complex>("echarge", Constants.Charge, Units.Coulomb));
+            variables.Add(Node.Variable("kelvin"), new ConstantVariable<Complex>("kelvin", -Constants.CelsiusKelvin, new SIUnitDefinition("K", new SIUnits(0, 0, 0, 0, 1, 0, 0))));
+
+            return new ComplexFunctionBuilder()
+            {
+                FunctionDefinitions = ComplexFunctionBuilderHelper.Defaults,
                 Variables = variables
             };
         }
@@ -159,19 +200,27 @@ namespace SpiceSharp.Components.BehavioralComponents
         private Func<string, Node> _parseAction = e => new Parser().Parse(e);
 
         /// <summary>
-        /// Gets or sets the builder factory.
+        /// Gets or sets the builder factory for real numbers.
         /// </summary>
         /// <value>
         /// The builder factory.
         /// </value>
-        public BuilderFactoryMethod BuilderFactory { get; set; } = DefaultBuilderFactory;
+        public BuilderFactoryMethod<double> RealBuilderFactory { get; set; } = DefaultRealBuilderFactory;
+
+        /// <summary>
+        /// Gets or sets the builder factory for complex numbers.
+        /// </summary>
+        /// <value>
+        /// The builder factory.
+        /// </value>
+        public BuilderFactoryMethod<Complex> ComplexBuilderFactory { get; set; } = DefaultComplexBuilderFactory;
 
         /// <summary>
         /// A delegate for creating an <see cref="IBuilder{T}"/>.
         /// </summary>
         /// <param name="simulation">The simulation for which the variables need to be created.</param>
         /// <param name="variables">The variables needed for building.</param>
-        /// <returns>The value.</returns>
-        public delegate IBuilder<Func<double>> BuilderFactoryMethod(ISimulation simulation, Dictionary<VariableNode, IVariable<double>> variables);
+        /// <returns>The function builder.</returns>
+        public delegate IFunctionBuilder<T> BuilderFactoryMethod<T>(ISimulation simulation, Dictionary<VariableNode, IVariable<T>> variables);
     }
 }

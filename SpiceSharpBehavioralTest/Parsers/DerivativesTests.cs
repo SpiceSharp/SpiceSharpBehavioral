@@ -24,7 +24,10 @@ namespace SpiceSharpBehavioralTest.Parsers
         public void When_DeriveNode_Expect_Reference(Node function, Dictionary<VariableNode, Node> expected)
         {
             var nf = new NodeFinder();
-            var d = new Derivatives(nf.Build(function));
+            var d = new Derivatives()
+            {
+                Variables = new HashSet<VariableNode>(nf.Build(function))
+            };
             var actual = d.Derive(function);
             CompareDictionary(expected, actual);
         }

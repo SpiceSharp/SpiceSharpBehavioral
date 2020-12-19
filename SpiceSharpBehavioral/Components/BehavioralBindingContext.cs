@@ -1,4 +1,5 @@
-﻿using SpiceSharp.Behaviors;
+﻿using SpiceSharp.Algebra;
+using SpiceSharp.Behaviors;
 using SpiceSharp.Simulations;
 using SpiceSharpBehavioral;
 using SpiceSharpBehavioral.Builders;
@@ -40,40 +41,39 @@ namespace SpiceSharp.Components.BehavioralComponents
         /// <summary>
         /// Creates the derivatives for the specified function.
         /// </summary>
-        /// <param name="builderFactory">The builder factory for creating the functions.</param>
         /// <param name="function">The function.</param>
-        /// <param name="ownBranch">Any own branch current that might be defined.</param>
         /// <returns>The derivatives with respect to all variables.</returns>
-        public Tuple<Func<double>, Tuple<VariableNode, IVariable<double>, Func<double>>[]> CreateDerivatives(Parameters.BuilderFactoryMethod builderFactory, Node function, IVariable<double> ownBranch = null)
+        public Dictionary<VariableNode, Node> CreateDerivatives(Node function)
         {
             var state = GetState<IBiasingSimulationState>();
             var bp = GetParameterSet<Parameters>();
             var comparer = new VariableNodeComparer(state.Comparer, Simulation.EntityBehaviors.Comparer, bp.VariableComparer);
-
+            
             // Derive the function
-            var derivatives = new Derivatives();
+            var derivatives = new Derivatives()
+            {
+                Variables = new HashSet<VariableNode>(comparer)
+            };
             var nf = new NodeFinder();
-            var variables = new Dictionary<VariableNode, IVariable<double>>();
             foreach (var variable in nf.Build(function).Where(v => v.NodeType == NodeTypes.Voltage || v.NodeType == NodeTypes.Current))
             {
-                if (variables.ContainsKey(variable))
+                if (derivatives.Variables.Contains(variable))
                     continue;
-                variables.Add(variable, MapNode(state, variable, ownBranch));
                 derivatives.Variables.Add(variable);
             }
-
-            // Build
-            var builder = builderFactory(Simulation, variables);
-            var df = derivatives.Derive(function);
-            var value = builder.Build(function);
-            var dfdv = new Tuple<VariableNode, IVariable<double>, Func<double>>[df?.Count ?? 0];
-            if (dfdv.Length > 0)
-            {
-                int index = 0;
-                foreach (var pair in df)
-                    dfdv[index++] = Tuple.Create(pair.Key, variables[pair.Key], builder.Build(pair.Value));
-            }
-            return Tuple.Create(value, dfdv);
+            return derivatives.Derive(function) ?? new Dictionary<VariableNode, Node>(comparer);
+        }
+                
+        /// <summary>
+        /// Create a builder.
+        /// </summary>
+        /// <typeparam name="T">The value.</typeparam>
+        /// <param name="builderFactory">A factory for creating a builder.</param>
+        /// <param name="variables">The variables.</param>
+        /// <returns>The function builder.</returns>
+        public IFunctionBuilder<T> CreateBuilder<T>(Parameters.BuilderFactoryMethod<T> builderFactory, Dictionary<VariableNode, IVariable<T>> variables)
+        {
+            return builderFactory(Simulation, variables);
         }
 
         /// <summary>

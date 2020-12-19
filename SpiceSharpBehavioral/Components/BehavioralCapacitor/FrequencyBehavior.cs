@@ -5,6 +5,10 @@ using SpiceSharp.Components.BehavioralComponents;
 using SpiceSharp.Components.CommonBehaviors;
 using SpiceSharp.ParameterSets;
 using SpiceSharp.Simulations;
+using SpiceSharpBehavioral;
+using SpiceSharpBehavioral.Parsers.Nodes;
+using System;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
@@ -19,8 +23,8 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
         private readonly IComplexSimulationState _state;
         private readonly OnePort<Complex> _variables;
         private readonly ElementSet<Complex> _elements;
-        private readonly double[] _values;
-        private readonly int[] _indices;
+        private readonly Func<Complex>[] _derivatives;
+        private readonly IVariable<Complex>[] _derivativeVariables;
 
         /// <summary>
         /// Gets the complex voltage.
@@ -38,8 +42,8 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
             get
             {
                 Complex total = 0.0;
-                for (var i = 0; i < Functions.Length; i++)
-                    total += _values[i] * _state.Solution[_indices[i]];
+                for (var i = 0; i < _derivatives.Length; i++)
+                    total += _derivatives[i]() * _derivativeVariables[i].Value;
                 return total * _state.Laplace;
             }
         }
@@ -57,21 +61,32 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
         public FrequencyBehavior(BehavioralBindingContext context)
             : base(context)
         {
+            var bp = context.GetParameterSet<Parameters>();
             _state = context.GetState<IComplexSimulationState>();
             _variables = new OnePort<Complex>(
                 _state.GetSharedVariable(context.Nodes[0]),
                 _state.GetSharedVariable(context.Nodes[1]));
-            _values = new double[Functions.Length];
 
-            var rhsLocs = _variables.GetRhsIndices(_state.Map);
-            var matLocs = new MatrixLocation[Functions.Length * 2];
-            _indices = new int[Functions.Length];
-            for (var i = 0; i < Functions.Length; i++)
+            _derivatives = new Func<Complex>[Derivatives.Count];
+            _derivativeVariables = new IVariable<Complex>[Derivatives.Count];
+            var nVariables = new Dictionary<VariableNode, IVariable<Complex>>(Derivatives.Comparer);
+            foreach (var variable in Derivatives.Keys)
             {
-                var variable = context.MapNode(_state, Functions[i].Item1);
-                _indices[i] = _state.Map[variable];
-                matLocs[i * 2] = new MatrixLocation(rhsLocs[0], _indices[i]);
-                matLocs[i * 2 + 1] = new MatrixLocation(rhsLocs[1], _indices[i]);
+                var orig = DerivativeVariables[variable];
+                nVariables.Add(variable, new FuncVariable<Complex>(orig.Name, () => orig.Value, orig.Unit));
+            }
+            var builder = context.CreateBuilder(bp.ComplexBuilderFactory, nVariables);
+            var matLocs = new MatrixLocation[Derivatives.Count * 2];
+            var rhsLocs = _variables.GetRhsIndices(_state.Map);
+            int index = 0;
+            foreach (var pair in Derivatives)
+            {
+                _derivatives[index] = builder.Build(pair.Value);
+                var variable = context.MapNode(_state, pair.Key);
+                _derivativeVariables[index] = variable;
+                matLocs[index * 2] = new MatrixLocation(rhsLocs[0], _state.Map[variable]);
+                matLocs[index * 2 + 1] = new MatrixLocation(rhsLocs[1], _state.Map[variable]);
+                index++;
             }
             _elements = new ElementSet<Complex>(_state.Solver, matLocs);
         }
@@ -81,8 +96,6 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
         /// </summary>
         void IFrequencyBehavior.InitializeParameters()
         {
-            for (var i = 0; i < Functions.Length; i++)
-                _values[i] = Functions[i].Item3();
         }
 
         /// <summary>
@@ -90,10 +103,10 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
         /// </summary>
         void IFrequencyBehavior.Load()
         {
-            var values = new Complex[Functions.Length * 2];
-            for (var i = 0; i < Functions.Length; i++)
+            var values = new Complex[_derivatives.Length * 2];
+            for (var i = 0; i < _derivatives.Length; i++)
             {
-                var g = _state.Laplace * _values[i];
+                var g = _state.Laplace * _derivatives[i]();
                 values[i * 2] = g;
                 values[i * 2 + 1] = -g;
             }

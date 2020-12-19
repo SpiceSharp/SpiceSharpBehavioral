@@ -7,6 +7,8 @@ using SpiceSharp.Simulations;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
 using SpiceSharp.Attributes;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
 {
@@ -25,6 +27,23 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         private readonly IVariable<double> _branch;
         private readonly ElementSet<double> _elements, _coreElements;
         private readonly Func<double> _value;
+        private readonly Func<double>[] _derivatives;
+        private readonly IVariable<double>[] _derivativeVariables;
+
+        /// <summary>
+        /// Gets the variables that are associated with each variable node.
+        /// </summary>
+        protected Dictionary<VariableNode, IVariable<double>> DerivativeVariables { get; }
+
+        /// <summary>
+        /// The function that computes the value.
+        /// </summary>
+        protected readonly Node Function;
+
+        /// <summary>
+        /// The functions that compute the derivatives.
+        /// </summary>
+        protected readonly Dictionary<VariableNode, Node> Derivatives;
 
         /// <summary>
         /// Gets the branch equation variable.
@@ -42,11 +61,6 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         /// </value>
         [ParameterName("v"), ParameterInfo("The instantaneous voltage")]
         public double Voltage { get; private set; }
-
-        /// <summary>
-        /// The functions that compute the derivatives.
-        /// </summary>
-        protected Tuple<VariableNode, IVariable<double>, Func<double>>[] Functions;
 
         /// <summary>
         /// Gets the current.
@@ -73,14 +87,26 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
             _branch = state.CreatePrivateVariable(Name.Combine("branch"), Units.Ampere);
 
             // Let's build the derivative functions and get their matrix locations/rhs locations
-            var df = context.CreateDerivatives(bp.BuilderFactory, bp.Function, _branch);
-            _value = df.Item1;
-            Functions = df.Item2;
-            var matLocs = new MatrixLocation[Functions.Length];
+            Function = bp.Function;
+            Derivatives = context.CreateDerivatives(Function);
+            DerivativeVariables = Derivatives.Keys.ToDictionary(d => d, d => context.MapNode(state, d, _branch), Derivatives.Comparer);
+            var builder = context.CreateBuilder(bp.RealBuilderFactory, DerivativeVariables);
+            _derivatives = new Func<double>[Derivatives.Count];
+            _derivativeVariables = new IVariable<double>[Derivatives.Count];
+            var matLocs = new MatrixLocation[Derivatives.Count];
             var rhsLocs = state.Map[_branch];
-            for (var i = 0; i < Functions.Length; i++)
-                matLocs[i] = new MatrixLocation(rhsLocs, state.Map[Functions[i].Item2]);
-            
+            int index = 0;
+            foreach (var pair in Derivatives)
+            {
+                _derivatives[index] = builder.Build(pair.Value);
+                var variable = DerivativeVariables[pair.Key];
+                _derivativeVariables[index] = variable;
+                matLocs[index] = new MatrixLocation(rhsLocs, state.Map[variable]);
+                index++;
+            }
+            _value = builder.Build(Function);
+
+
             // Get the matrix elements
             _elements = new ElementSet<double>(state.Solver, matLocs);
             int br = state.Map[_branch];
@@ -99,14 +125,12 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         /// </summary>
         void IBiasingBehavior.Load()
         {
-            double[] values = new double[Functions.Length];
+            double[] values = new double[_derivatives.Length];
             var total = Voltage = _value();
-
-            int i;
-            for (i = 0; i < Functions.Length; i++)
+            for (var i = 0; i < _derivatives.Length; i++)
             {
-                var df = Functions[i].Item3.Invoke();
-                total -= Functions[i].Item2.Value * df;
+                var df = _derivatives[i]();
+                total -= _derivativeVariables[i].Value * df;
                 values[i] = -df;
             }
             _elements.Add(values);

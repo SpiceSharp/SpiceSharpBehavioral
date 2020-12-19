@@ -6,12 +6,12 @@ namespace SpiceSharpBehavioral
     /// <summary>
     /// A constant variable.
     /// </summary>
-    public class ConstantVariable : IVariable<double>
+    public class ConstantVariable<T> : IVariable<T>
     {
         /// <summary>
         /// Gets the value.
         /// </summary>
-        public double Value { get; }
+        public T Value { get; }
 
         /// <summary>
         /// Gets the name.
@@ -24,12 +24,12 @@ namespace SpiceSharpBehavioral
         public IUnit Unit { get; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConstantVariable"/> class.
+        /// Initializes a new instance of the <see cref="ConstantVariable{T}"/> class.
         /// </summary>
         /// <param name="name">The name.</param>
         /// <param name="value">The value.</param>
         /// <param name="unit">The unit.</param>
-        public ConstantVariable(string name, double value, IUnit unit)
+        public ConstantVariable(string name, T value, IUnit unit)
         {
             Name = name;
             Value = value;

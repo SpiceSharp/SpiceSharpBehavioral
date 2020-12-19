@@ -4,8 +4,10 @@ using SpiceSharp.Behaviors;
 using SpiceSharp.Components.BehavioralComponents;
 using SpiceSharp.Components.CommonBehaviors;
 using SpiceSharp.Simulations;
+using SpiceSharpBehavioral;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
@@ -21,7 +23,7 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
     {
         private readonly OnePort<Complex> _variables;
         private readonly ElementSet<Complex> _elements;
-        private readonly Complex[] _values;
+        private readonly Func<Complex>[] _derivatives;
 
         /// <summary>
         /// Gets the complex current.
@@ -39,20 +41,31 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
         public FrequencyBehavior(BehavioralBindingContext context)
             : base(context)
         {
+            var bp = context.GetParameterSet<Parameters>();
             var state = context.GetState<IComplexSimulationState>();
             _variables = new OnePort<Complex>(
                 state.GetSharedVariable(context.Nodes[0]),
                 state.GetSharedVariable(context.Nodes[1]));
 
-            // Build the functions using our variable
-            var rhsLocs = _variables.GetRhsIndices(state.Map);
-            var matLocs = new MatrixLocation[Functions.Length * 2];
-            _values = new Complex[Functions.Length * 2];
-            for (var i = 0; i < Functions.Length; i++)
+            // Build the functions
+            var nVariables = new Dictionary<VariableNode, IVariable<Complex>>(Derivatives.Comparer);
+            foreach (var variable in Derivatives.Keys)
             {
-                var variable = context.MapNode(state, Functions[i].Item1);
-                matLocs[i * 2] = new MatrixLocation(rhsLocs[0], state.Map[variable]);
-                matLocs[i * 2 + 1] = new MatrixLocation(rhsLocs[1], state.Map[variable]);
+                var orig = DerivativeVariables[variable];
+                nVariables.Add(variable, new FuncVariable<Complex>(orig.Name, () => orig.Value, orig.Unit));
+            }
+            _derivatives = new Func<Complex>[Derivatives.Count];
+            var builder = context.CreateBuilder(bp.ComplexBuilderFactory, nVariables);
+            var rhsLocs = _variables.GetRhsIndices(state.Map);
+            var matLocs = new MatrixLocation[Derivatives.Count * 2];
+            int index = 0;
+            foreach (var pair in Derivatives)
+            {
+                _derivatives[index] = builder.Build(pair.Value);
+                var variable = context.MapNode(state, pair.Key);
+                matLocs[index * 2] = new MatrixLocation(rhsLocs[0], state.Map[variable]);
+                matLocs[index * 2 + 1] = new MatrixLocation(rhsLocs[1], state.Map[variable]);
+                index++;
             }
 
             // Get the matrix elements
@@ -64,12 +77,6 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
         /// </summary>
         void IFrequencyBehavior.InitializeParameters()
         {
-            for (var i = 0; i < Functions.Length; i++)
-            {
-                var value = Functions[i].Item3.Invoke();
-                _values[i * 2] = value;
-                _values[i * 2 + 1] = -value;
-            }
         }
 
         /// <summary>
@@ -77,7 +84,14 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
         /// </summary>
         void IFrequencyBehavior.Load()
         {
-            _elements.Add(_values);
+            var values = new Complex[_derivatives.Length * 2];
+            for (var i = 0; i < _derivatives.Length; i++)
+            {
+                var g = _derivatives[i]();
+                values[i * 2] = g;
+                values[i * 2 + 1] = -g;
+            }
+            _elements.Add(values);
         }
     }
 }
