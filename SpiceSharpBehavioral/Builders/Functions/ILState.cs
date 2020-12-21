@@ -38,6 +38,16 @@ namespace SpiceSharpBehavioral.Builders
         public ILGenerator Generator { get; private set; }
 
         /// <summary>
+        /// Occurs when a function was encountered.
+        /// </summary>
+        public event EventHandler<FunctionFoundEventArgs<T>> FunctionFound;
+
+        /// <summary>
+        /// Occurs when a variable was encountered.
+        /// </summary>
+        public event EventHandler<VariableFoundEventArgs<T>> VariableFound;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ILState{T}"/> class.
         /// </summary>
         /// <param name="parent">The parent function builder.</param>
@@ -47,6 +57,18 @@ namespace SpiceSharpBehavioral.Builders
             _method = new DynamicMethod("function", typeof(T), new[] { typeof(object[]) });
             Generator = _method.GetILGenerator();
         }
+
+        /// <summary>
+        /// Call when a function has been encountered.
+        /// </summary>
+        /// <param name="args">The event arguments.</param>
+        protected void OnFunctionFound(FunctionFoundEventArgs<T> args) => FunctionFound?.Invoke(this, args);
+
+        /// <summary>
+        /// Call when a variable has been encountered.
+        /// </summary>
+        /// <param name="args">The event arguments.</param>
+        protected void OnVariableFound(VariableFoundEventArgs<T> args) => VariableFound?.Invoke(this, args);
 
         /// <summary>
         /// Creates the function.

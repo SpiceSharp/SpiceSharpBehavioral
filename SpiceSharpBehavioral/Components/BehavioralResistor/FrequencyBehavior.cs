@@ -10,6 +10,7 @@ using SpiceSharp.Attributes;
 using SpiceSharpBehavioral;
 using System.Collections.Generic;
 using SpiceSharpBehavioral.Parsers.Nodes;
+using SpiceSharpBehavioral.Builders;
 
 namespace SpiceSharp.Components.BehavioralResistorBehaviors
 {
@@ -77,7 +78,13 @@ namespace SpiceSharp.Components.BehavioralResistorBehaviors
                 var orig = DerivativeVariables[variable];
                 nVariables.Add(variable, new FuncVariable<Complex>(orig.Name, () => orig.Value, orig.Unit));
             }
-            var builder = context.CreateBuilder(bp.ComplexBuilderFactory, nVariables);
+            var builder = new ComplexFunctionBuilder();
+            builder.VariableFound += (sender, args) =>
+            {
+                if (args.Variable == null && DerivativeVariables.TryGetValue(args.Node, out var variable))
+                    args.Variable = new FuncVariable<Complex>(variable.Name, () => variable.Value, variable.Unit);
+            };
+            bp.RegisterBuilder(context, builder);
             _derivatives = new Func<Complex>[Derivatives.Count];
             var rhsLocs = state.Map[_branch];
             var matLocs = new MatrixLocation[Derivatives.Count];

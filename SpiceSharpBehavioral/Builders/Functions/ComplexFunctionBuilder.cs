@@ -22,15 +22,17 @@ namespace SpiceSharpBehavioral.Builders
         public double AbsoluteTolerance { get; set; } = 1e-12;
 
         /// <inheritdoc/>
-        public Dictionary<string, ApplyFunction<Complex>> FunctionDefinitions { get; set; }
+        public event EventHandler<FunctionFoundEventArgs<Complex>> FunctionFound;
 
         /// <inheritdoc/>
-        public Dictionary<VariableNode, IVariable<Complex>> Variables { get; set; }
+        public event EventHandler<VariableFoundEventArgs<Complex>> VariableFound;
 
         /// <inheritdoc/>
         public Func<Complex> Build(Node expression)
         {
             var instance = new ComplexILState(this);
+            instance.FunctionFound += (sender, args) => FunctionFound?.Invoke(sender, args);
+            instance.VariableFound += (sender, args) => VariableFound?.Invoke(sender, args);
             instance.Push(expression);
             return instance.CreateFunction();
         }

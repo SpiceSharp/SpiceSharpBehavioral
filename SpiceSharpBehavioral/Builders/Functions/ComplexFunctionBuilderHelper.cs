@@ -23,9 +23,16 @@ namespace SpiceSharpBehavioral.Builders
         private static readonly ConstructorInfo _point = typeof(Point).GetTypeInfo().GetConstructor(new[] { typeof(double), typeof(double) });
 
         /// <summary>
+        /// A delegate for applying a function to an IL state.
+        /// </summary>
+        /// <param name="il">The IL state.</param>
+        /// <param name="arguments">The function arguments.</param>
+        public delegate void ApplyFunction(IILState<Complex> il, IReadOnlyList<Node> arguments);
+
+        /// <summary>
         /// A set of default functions.
         /// </summary>
-        public static readonly Dictionary<string, ApplyFunction<Complex>> Defaults = new Dictionary<string, ApplyFunction<Complex>>(StringComparer.OrdinalIgnoreCase)
+        public static readonly Dictionary<string, ApplyFunction> Defaults = new Dictionary<string, ApplyFunction>(StringComparer.OrdinalIgnoreCase)
         {
             { "abs", Abs },
             { "sgn", Sgn },
@@ -72,14 +79,27 @@ namespace SpiceSharpBehavioral.Builders
         }
 
         /// <summary>
-        /// Registers the default functions.
+        /// Registers the default functions for a function builder.
         /// </summary>
-        /// <param name="definitions">The definitions.</param>
-        public static void RegisterDefaultFunctions(this Dictionary<string, ApplyFunction<Complex>> definitions)
+        /// <param name="builder">The builder.</param>
+        public static void RegisterDefaultFunctions(this IFunctionBuilder<Complex> builder)
         {
-            definitions.ThrowIfNull(nameof(definitions));
-            foreach (var pair in Defaults)
-                definitions.Add(pair.Key, pair.Value);
+            builder.ThrowIfNull(nameof(builder));
+            builder.FunctionFound += OnFunctionFound;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        private static void OnFunctionFound(object sender, FunctionFoundEventArgs<Complex> args)
+        {
+            if (Defaults.TryGetValue(args.Function.Name, out var func))
+            {
+                func(args.ILState, args.Function.Arguments);
+                args.Created = true;
+            }    
         }
 
         // No-argument functions

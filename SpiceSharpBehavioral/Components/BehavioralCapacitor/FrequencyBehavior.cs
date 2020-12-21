@@ -6,6 +6,7 @@ using SpiceSharp.Components.CommonBehaviors;
 using SpiceSharp.ParameterSets;
 using SpiceSharp.Simulations;
 using SpiceSharpBehavioral;
+using SpiceSharpBehavioral.Builders;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
 using System.Collections.Generic;
@@ -69,13 +70,13 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
 
             _derivatives = new Func<Complex>[Derivatives.Count];
             _derivativeVariables = new IVariable<Complex>[Derivatives.Count];
-            var nVariables = new Dictionary<VariableNode, IVariable<Complex>>(Derivatives.Comparer);
-            foreach (var variable in Derivatives.Keys)
+            var builder = new ComplexFunctionBuilder();
+            builder.VariableFound += (sender, args) =>
             {
-                var orig = DerivativeVariables[variable];
-                nVariables.Add(variable, new FuncVariable<Complex>(orig.Name, () => orig.Value, orig.Unit));
-            }
-            var builder = context.CreateBuilder(bp.ComplexBuilderFactory, nVariables);
+                if (args.Variable == null && DerivativeVariables.TryGetValue(args.Node, out var variable))
+                    args.Variable = new FuncVariable<Complex>(variable.Name, () => variable.Value, variable.Unit);
+            };
+            bp.RegisterBuilder(context, builder);
             var matLocs = new MatrixLocation[Derivatives.Count * 2];
             var rhsLocs = _variables.GetRhsIndices(_state.Map);
             int index = 0;

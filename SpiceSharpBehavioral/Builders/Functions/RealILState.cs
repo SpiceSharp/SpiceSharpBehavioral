@@ -173,21 +173,20 @@ namespace SpiceSharpBehavioral.Builders
                     break;
 
                 case FunctionNode fn:
-                    if (Builder.FunctionDefinitions != null && Builder.FunctionDefinitions.TryGetValue(fn.Name, out var definition))
-                    {
-                        definition.ThrowIfNull(nameof(definition));
-                        definition.Invoke(this, fn.Arguments);
-                        return;
-                    }
-                    break;
+                    var fargs = new FunctionFoundEventArgs<double>(fn, this);
+                    OnFunctionFound(fargs);
+                    if (!fargs.Created)
+                        throw new SpiceSharpException($"Unrecognized function {fn.Name}");
+                    return;
 
                 case VariableNode vn:
-                    if (Builder.Variables != null && Builder.Variables.TryGetValue(vn, out var variable))
-                    {
-                        Call(() => variable.Value);
-                        return;
-                    }
-                    break;
+                    var vargs = new VariableFoundEventArgs<double>(vn);
+                    OnVariableFound(vargs);
+                    if (vargs.Variable == null)
+                        throw new SpiceSharpException($"Unrecognized variable {vn.Name}");
+                    var variable = vargs.Variable;
+                    Call(() => variable.Value);
+                    return;
 
                 case TernaryOperatorNode tn:
                     lblBypass = Generator.DefineLabel();

@@ -9,6 +9,7 @@ using System;
 using SpiceSharp.Attributes;
 using System.Collections.Generic;
 using System.Linq;
+using SpiceSharpBehavioral.Builders;
 
 namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
 {
@@ -90,7 +91,13 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
             Function = bp.Function;
             Derivatives = context.CreateDerivatives(Function);
             DerivativeVariables = Derivatives.Keys.ToDictionary(d => d, d => context.MapNode(state, d, _branch), Derivatives.Comparer);
-            var builder = context.CreateBuilder(bp.RealBuilderFactory, DerivativeVariables);
+            var builder = new RealFunctionBuilder();
+            builder.VariableFound += (sender, args) =>
+            {
+                if (args.Variable == null && DerivativeVariables.TryGetValue(args.Node, out var variable))
+                    args.Variable = variable;
+            };
+            bp.RegisterBuilder(context, builder);
             _derivatives = new Func<double>[Derivatives.Count];
             _derivativeVariables = new IVariable<double>[Derivatives.Count];
             var matLocs = new MatrixLocation[Derivatives.Count];

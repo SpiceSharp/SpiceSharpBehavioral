@@ -9,6 +9,7 @@ using SpiceSharpBehavioral.Parsers.Nodes;
 using SpiceSharp.Attributes;
 using System.Collections.Generic;
 using System.Linq;
+using SpiceSharpBehavioral.Builders;
 
 namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
 {
@@ -80,7 +81,13 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
             DerivativeVariables = Derivatives.Keys.ToDictionary(d => d, d => context.MapNode(state, d), Derivatives.Comparer);
             _derivatives = new Func<double>[Derivatives.Count];
             _derivativeVariables = new IVariable<double>[Derivatives.Count];
-            var builder = context.CreateBuilder(bp.RealBuilderFactory, DerivativeVariables);
+            var builder = new RealFunctionBuilder();
+            builder.VariableFound += (sender, args) =>
+            {
+                if (args.Variable == null && DerivativeVariables.TryGetValue(args.Node, out var variable))
+                    args.Variable = variable;
+            };
+            bp.RegisterBuilder(context, builder);
             var matLocs = new MatrixLocation[Derivatives.Count * 2];
             var rhsLocs = _variables.GetRhsIndices(state.Map);
             int index = 0;

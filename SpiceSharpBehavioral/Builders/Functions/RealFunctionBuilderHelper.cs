@@ -22,9 +22,16 @@ namespace SpiceSharpBehavioral.Builders
         private static readonly ConstructorInfo _point = typeof(Point).GetTypeInfo().GetConstructor(new[] { typeof(double), typeof(double) });
 
         /// <summary>
+        /// Delegjate for applying a function to the IL state.
+        /// </summary>
+        /// <param name="il">The IL state.</param>
+        /// <param name="arguments">The function arguments.</param>
+        public delegate void ApplyFunction(IILState<double> il, IReadOnlyList<Node> arguments);
+
+        /// <summary>
         /// A set of default functions.
         /// </summary>
-        public static readonly Dictionary<string, ApplyFunction<double>> Defaults = new Dictionary<string, ApplyFunction<double>>(StringComparer.OrdinalIgnoreCase)
+        public static readonly Dictionary<string, ApplyFunction> Defaults = new Dictionary<string, ApplyFunction>(StringComparer.OrdinalIgnoreCase)
         {
             { "abs", Abs },
             { "sgn", Sgn },
@@ -73,12 +80,21 @@ namespace SpiceSharpBehavioral.Builders
         /// <summary>
         /// Registers the default functions.
         /// </summary>
-        /// <param name="definitions">The definitions.</param>
-        public static void RegisterDefaultFunctions(this Dictionary<string, ApplyFunction<double>> definitions)
+        /// <param name="builder">The function builder.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="builder"/> is <c>null</c>.</exception>
+        public static void RegisterDefaultFunctions(this IFunctionBuilder<double> builder)
         {
-            definitions.ThrowIfNull(nameof(definitions));
-            foreach (var pair in Defaults)
-                definitions.Add(pair.Key, pair.Value);
+            builder.ThrowIfNull(nameof(builder));
+            builder.FunctionFound += OnFunctionFound;
+        }
+
+        private static void OnFunctionFound(object sender, FunctionFoundEventArgs<double> args)
+        {
+            if (Defaults.TryGetValue(args.Function.Name, out var func))
+            {
+                func(args.ILState, args.Function.Arguments);
+                args.Created = true;
+            }
         }
 
         // No-argument functions

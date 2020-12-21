@@ -54,88 +54,96 @@ namespace SpiceSharp.Components.BehavioralComponents
         public IEqualityComparer<string> VariableComparer { get; set; } = StringComparer.OrdinalIgnoreCase;
 
         /// <summary>
-        /// Gets the default builder for building expressions.
+        /// A default method for registering variables with a real function builder.
         /// </summary>
-        /// <param name="simulation">The simulation for which to create variables.</param>
-        /// <param name="variables">The variables that are defined by the behavioral component. You should probably not touch these...</param>
-        /// <value>
-        /// The default builder.
-        /// </value>
-        public static IFunctionBuilder<double> DefaultRealBuilderFactory(ISimulation simulation, Dictionary<VariableNode, IVariable<double>> variables)
+        /// <param name="sender">The sender.</param>
+        /// <param name="args">The arguments.</param>
+        public void RegisterDefaultRealBuilder(object sender, BuilderCreatedEventArgs<double> args)
         {
+            var context = args.Context;
+            var builder = args.Builder;
+            var variables = new Dictionary<string, IVariable<double>>(VariableComparer);
             var scalar = new SIUnitDefinition("scalar", new SIUnits());
 
+            // Register the regular functions
+            builder.RegisterDefaultFunctions();
+
             // Temperature
-            if (simulation.TryGetState<ITemperatureSimulationState>(out var tempState))
+            if (context.TryGetState<ITemperatureSimulationState>(out var tempState))
             {
-                variables.Add(Node.Variable("temperature"), new FuncVariable<double>("temperature", () => tempState.Temperature, new SIUnitDefinition("K", new SIUnits(0, 0, 0, 0, 1, 0, 0))));
+                variables.Add("temperature", new FuncVariable<double>("temperature", () => tempState.Temperature, new SIUnitDefinition("K", new SIUnits(0, 0, 0, 0, 1, 0, 0))));
             }
 
             // Time variable
-            if (simulation.TryGetState<IIntegrationMethod>(out var method))
+            if (context.TryGetState<IIntegrationMethod>(out var method))
             {
-                variables.Add(Node.Variable("time"), new FuncVariable<double>("time", () => method.Time, new SIUnitDefinition("s", new SIUnits(1, 0, 0, 0, 0, 0, 0))));
+                variables.Add("time", new FuncVariable<double>("time", () => method.Time, new SIUnitDefinition("s", new SIUnits(1, 0, 0, 0, 0, 0, 0))));
             }
             
             // Iteration control
-            if (simulation.TryGetState<IIterationSimulationState>(out var iterState))
+            if (context.TryGetState<IIterationSimulationState>(out var iterState))
             {
-                variables.Add(Node.Variable("gmin"), new FuncVariable<double>("gmin", () => iterState.Gmin, new SIUnitDefinition("Mho", new SIUnits(3, -2, -1, 2, 0, 0, 0))));
-                variables.Add(Node.Variable("sourcefactor"), new FuncVariable<double>("sourcefactor", () => iterState.SourceFactor, scalar));
+                variables.Add("gmin", new FuncVariable<double>("gmin", () => iterState.Gmin, new SIUnitDefinition("Mho", new SIUnits(3, -2, -1, 2, 0, 0, 0))));
+                variables.Add("sourcefactor", new FuncVariable<double>("sourcefactor", () => iterState.SourceFactor, scalar));
             }
 
             // Some standard constants
-            variables.Add(Node.Variable("pi"), new ConstantVariable<double>("pi", Math.PI, scalar));
-            variables.Add(Node.Variable("e"), new ConstantVariable<double>("e", Math.Exp(1.0), scalar));
-            variables.Add(Node.Variable("boltz"), new ConstantVariable<double>("boltz", Constants.Boltzmann, new SIUnitDefinition("J/K", new SIUnits(-2, 2, 1, 0, -1, 0, 0))));
-            variables.Add(Node.Variable("planck"), new ConstantVariable<double>("planck", 6.626207004e-34, new SIUnitDefinition("Js", new SIUnits(-1, 2, 1, 0, 0, 0, 0))));
-            variables.Add(Node.Variable("echarge"), new ConstantVariable<double>("echarge", Constants.Charge, Units.Coulomb));
-            variables.Add(Node.Variable("kelvin"), new ConstantVariable<double>("kelvin", -Constants.CelsiusKelvin, new SIUnitDefinition("K", new SIUnits(0, 0, 0, 0, 1, 0, 0))));
-            
-            return new RealFunctionBuilder()
+            variables.Add("pi", new ConstantVariable<double>("pi", Math.PI, scalar));
+            variables.Add("e", new ConstantVariable<double>("e", Math.Exp(1.0), scalar));
+            variables.Add("boltz", new ConstantVariable<double>("boltz", Constants.Boltzmann, new SIUnitDefinition("J/K", new SIUnits(-2, 2, 1, 0, -1, 0, 0))));
+            variables.Add("planck", new ConstantVariable<double>("planck", 6.626207004e-34, new SIUnitDefinition("Js", new SIUnits(-1, 2, 1, 0, 0, 0, 0))));
+            variables.Add("echarge", new ConstantVariable<double>("echarge", Constants.Charge, Units.Coulomb));
+            variables.Add("kelvin", new ConstantVariable<double>("kelvin", -Constants.CelsiusKelvin, new SIUnitDefinition("K", new SIUnits(0, 0, 0, 0, 1, 0, 0))));
+
+            // Register the variables
+            builder.VariableFound += (sender, args) =>
             {
-                FunctionDefinitions = RealFunctionBuilderHelper.Defaults,
-                Variables = variables
+                if (args.Variable == null && variables.TryGetValue(args.Node.Name, out var variable))
+                    args.Variable = variable;
             };
         }
 
         /// <summary>
-        /// Gets the default builder for building expressions.
+        /// A default method for registering variables with a complex function builder.
         /// </summary>
-        /// <param name="simulation">The simulation for which to create variables.</param>
-        /// <param name="variables">The variables that are defined by the behavioral component. You should probably not touch these...</param>
-        /// <value>
-        /// The default builder.
-        /// </value>
-        public static IFunctionBuilder<Complex> DefaultComplexBuilderFactory(ISimulation simulation, Dictionary<VariableNode, IVariable<Complex>> variables)
+        /// <param name="sender">The sender.</param>
+        /// <param name="args">The arguments.</param>
+        public void RegisterDefaultComplexBuilder(object sender, BuilderCreatedEventArgs<Complex> args)
         {
+            var context = args.Context;
+            var builder = args.Builder;
+            var variables = new Dictionary<string, IVariable<Complex>>(VariableComparer);
             var scalar = new SIUnitDefinition("scalar", new SIUnits());
 
+            // Register the default functions
+            builder.RegisterDefaultFunctions();
+
             // Temperature
-            if (simulation.TryGetState<ITemperatureSimulationState>(out var tempState))
+            if (context.TryGetState<ITemperatureSimulationState>(out var tempState))
             {
-                variables.Add(Node.Variable("temperature"), new FuncVariable<Complex>("temperature", () => tempState.Temperature, new SIUnitDefinition("K", new SIUnits(0, 0, 0, 0, 1, 0, 0))));
+                variables.Add("temperature", new FuncVariable<Complex>("temperature", () => tempState.Temperature, new SIUnitDefinition("K", new SIUnits(0, 0, 0, 0, 1, 0, 0))));
             }
 
             // Iteration control
-            if (simulation.TryGetState<IIterationSimulationState>(out var iterState))
+            if (context.TryGetState<IIterationSimulationState>(out var iterState))
             {
-                variables.Add(Node.Variable("gmin"), new FuncVariable<Complex>("gmin", () => iterState.Gmin, new SIUnitDefinition("Mho", new SIUnits(3, -2, -1, 2, 0, 0, 0))));
-                variables.Add(Node.Variable("sourcefactor"), new FuncVariable<Complex>("sourcefactor", () => iterState.SourceFactor, scalar));
+                variables.Add("gmin", new FuncVariable<Complex>("gmin", () => iterState.Gmin, new SIUnitDefinition("Mho", new SIUnits(3, -2, -1, 2, 0, 0, 0))));
+                variables.Add("sourcefactor", new FuncVariable<Complex>("sourcefactor", () => iterState.SourceFactor, scalar));
             }
 
             // Some standard constants
-            variables.Add(Node.Variable("pi"), new ConstantVariable<Complex>("pi", Math.PI, scalar));
-            variables.Add(Node.Variable("e"), new ConstantVariable<Complex>("e", Math.Exp(1.0), scalar));
-            variables.Add(Node.Variable("boltz"), new ConstantVariable<Complex>("boltz", Constants.Boltzmann, new SIUnitDefinition("J/K", new SIUnits(-2, 2, 1, 0, -1, 0, 0))));
-            variables.Add(Node.Variable("planck"), new ConstantVariable<Complex>("planck", 6.626207004e-34, new SIUnitDefinition("Js", new SIUnits(-1, 2, 1, 0, 0, 0, 0))));
-            variables.Add(Node.Variable("echarge"), new ConstantVariable<Complex>("echarge", Constants.Charge, Units.Coulomb));
-            variables.Add(Node.Variable("kelvin"), new ConstantVariable<Complex>("kelvin", -Constants.CelsiusKelvin, new SIUnitDefinition("K", new SIUnits(0, 0, 0, 0, 1, 0, 0))));
+            variables.Add("pi", new ConstantVariable<Complex>("pi", Math.PI, scalar));
+            variables.Add("e", new ConstantVariable<Complex>("e", Math.Exp(1.0), scalar));
+            variables.Add("boltz", new ConstantVariable<Complex>("boltz", Constants.Boltzmann, new SIUnitDefinition("J/K", new SIUnits(-2, 2, 1, 0, -1, 0, 0))));
+            variables.Add("planck", new ConstantVariable<Complex>("planck", 6.626207004e-34, new SIUnitDefinition("Js", new SIUnits(-1, 2, 1, 0, 0, 0, 0))));
+            variables.Add("echarge", new ConstantVariable<Complex>("echarge", Constants.Charge, Units.Coulomb));
+            variables.Add("kelvin", new ConstantVariable<Complex>("kelvin", -Constants.CelsiusKelvin, new SIUnitDefinition("K", new SIUnits(0, 0, 0, 0, 1, 0, 0))));
 
-            return new ComplexFunctionBuilder()
+            // Register these variables
+            builder.VariableFound += (sender, args) =>
             {
-                FunctionDefinitions = ComplexFunctionBuilderHelper.Defaults,
-                Variables = variables
+                if (args.Variable == null && variables.TryGetValue(args.Node.Name, out var variable))
+                    args.Variable = variable;
             };
         }
 
@@ -200,27 +208,38 @@ namespace SpiceSharp.Components.BehavioralComponents
         private Func<string, Node> _parseAction = e => new Parser().Parse(e);
 
         /// <summary>
-        /// Gets or sets the builder factory for real numbers.
+        /// Occurs when a builder has been created that uses real values.
         /// </summary>
-        /// <value>
-        /// The builder factory.
-        /// </value>
-        public BuilderFactoryMethod<double> RealBuilderFactory { get; set; } = DefaultRealBuilderFactory;
+        public event EventHandler<BuilderCreatedEventArgs<double>> RealBuilderCreated;
 
         /// <summary>
-        /// Gets or sets the builder factory for complex numbers.
+        /// Occurs when a builder has been created that uses complex values.
         /// </summary>
-        /// <value>
-        /// The builder factory.
-        /// </value>
-        public BuilderFactoryMethod<Complex> ComplexBuilderFactory { get; set; } = DefaultComplexBuilderFactory;
+        public event EventHandler<BuilderCreatedEventArgs<Complex>> ComplexBuilderCreated;
 
         /// <summary>
-        /// A delegate for creating an <see cref="IBuilder{T}"/>.
+        /// Registers a new function builder.
         /// </summary>
-        /// <param name="simulation">The simulation for which the variables need to be created.</param>
-        /// <param name="variables">The variables needed for building.</param>
-        /// <returns>The function builder.</returns>
-        public delegate IFunctionBuilder<T> BuilderFactoryMethod<T>(ISimulation simulation, Dictionary<VariableNode, IVariable<T>> variables);
+        /// <param name="context">The context.</param>
+        /// <param name="builder">The builder.</param>
+        public void RegisterBuilder(IComponentBindingContext context, IFunctionBuilder<double> builder) 
+            => RealBuilderCreated?.Invoke(this, new BuilderCreatedEventArgs<double>(context, builder));
+
+        /// <summary>
+        /// Register a new function builder.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <param name="builder">The builder.</param>
+        public void RegisterBuilder(IComponentBindingContext context, IFunctionBuilder<Complex> builder)
+            => ComplexBuilderCreated?.Invoke(this, new BuilderCreatedEventArgs<Complex>(context, builder));
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Parameters"/> class.
+        /// </summary>
+        public Parameters()
+        {
+            RealBuilderCreated += RegisterDefaultRealBuilder;
+            ComplexBuilderCreated += RegisterDefaultComplexBuilder;
+        }
     }
 }

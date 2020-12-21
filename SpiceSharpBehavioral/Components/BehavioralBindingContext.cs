@@ -7,6 +7,7 @@ using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 
 namespace SpiceSharp.Components.BehavioralComponents
 {
@@ -62,18 +63,6 @@ namespace SpiceSharp.Components.BehavioralComponents
                 derivatives.Variables.Add(variable);
             }
             return derivatives.Derive(function) ?? new Dictionary<VariableNode, Node>(comparer);
-        }
-                
-        /// <summary>
-        /// Create a builder.
-        /// </summary>
-        /// <typeparam name="T">The value.</typeparam>
-        /// <param name="builderFactory">A factory for creating a builder.</param>
-        /// <param name="variables">The variables.</param>
-        /// <returns>The function builder.</returns>
-        public IFunctionBuilder<T> CreateBuilder<T>(Parameters.BuilderFactoryMethod<T> builderFactory, Dictionary<VariableNode, IVariable<T>> variables)
-        {
-            return builderFactory(Simulation, variables);
         }
 
         /// <summary>

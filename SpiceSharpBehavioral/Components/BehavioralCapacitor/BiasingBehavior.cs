@@ -60,7 +60,9 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
             };
             Function = replacer.Build(bp.Function);
             Derivatives = context.CreateDerivatives(Function);
-            DerivativeVariables = Derivatives.Keys.ToDictionary(d => d, d => context.MapNode(state, d), Derivatives.Comparer);
+            DerivativeVariables = new Dictionary<VariableNode, IVariable<double>>(Derivatives.Comparer);
+            foreach (var key in Derivatives.Keys)
+                DerivativeVariables.Add(key, context.MapNode(state, key));
         }
     }
 }

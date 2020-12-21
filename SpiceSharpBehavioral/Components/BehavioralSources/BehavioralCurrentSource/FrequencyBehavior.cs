@@ -5,6 +5,7 @@ using SpiceSharp.Components.BehavioralComponents;
 using SpiceSharp.Components.CommonBehaviors;
 using SpiceSharp.Simulations;
 using SpiceSharpBehavioral;
+using SpiceSharpBehavioral.Builders;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
 using System.Collections.Generic;
@@ -48,14 +49,13 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
                 state.GetSharedVariable(context.Nodes[1]));
 
             // Build the functions
-            var nVariables = new Dictionary<VariableNode, IVariable<Complex>>(Derivatives.Comparer);
-            foreach (var variable in Derivatives.Keys)
-            {
-                var orig = DerivativeVariables[variable];
-                nVariables.Add(variable, new FuncVariable<Complex>(orig.Name, () => orig.Value, orig.Unit));
-            }
             _derivatives = new Func<Complex>[Derivatives.Count];
-            var builder = context.CreateBuilder(bp.ComplexBuilderFactory, nVariables);
+            var builder = new ComplexFunctionBuilder();
+            builder.VariableFound += (sender, args) =>
+            {
+                if (args.Variable == null && DerivativeVariables.TryGetValue(args.Node, out var variable))
+                    args.Variable = new FuncVariable<Complex>(variable.Name, () => variable.Value, variable.Unit);
+            };
             var rhsLocs = _variables.GetRhsIndices(state.Map);
             var matLocs = new MatrixLocation[Derivatives.Count * 2];
             int index = 0;

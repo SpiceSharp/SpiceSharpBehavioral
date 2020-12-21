@@ -32,10 +32,8 @@ namespace SpiceSharpBehavioralTest.Builders
         [TestCaseSource(typeof(BuilderTestData), nameof(BuilderTestData.ComplexFunctionNodes))]
         public void When_BuildNodeFunctions_Expect_Reference(Node node, Complex expected)
         {
-            var builder = new ComplexFunctionBuilder
-            {
-                FunctionDefinitions = ComplexFunctionBuilderHelper.Defaults
-            };
+            var builder = new ComplexFunctionBuilder();
+            builder.RegisterDefaultFunctions();
             var act = builder.Build(node).Invoke();
             Assert.AreEqual(expected.Real, act.Real, 1e-20);
             Assert.AreEqual(act.Imaginary, act.Imaginary, 1e-20);
@@ -46,8 +44,11 @@ namespace SpiceSharpBehavioralTest.Builders
         {
             var builder = new ComplexFunctionBuilder();
             var variable = new GetSetVariable<Complex>("a", Units.Volt);
-            builder.Variables = new Dictionary<VariableNode, IVariable<Complex>> { { VariableNode.Variable("a"), variable } };
-
+            builder.VariableFound += (sender, args) =>
+            {
+                if (args.Variable == null && args.Node.Name == "a")
+                    args.Variable = variable;
+            };
             variable.Value = new Complex(1.0, 2.0);
             var act = builder.Build(Node.Variable("a") + 3.0).Invoke();
             Assert.AreEqual(4.0, act.Real, 1e-20);

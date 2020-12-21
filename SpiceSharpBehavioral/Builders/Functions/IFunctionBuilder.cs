@@ -36,26 +36,13 @@ namespace SpiceSharpBehavioral.Builders
         double AbsoluteTolerance { get; set; }
 
         /// <summary>
-        /// Gets or sets the function definitions.
+        /// Occurs when a function is encountered.
         /// </summary>
-        /// <value>
-        /// The function definitions.
-        /// </value>
-        public Dictionary<string, ApplyFunction<T>> FunctionDefinitions { get; set; }
+        event EventHandler<FunctionFoundEventArgs<T>> FunctionFound;
 
         /// <summary>
-        /// Gets or sets the variables.
+        /// Occurs when a variable is encountered.
         /// </summary>
-        /// <value>
-        /// The function variables.
-        /// </value>
-        public Dictionary<VariableNode, IVariable<T>> Variables { get; set; }
+        event EventHandler<VariableFoundEventArgs<T>> VariableFound;
     }
-
-    /// <summary>
-    /// A delegate for applying a function.
-    /// </summary>
-    /// <param name="state">The state.</param>
-    /// <param name="arguments">The arguments.</param>
-    public delegate void ApplyFunction<T>(IILState<T> state, IReadOnlyList<Node> arguments);
 }

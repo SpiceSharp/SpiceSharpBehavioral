@@ -10,6 +10,7 @@ using SpiceSharp.Attributes;
 using System.Collections.Generic;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using SpiceSharpBehavioral;
+using SpiceSharpBehavioral.Builders;
 
 namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
 {
@@ -72,14 +73,12 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
 
             // Build the functions
             _derivatives = new Func<Complex>[Derivatives.Count];
-            var nVariables = new Dictionary<VariableNode, IVariable<Complex>>(Derivatives.Comparer);
-            foreach (var variable in Derivatives.Keys)
+            var builder = new ComplexFunctionBuilder();
+            builder.VariableFound += (sender, args) =>
             {
-                var orig = DerivativeVariables[variable];
-                nVariables.Add(variable, new FuncVariable<Complex>(orig.Name, () => orig.Value, orig.Unit));
-            }
-            var builder = context.CreateBuilder(bp.ComplexBuilderFactory, nVariables);
-            var rhsLocs = state.Map[_branch];
+                if (args.Variable == null && DerivativeVariables.TryGetValue(args.Node, out var variable))
+                    args.Variable = new FuncVariable<Complex>(variable.Name, () => variable.Value, variable.Unit);
+            }; var rhsLocs = state.Map[_branch];
             var matLocs = new MatrixLocation[Derivatives.Count];
             int index = 0;
             foreach (var pair in Derivatives)

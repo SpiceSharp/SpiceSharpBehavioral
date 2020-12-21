@@ -4,6 +4,7 @@ using SpiceSharp.Behaviors;
 using SpiceSharp.Components.BehavioralComponents;
 using SpiceSharp.Components.CommonBehaviors;
 using SpiceSharp.Simulations;
+using SpiceSharpBehavioral.Builders;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
 using System.Collections.Generic;
@@ -89,7 +90,13 @@ namespace SpiceSharp.Components.BehavioralResistorBehaviors
             DerivativeVariables = Derivatives.Keys.ToDictionary(d => d, d => context.MapNode(state, d, _branch), Derivatives.Comparer);
             _derivatives = new Func<double>[Derivatives.Count];
             _derivativeVariables = new IVariable<double>[Derivatives.Count];
-            var builder = context.CreateBuilder(bp.RealBuilderFactory, DerivativeVariables);
+            var builder = new RealFunctionBuilder();
+            builder.VariableFound += (sender, args) =>
+            {
+                if (args.Variable == null && DerivativeVariables.TryGetValue(args.Node, out var variable))
+                    args.Variable = variable;
+            };
+            bp.RegisterBuilder(context, builder);
             var matLocs = new MatrixLocation[Derivatives.Count];
             var rhsLocs = state.Map[_branch];
             int index = 0;
