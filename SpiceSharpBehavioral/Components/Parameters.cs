@@ -55,100 +55,6 @@ namespace SpiceSharp.Components.BehavioralComponents
         public IEqualityComparer<string> VariableComparer { get; set; } = StringComparer.OrdinalIgnoreCase;
 
         /// <summary>
-        /// A default method for registering variables with a real function builder.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="args">The arguments.</param>
-        public void RegisterDefaultRealBuilder(object sender, BuilderCreatedEventArgs<double> args)
-        {
-            var context = args.Context;
-            var builder = args.Builder;
-            var variables = new Dictionary<string, IVariable<double>>(VariableComparer);
-            var scalar = new SIUnitDefinition("scalar", new SIUnits());
-
-            // Register the regular functions
-            builder.RegisterDefaultFunctions();
-
-            // Temperature
-            if (context.TryGetState<ITemperatureSimulationState>(out var tempState))
-            {
-                variables.Add("temperature", new FuncVariable<double>("temperature", () => tempState.Temperature, new SIUnitDefinition("K", new SIUnits(0, 0, 0, 0, 1, 0, 0))));
-            }
-
-            // Time variable
-            if (context.TryGetState<IIntegrationMethod>(out var method))
-            {
-                variables.Add("time", new FuncVariable<double>("time", () => method.Time, new SIUnitDefinition("s", new SIUnits(1, 0, 0, 0, 0, 0, 0))));
-            }
-            
-            // Iteration control
-            if (context.TryGetState<IIterationSimulationState>(out var iterState))
-            {
-                variables.Add("gmin", new FuncVariable<double>("gmin", () => iterState.Gmin, new SIUnitDefinition("Mho", new SIUnits(3, -2, -1, 2, 0, 0, 0))));
-                variables.Add("sourcefactor", new FuncVariable<double>("sourcefactor", () => iterState.SourceFactor, scalar));
-            }
-
-            // Some standard constants
-            variables.Add("pi", new ConstantVariable<double>("pi", Math.PI, scalar));
-            variables.Add("e", new ConstantVariable<double>("e", Math.Exp(1.0), scalar));
-            variables.Add("boltz", new ConstantVariable<double>("boltz", Constants.Boltzmann, new SIUnitDefinition("J/K", new SIUnits(-2, 2, 1, 0, -1, 0, 0))));
-            variables.Add("planck", new ConstantVariable<double>("planck", 6.626207004e-34, new SIUnitDefinition("Js", new SIUnits(-1, 2, 1, 0, 0, 0, 0))));
-            variables.Add("echarge", new ConstantVariable<double>("echarge", Constants.Charge, Units.Coulomb));
-            variables.Add("kelvin", new ConstantVariable<double>("kelvin", -Constants.CelsiusKelvin, new SIUnitDefinition("K", new SIUnits(0, 0, 0, 0, 1, 0, 0))));
-
-            // Register the variables
-            builder.VariableFound += (sender, args) =>
-            {
-                if (args.Variable == null && variables.TryGetValue(args.Node.Name, out var variable))
-                    args.Variable = variable;
-            };
-        }
-
-        /// <summary>
-        /// A default method for registering variables with a complex function builder.
-        /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="args">The arguments.</param>
-        public void RegisterDefaultComplexBuilder(object sender, BuilderCreatedEventArgs<Complex> args)
-        {
-            var context = args.Context;
-            var builder = args.Builder;
-            var variables = new Dictionary<string, IVariable<Complex>>(VariableComparer);
-            var scalar = new SIUnitDefinition("scalar", new SIUnits());
-
-            // Register the default functions
-            builder.RegisterDefaultFunctions();
-
-            // Temperature
-            if (context.TryGetState<ITemperatureSimulationState>(out var tempState))
-            {
-                variables.Add("temperature", new FuncVariable<Complex>("temperature", () => tempState.Temperature, new SIUnitDefinition("K", new SIUnits(0, 0, 0, 0, 1, 0, 0))));
-            }
-
-            // Iteration control
-            if (context.TryGetState<IIterationSimulationState>(out var iterState))
-            {
-                variables.Add("gmin", new FuncVariable<Complex>("gmin", () => iterState.Gmin, new SIUnitDefinition("Mho", new SIUnits(3, -2, -1, 2, 0, 0, 0))));
-                variables.Add("sourcefactor", new FuncVariable<Complex>("sourcefactor", () => iterState.SourceFactor, scalar));
-            }
-
-            // Some standard constants
-            variables.Add("pi", new ConstantVariable<Complex>("pi", Math.PI, scalar));
-            variables.Add("e", new ConstantVariable<Complex>("e", Math.Exp(1.0), scalar));
-            variables.Add("boltz", new ConstantVariable<Complex>("boltz", Constants.Boltzmann, new SIUnitDefinition("J/K", new SIUnits(-2, 2, 1, 0, -1, 0, 0))));
-            variables.Add("planck", new ConstantVariable<Complex>("planck", 6.626207004e-34, new SIUnitDefinition("Js", new SIUnits(-1, 2, 1, 0, 0, 0, 0))));
-            variables.Add("echarge", new ConstantVariable<Complex>("echarge", Constants.Charge, Units.Coulomb));
-            variables.Add("kelvin", new ConstantVariable<Complex>("kelvin", -Constants.CelsiusKelvin, new SIUnitDefinition("K", new SIUnits(0, 0, 0, 0, 1, 0, 0))));
-
-            // Register these variables
-            builder.VariableFound += (sender, args) =>
-            {
-                if (args.Variable == null && variables.TryGetValue(args.Node.Name, out var variable))
-                    args.Variable = variable;
-            };
-        }
-
-        /// <summary>
         /// Gets or sets the expression.
         /// </summary>
         /// <value>
@@ -239,8 +145,8 @@ namespace SpiceSharp.Components.BehavioralComponents
         /// </summary>
         public Parameters()
         {
-            RealBuilderCreated += RegisterDefaultRealBuilder;
-            ComplexBuilderCreated += RegisterDefaultComplexBuilder;
+            RealBuilderCreated += BuilderHelper.RegisterDefaultBuilder;
+            ComplexBuilderCreated += BuilderHelper.RegisterDefaultBuilder;
         }
     }
 }

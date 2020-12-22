@@ -57,6 +57,7 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
                 if (args.Variable == null && DerivativeVariables.TryGetValue(args.Node, out var variable))
                     args.Variable = new FuncVariable<Complex>(variable.Name, () => variable.Value, variable.Unit);
             };
+            bp.RegisterBuilder(context, builder);
             var rhsLocs = _variables.GetRhsIndices(state.Map);
             var matLocs = new MatrixLocation[Derivatives.Count * 2];
             int index = 0;

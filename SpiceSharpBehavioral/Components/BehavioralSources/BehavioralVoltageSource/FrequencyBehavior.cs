@@ -80,6 +80,7 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
                 if (args.Variable == null && DerivativeVariables.TryGetValue(args.Node, out var variable))
                     args.Variable = new FuncVariable<Complex>(variable.Name, () => variable.Value, variable.Unit);
             }; var rhsLocs = state.Map[_branch];
+            bp.RegisterBuilder(context, builder);
             var matLocs = new MatrixLocation[Derivatives.Count];
             int index = 0;
             foreach (var pair in Derivatives)
