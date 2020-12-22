@@ -10,6 +10,7 @@ using SpiceSharp.Attributes;
 using System.Collections.Generic;
 using System.Linq;
 using SpiceSharpBehavioral.Builders;
+using SpiceSharpBehavioral.Builders.Functions;
 
 namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
 {

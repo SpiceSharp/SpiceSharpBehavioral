@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace SpiceSharpBehavioral.Builders
+namespace SpiceSharpBehavioral.Builders.Functions
 {
     /// <summary>
     /// Describes a state for writing IL code.

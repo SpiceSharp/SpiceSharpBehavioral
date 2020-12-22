@@ -3,7 +3,7 @@ using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
 using System.Collections.Generic;
 
-namespace SpiceSharpBehavioral.Builders
+namespace SpiceSharpBehavioral.Builders.Functions
 {
     /// <summary>
     /// Event arguments for when a function has been found.

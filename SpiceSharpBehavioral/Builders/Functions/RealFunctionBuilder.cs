@@ -3,7 +3,7 @@ using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
 using System.Collections.Generic;
 
-namespace SpiceSharpBehavioral.Builders
+namespace SpiceSharpBehavioral.Builders.Functions
 {
     /// <summary>
     /// A function builder for real numbers.

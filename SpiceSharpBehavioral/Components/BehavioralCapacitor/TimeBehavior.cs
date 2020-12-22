@@ -5,6 +5,7 @@ using SpiceSharp.Components.BehavioralComponents;
 using SpiceSharp.ParameterSets;
 using SpiceSharp.Simulations;
 using SpiceSharpBehavioral.Builders;
+using SpiceSharpBehavioral.Builders.Functions;
 using System;
 
 namespace SpiceSharp.Components.BehavioralCapacitorBehaviors

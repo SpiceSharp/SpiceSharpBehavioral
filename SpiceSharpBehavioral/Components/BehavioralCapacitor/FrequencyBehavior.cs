@@ -7,6 +7,7 @@ using SpiceSharp.ParameterSets;
 using SpiceSharp.Simulations;
 using SpiceSharpBehavioral;
 using SpiceSharpBehavioral.Builders;
+using SpiceSharpBehavioral.Builders.Functions;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
 using System.Collections.Generic;

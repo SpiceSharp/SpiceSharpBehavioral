@@ -11,6 +11,7 @@ using SpiceSharpBehavioral;
 using System.Collections.Generic;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using SpiceSharpBehavioral.Builders;
+using SpiceSharpBehavioral.Builders.Functions;
 
 namespace SpiceSharp.Components.BehavioralResistorBehaviors
 {

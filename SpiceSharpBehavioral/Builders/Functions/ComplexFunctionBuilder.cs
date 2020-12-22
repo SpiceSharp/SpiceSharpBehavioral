@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 
-namespace SpiceSharpBehavioral.Builders
+namespace SpiceSharpBehavioral.Builders.Functions
 {
     /// <summary>
     /// A function builder for complex numbers.

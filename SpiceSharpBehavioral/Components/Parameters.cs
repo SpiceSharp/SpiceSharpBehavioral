@@ -3,6 +3,7 @@ using SpiceSharp.Simulations;
 using SpiceSharp.Simulations.Variables;
 using SpiceSharpBehavioral;
 using SpiceSharpBehavioral.Builders;
+using SpiceSharpBehavioral.Builders.Functions;
 using SpiceSharpBehavioral.Parsers;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using System;

@@ -5,15 +5,15 @@ using System.Numerics;
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace SpiceSharpBehavioral.Builders
+namespace SpiceSharpBehavioral.Builders.Functions
 {
     /// <summary>
     /// An IL state for complex values.
     /// </summary>
     public class ComplexILState : ILState<Complex>, IILComplexState
     {
-        private static readonly MethodInfo _safeDiv = ((Func<Complex, Complex, double, Complex>)Functions.SafeDivide).GetMethodInfo();
-        private static readonly MethodInfo _equals = ((Func<Complex, Complex, double, double, bool>)Functions.Equals).GetMethodInfo();
+        private static readonly MethodInfo _safeDiv = ((Func<Complex, Complex, double, Complex>)HelperFunctions.SafeDivide).GetMethodInfo();
+        private static readonly MethodInfo _equals = ((Func<Complex, Complex, double, double, bool>)HelperFunctions.Equals).GetMethodInfo();
         private static readonly ConstructorInfo _cplx = typeof(Complex).GetTypeInfo().GetConstructor(new[] { typeof(double), typeof(double) });
         private static readonly MethodInfo _realPart = typeof(Complex).GetTypeInfo().GetProperty("Real", typeof(double)).GetGetMethod();
 
@@ -147,7 +147,7 @@ namespace SpiceSharpBehavioral.Builders
                             return;
 
                         case NodeTypes.Pow:
-                            Call(Functions.Power, new[] { bn.Left, bn.Right });
+                            Call(HelperFunctions.Power, new[] { bn.Left, bn.Right });
                             return;
                     }
                     break;

@@ -5,52 +5,27 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 
-namespace SpiceSharpBehavioral.Builders
+namespace SpiceSharpBehavioral.Builders.Direct
 {
     /// <summary>
     /// A builder that can compute values.
     /// </summary>
     /// <seealso cref="IBuilder{T}" />
-    public class ComplexBuilder : IBuilder<Complex>
+    public class ComplexBuilder : IDirectBuilder<Complex>
     {
-        /// <summary>
-        /// Gets the functions.
-        /// </summary>
-        /// <value>
-        /// The functions.
-        /// </value>
-        public Dictionary<string, Func<Complex[], Complex>> FunctionDefinitions { get; set; }
+        /// <inheritdoc/>
+        public event EventHandler<FunctionFoundEventArgs<Complex>> FunctionFound;
 
-        /// <summary>
-        /// Gets the variables.
-        /// </summary>
-        /// <value>
-        /// The variables.
-        /// </value>
-        public Dictionary<VariableNode, IVariable<Complex>> Variables { get; set; }
+        /// <inheritdoc/>
+        public event EventHandler<VariableFoundEventArgs<Complex>> VariableFound;
 
-        /// <summary>
-        /// Gets or sets the fudge factor.
-        /// </summary>
-        /// <value>
-        /// The fudge factor.
-        /// </value>
+        /// <inheritdoc/>
         public double FudgeFactor { get; set; } = 1e-20;
 
-        /// <summary>
-        /// Gets or sets the relative tolerance.
-        /// </summary>
-        /// <value>
-        /// The relative tolerance.
-        /// </value>
+        /// <inheritdoc/>
         public double RelativeTolerance { get; set; } = 1e-6;
 
-        /// <summary>
-        /// Gets or sets the absolute tolerance.
-        /// </summary>
-        /// <value>
-        /// The absolute tolerance.
-        /// </value>
+        /// <inheritdoc/>
         public double AbsoluteTolerance { get; set; } = 1e-12;
 
         /// <summary>
@@ -70,18 +45,18 @@ namespace SpiceSharpBehavioral.Builders
                         case NodeTypes.Add: return Build(bn.Left) + Build(bn.Right);
                         case NodeTypes.Subtract: return Build(bn.Left) - Build(bn.Right);
                         case NodeTypes.Multiply: return Build(bn.Left) * Build(bn.Right);
-                        case NodeTypes.Divide: return Functions.SafeDivide(Build(bn.Left), Build(bn.Right), FudgeFactor);
+                        case NodeTypes.Divide: return HelperFunctions.SafeDivide(Build(bn.Left), Build(bn.Right), FudgeFactor);
                         case NodeTypes.Modulo: return Build(bn.Left).Real % Build(bn.Right).Real;
                         case NodeTypes.LessThan: return Build(bn.Left).Real < Build(bn.Right).Real ? 1.0 : 0.0;
                         case NodeTypes.GreaterThan: return Build(bn.Left).Real > Build(bn.Right).Real ? 1.0 : 0.0;
                         case NodeTypes.LessThanOrEqual: return Build(bn.Left).Real <= Build(bn.Right).Real ? 1.0 : 0.0;
                         case NodeTypes.GreaterThanOrEqual: return Build(bn.Left).Real >= Build(bn.Right).Real ? 1.0 : 0.0;
-                        case NodeTypes.Equals: return Functions.Equals(Build(bn.Left), Build(bn.Right), RelativeTolerance, AbsoluteTolerance) ? 1.0 : 0.0;
-                        case NodeTypes.NotEquals: return Functions.Equals(Build(bn.Left), Build(bn.Right), RelativeTolerance, AbsoluteTolerance) ? 0.0 : 1.0;
+                        case NodeTypes.Equals: return HelperFunctions.Equals(Build(bn.Left), Build(bn.Right), RelativeTolerance, AbsoluteTolerance) ? 1.0 : 0.0;
+                        case NodeTypes.NotEquals: return HelperFunctions.Equals(Build(bn.Left), Build(bn.Right), RelativeTolerance, AbsoluteTolerance) ? 0.0 : 1.0;
                         case NodeTypes.And: return Build(bn.Left).Real > 0.5 && Build(bn.Right).Real > 0.5 ? 1.0 : 0.0;
                         case NodeTypes.Or: return Build(bn.Left).Real > 0.5 || Build(bn.Right).Real > 0.5 ? 1.0 : 0.0;
                         case NodeTypes.Xor: return Build(bn.Left).Real > 0.5 ^ Build(bn.Right).Real > 0.5 ? 1.0 : 0.0;
-                        case NodeTypes.Pow: return Functions.Power(Build(bn.Left), Build(bn.Right));
+                        case NodeTypes.Pow: return HelperFunctions.Power(Build(bn.Left), Build(bn.Right));
                     }
                     break;
 
@@ -98,26 +73,36 @@ namespace SpiceSharpBehavioral.Builders
                     return Build(tn.Condition).Real > 0.5 ? Build(tn.IfTrue) : Build(tn.IfFalse);
 
                 case FunctionNode fn:
-                    if (FunctionDefinitions != null && FunctionDefinitions.TryGetValue(fn.Name, out var definition))
-                    {
-                        var args = new Complex[fn.Arguments.Count];
-                        for (var i = 0; i < args.Length; i++)
-                            args[i] = Build(fn.Arguments[i]);
-                        var result = definition.Invoke(args);
-                        return result;
-                    }
-                    break;
+                    var fargs = new FunctionFoundEventArgs<Complex>(this, fn);
+                    OnFunctionFound(fargs);
+                    if (!fargs.Created)
+                        throw new SpiceSharpException($"Could not recognized function {fn.Name}");
+                    return fargs.Result;
 
                 case ConstantNode cn:
                     return cn.Literal;
 
                 case VariableNode vn:
-                    if (Variables != null && Variables.TryGetValue(vn, out var variable))
-                        return variable.Value;
-                    break;
+                    var vargs = new VariableFoundEventArgs<Complex>(this, vn);
+                    OnVariableFound(vargs);
+                    if (!vargs.Created)
+                        throw new SpiceSharpException($"Could not recognized variable {vn.Name}");
+                    return vargs.Result;
             }
             return BuildNode(expression);
         }
+
+        /// <summary>
+        /// Called when a function was found.
+        /// </summary>
+        /// <param name="args">The event arguments.</param>
+        protected virtual void OnFunctionFound(FunctionFoundEventArgs<Complex> args) => FunctionFound?.Invoke(this, args);
+
+        /// <summary>
+        /// Called when a variable was found.
+        /// </summary>
+        /// <param name="args">The event arguments.</param>
+        protected virtual void OnVariableFound(VariableFoundEventArgs<Complex> args) => VariableFound?.Invoke(this, args);
 
         /// <summary>
         /// Builds the node.

@@ -7,7 +7,7 @@ namespace SpiceSharpBehavioral.Builders
     /// <summary>
     /// Supporting functions for behavioral models.
     /// </summary>
-    public static class Functions
+    public static class HelperFunctions
     {
         /// <summary>
         /// Divides two numbers while avoiding division by 0 using a fudge factor.

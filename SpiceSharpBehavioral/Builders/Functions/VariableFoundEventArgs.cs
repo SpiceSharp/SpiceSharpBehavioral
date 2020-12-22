@@ -3,7 +3,7 @@ using SpiceSharp.Simulations;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
 
-namespace SpiceSharpBehavioral.Builders
+namespace SpiceSharpBehavioral.Builders.Functions
 {
     /// <summary>
     /// Event arguments for when a variable was found.

@@ -1,6 +1,6 @@
 ﻿using SpiceSharp;
 using SpiceSharp.Simulations;
-using SpiceSharpBehavioral.Builders;
+using SpiceSharpBehavioral.Builders.Functions;
 using System;
 
 namespace SpiceSharp.Components.BehavioralComponents

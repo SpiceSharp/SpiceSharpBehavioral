@@ -1,7 +1,7 @@
 ﻿using SpiceSharpBehavioral.Parsers.Nodes;
 using System.Numerics;
 
-namespace SpiceSharpBehavioral.Builders
+namespace SpiceSharpBehavioral.Builders.Functions
 {
     /// <summary>
     /// Additional methods that can be supplied by a complex IL state.

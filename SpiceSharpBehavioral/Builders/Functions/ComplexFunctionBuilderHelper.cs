@@ -7,7 +7,7 @@ using System.Numerics;
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace SpiceSharpBehavioral.Builders
+namespace SpiceSharpBehavioral.Builders.Functions
 {
     /// <summary>
     /// Helper methods for a <see cref="RealFunctionBuilder"/>.
@@ -17,9 +17,9 @@ namespace SpiceSharpBehavioral.Builders
         private static readonly Random _rnd = new Random();
         private static readonly MethodInfo
             _sgn = ((Func<double, int>)Math.Sign).GetMethodInfo(),
-            _round = ((Func<Complex, int, Complex>)Functions.Round).GetMethodInfo(),
-            _pwl = ((Func<double, Point[], double>)Functions.Pwl).GetMethodInfo(),
-            _pwlDerivative = ((Func<double, Point[], double>)Functions.PwlDerivative).GetMethodInfo();
+            _round = ((Func<Complex, int, Complex>)HelperFunctions.Round).GetMethodInfo(),
+            _pwl = ((Func<double, Point[], double>)HelperFunctions.Pwl).GetMethodInfo(),
+            _pwlDerivative = ((Func<double, Point[], double>)HelperFunctions.PwlDerivative).GetMethodInfo();
         private static readonly ConstructorInfo _point = typeof(Point).GetTypeInfo().GetConstructor(new[] { typeof(double), typeof(double) });
 
         /// <summary>
@@ -88,11 +88,6 @@ namespace SpiceSharpBehavioral.Builders
             builder.FunctionFound += OnFunctionFound;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
         private static void OnFunctionFound(object sender, FunctionFoundEventArgs<Complex> args)
         {
             if (Defaults.TryGetValue(args.Function.Name, out var func))
@@ -110,14 +105,14 @@ namespace SpiceSharpBehavioral.Builders
 
         // One-argument functions
         private static void Zero(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Push(new Complex());
-        private static void Abs(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Abs, arguments);
+        private static void Abs(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Abs, arguments);
         private static void Sgn(IILState<Complex> ils, IReadOnlyList<Node> arguments) { ils.Call(null, _sgn, arguments.Check(1)); ils.Generator.Emit(OpCodes.Conv_R8); }
-        private static void Sqrt(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Sqrt, arguments);
-        private static void URamp(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Ramp, arguments);
-        private static void DURampDerivative(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.RampDerivative, arguments);
-        private static void U(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Step, arguments);
-        private static void U2(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Step2, arguments);
-        private static void DU2(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Step2Derivative, arguments);
+        private static void Sqrt(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Sqrt, arguments);
+        private static void URamp(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Ramp, arguments);
+        private static void DURampDerivative(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.RampDerivative, arguments);
+        private static void U(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Step, arguments);
+        private static void U2(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Step2, arguments);
+        private static void DU2(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Step2Derivative, arguments);
         private static void Sin(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(Complex.Sin, arguments);
         private static void Cos(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(Complex.Cos, arguments);
         private static void Tan(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(Complex.Tan, arguments);
@@ -127,14 +122,14 @@ namespace SpiceSharpBehavioral.Builders
         private static void Sinh(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(Complex.Sinh, arguments);
         private static void Cosh(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(Complex.Cosh, arguments);
         private static void Tanh(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(Complex.Tanh, arguments);
-        private static void Ceil(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Ceiling, arguments);
-        private static void Floor(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Floor, arguments);
+        private static void Ceil(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Ceiling, arguments);
+        private static void Floor(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Floor, arguments);
         private static void Exp(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(Complex.Exp, arguments);
-        private static void Log(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Log, arguments);
-        private static void Log10(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Log10, arguments);
+        private static void Log(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Log, arguments);
+        private static void Log10(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Log10, arguments);
         private static void Square(IILState<Complex> ils, IReadOnlyList<Node> arguments)
         {
-            ils.Call(Functions.Square, arguments);
+            ils.Call(HelperFunctions.Square, arguments);
         }
         private static void Nint(IILState<Complex> ils, IReadOnlyList<Node> arguments)
         {
@@ -145,10 +140,10 @@ namespace SpiceSharpBehavioral.Builders
 
         // Two-argument functions
         private static void Pow(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(Complex.Pow, arguments);
-        private static void Pwr(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Power, arguments);
-        private static void Pwrs(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Power2, arguments);
-        private static void Min(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Min, arguments);
-        private static void Max(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Max, arguments);
+        private static void Pwr(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Power, arguments);
+        private static void Pwrs(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Power2, arguments);
+        private static void Min(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Min, arguments);
+        private static void Max(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Max, arguments);
         private static void Round(IILState<Complex> ils, IReadOnlyList<Node> arguments)
         {
             ils.Push(arguments.Check(2)[0]);
@@ -156,8 +151,8 @@ namespace SpiceSharpBehavioral.Builders
             ils.Generator.Emit(OpCodes.Conv_I4);
             ils.Generator.Emit(OpCodes.Call, _round);
         }
-        private static void Atan2(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Atan2, arguments);
-        private static void Hypot(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(Functions.Hypot, arguments);
+        private static void Atan2(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Atan2, arguments);
+        private static void Hypot(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Hypot, arguments);
 
         // Three-argument functions
         private static void If(IILState<Complex> ils, IReadOnlyList<Node> arguments)

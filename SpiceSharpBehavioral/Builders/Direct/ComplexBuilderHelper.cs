@@ -4,10 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 
-namespace SpiceSharpBehavioral.Builders
+namespace SpiceSharpBehavioral.Builders.Direct
 {
     /// <summary>
-    /// Helper methods for a <see cref="RealBuilder"/>.
+    /// Helper methods for a <see cref="ComplexBuilder"/>.
     /// </summary>
     public static class ComplexBuilderHelper
     {
@@ -16,7 +16,7 @@ namespace SpiceSharpBehavioral.Builders
         /// <summary>
         /// A set of default functions.
         /// </summary>
-        public static readonly Dictionary<string, Func<Complex[], Complex>> Defaults = new Dictionary<string, Func<Complex[], Complex>>
+        public static readonly Dictionary<string, Func<Complex[], Complex>> Defaults = new Dictionary<string, Func<Complex[], Complex>>(StringComparer.OrdinalIgnoreCase)
         {
             { "abs", Abs },
             { "sgn", Sgn },
@@ -65,12 +65,23 @@ namespace SpiceSharpBehavioral.Builders
         /// <summary>
         /// Registers the default functions.
         /// </summary>
-        /// <param name="definitions">The definitions.</param>
-        public static void RegisterDefaultFunctions(this Dictionary<string, Func<Complex[], Complex>> definitions)
+        /// <param name="builder">The builder.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="builder"/> is <c>null</c>.</exception>
+        public static void RegisterDefaultFunctions(this IDirectBuilder<Complex> builder)
         {
-            definitions.ThrowIfNull(nameof(definitions));
-            foreach (var pair in Defaults)
-                definitions.Add(pair.Key, pair.Value);
+            builder.ThrowIfNull(nameof(builder));
+            builder.FunctionFound += OnFunctionFound;
+        }
+
+        private static void OnFunctionFound(object sender, FunctionFoundEventArgs<Complex> args)
+        {
+            if (!args.Created && Defaults.TryGetValue(args.Function.Name, out var definition))
+            {
+                var arguments = new Complex[args.Function.Arguments.Count];
+                for (var i = 0; i < arguments.Length; i++)
+                    arguments[i] = args.Builder.Build(args.Function.Arguments[i]);
+                args.Result = definition(arguments);
+            }
         }
 
         // No-argument functions
@@ -79,10 +90,10 @@ namespace SpiceSharpBehavioral.Builders
         // One-argument functions
         private static Complex Abs(Complex[] args) => args.Check(1)[0].Magnitude;
         private static Complex Sgn(Complex[] args) => Math.Sign(args.Check(1)[0].Real);
-        private static Complex Sqrt(Complex[] args) => Functions.Sqrt(args.Check(1)[0]);
-        private static Complex URamp(Complex[] args) => Functions.Ramp(args.Check(1)[0]);
-        private static Complex U(Complex[] args) => Functions.Step(args.Check(1)[0]);
-        private static Complex U2(Complex[] args) => Functions.Step2(args.Check(1)[0]);
+        private static Complex Sqrt(Complex[] args) => HelperFunctions.Sqrt(args.Check(1)[0]);
+        private static Complex URamp(Complex[] args) => HelperFunctions.Ramp(args.Check(1)[0]);
+        private static Complex U(Complex[] args) => HelperFunctions.Step(args.Check(1)[0]);
+        private static Complex U2(Complex[] args) => HelperFunctions.Step2(args.Check(1)[0]);
         private static Complex Sin(Complex[] args) => Complex.Sin(args.Check(1)[0]);
         private static Complex Cos(Complex[] args) => Complex.Cos(args.Check(1)[0]);
         private static Complex Tan(Complex[] args) => Complex.Tan(args.Check(1)[0]);
@@ -103,8 +114,8 @@ namespace SpiceSharpBehavioral.Builders
             return new Complex(Math.Floor(arg.Real), Math.Floor(arg.Imaginary));
         }
         private static Complex Exp(Complex[] args) => Complex.Exp(args.Check(1)[0]);
-        private static Complex Log(Complex[] args) => Functions.Log(args.Check(1)[0]);
-        private static Complex Log10(Complex[] args) => Functions.Log10(args.Check(1)[0]);
+        private static Complex Log(Complex[] args) => HelperFunctions.Log(args.Check(1)[0]);
+        private static Complex Log10(Complex[] args) => HelperFunctions.Log10(args.Check(1)[0]);
         private static Complex Square(Complex[] args) { var x = args.Check(1)[0]; return x * x; }
         private static Complex Nint(Complex[] args)
         {
@@ -114,8 +125,8 @@ namespace SpiceSharpBehavioral.Builders
 
         // Two-argument functions
         private static Complex Pow(Complex[] args) { args.Check(2); return Complex.Pow(args[0], args[1]); }
-        private static Complex Pwr(Complex[] args) { args.Check(2); return Functions.Power(args[0], args[1]); }
-        private static Complex Pwrs(Complex[] args) { args.Check(2); return Functions.Power2(args[0], args[1]); }
+        private static Complex Pwr(Complex[] args) { args.Check(2); return HelperFunctions.Power(args[0], args[1]); }
+        private static Complex Pwrs(Complex[] args) { args.Check(2); return HelperFunctions.Power2(args[0], args[1]); }
         private static Complex Min(Complex[] args) { args.Check(2); return Math.Min(args[0].Real, args[1].Real); }
         private static Complex Max(Complex[] args) { args.Check(2); return Math.Max(args[0].Real, args[1].Real); }
         private static Complex Round(Complex[] args)
@@ -125,7 +136,7 @@ namespace SpiceSharpBehavioral.Builders
             return new Complex(Math.Round(arg.Real, n), Math.Round(arg.Imaginary, n));
         }
         private static Complex Atan2(Complex[] args) { args.Check(2); return Math.Atan2(args[0].Real, args[1].Real); }
-        private static Complex Hypot(Complex[] args) { args.Check(2); return Functions.Hypot(args[0], args[1]); }
+        private static Complex Hypot(Complex[] args) { args.Check(2); return HelperFunctions.Hypot(args[0], args[1]); }
 
         // Three-argument functions
         private static Complex If(Complex[] args) { args.Check(3); return args[0].Real > 0.5 ? args[1] : args[2]; }
@@ -142,7 +153,7 @@ namespace SpiceSharpBehavioral.Builders
             var data = new Point[points];
             for (var i = 0; i < points; i++)
                 data[i] = new Point(args[i * 2 + 1].Real, args[i * 2 + 2].Real);
-            return Functions.Pwl(args[0].Real, data);
+            return HelperFunctions.Pwl(args[0].Real, data);
         }
         private static Complex PwlDerivative(Complex[] args)
         {
@@ -155,7 +166,7 @@ namespace SpiceSharpBehavioral.Builders
             var data = new Point[points];
             for (var i = 0; i < points; i++)
                 data[i] = new Point(args[i * 2 + 1].Real, args[i * 2 + 2].Real);
-            return Functions.PwlDerivative(args[0].Real, data);
+            return HelperFunctions.PwlDerivative(args[0].Real, data);
         }
     }
 }

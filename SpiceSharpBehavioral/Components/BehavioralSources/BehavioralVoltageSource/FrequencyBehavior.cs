@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using SpiceSharpBehavioral;
 using SpiceSharpBehavioral.Builders;
+using SpiceSharpBehavioral.Builders.Functions;
 
 namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
 {

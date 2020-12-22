@@ -6,16 +6,16 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace SpiceSharpBehavioral.Builders
+namespace SpiceSharpBehavioral.Builders.Functions
 {
     /// <summary>
     /// An IL state for real values.
     /// </summary>
     public class RealILState : ILState<double>
     {
-        private static readonly MethodInfo _safeDiv = ((Func<double, double, double, double>)Functions.SafeDivide).GetMethodInfo();
-        private static readonly MethodInfo _power = ((Func<double, double, double>)Functions.Power).GetMethodInfo();
-        private static readonly MethodInfo _equals = ((Func<double, double, double, double, bool>)Functions.Equals).GetMethodInfo();
+        private static readonly MethodInfo _safeDiv = ((Func<double, double, double, double>)HelperFunctions.SafeDivide).GetMethodInfo();
+        private static readonly MethodInfo _power = ((Func<double, double, double>)HelperFunctions.Power).GetMethodInfo();
+        private static readonly MethodInfo _equals = ((Func<double, double, double, double, bool>)HelperFunctions.Equals).GetMethodInfo();
 
         /// <summary>
         /// Creates a new instance of the <see cref="RealILState"/> class.
@@ -150,7 +150,7 @@ namespace SpiceSharpBehavioral.Builders
                             return;
 
                         case NodeTypes.Pow:
-                            Call(Functions.Power, new[] { bn.Left, bn.Right });
+                            Call(HelperFunctions.Power, new[] { bn.Left, bn.Right });
                             return;
                     }
                     break;

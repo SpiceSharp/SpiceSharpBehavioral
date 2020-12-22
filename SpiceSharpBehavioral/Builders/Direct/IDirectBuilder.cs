@@ -1,12 +1,12 @@
 ﻿using System;
 
-namespace SpiceSharpBehavioral.Builders.Functions
+namespace SpiceSharpBehavioral.Builders.Direct
 {
     /// <summary>
-    /// A function builder.
+    /// A direct builder.
     /// </summary>
     /// <typeparam name="T">The value type.</typeparam>
-    public interface IFunctionBuilder<T> : IBuilder<Func<T>>
+    public interface IDirectBuilder<T> : IBuilder<T>
     {
         /// <summary>
         /// Gets or sets the fudge factor.

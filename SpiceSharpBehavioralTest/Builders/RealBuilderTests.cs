@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using SpiceSharp.Simulations;
 using SpiceSharpBehavioral;
-using SpiceSharpBehavioral.Builders;
+using SpiceSharpBehavioral.Builders.Direct;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using System.Collections.Generic;
 
@@ -20,10 +20,8 @@ namespace SpiceSharpBehavioralTest.Builders
         [TestCaseSource(typeof(BuilderTestData), nameof(BuilderTestData.FunctionNodes))]
         public void When_BuildNodeFunctions_Expect_Reference(Node node, double expected)
         {
-            var builder = new RealBuilder
-            {
-                FunctionDefinitions = RealBuilderHelper.Defaults
-            };
+            var builder = new RealBuilder();
+            builder.RegisterDefaultFunctions();
             Assert.AreEqual(expected, builder.Build(node), 1e-20);
         }
 
@@ -32,8 +30,11 @@ namespace SpiceSharpBehavioralTest.Builders
         {
             var builder = new RealBuilder();
             var variable = new GetSetVariable<double>("a", Units.Volt);
-            builder.Variables = new Dictionary<VariableNode, IVariable<double>> { { VariableNode.Variable("a"), variable } };
-
+            builder.VariableFound += (sender, args) =>
+            {
+                if (!args.Created && args.Node.Name == "a")
+                    args.Result = variable.Value;
+            };
             variable.Value = 2.0;
             Assert.AreEqual(5.0, builder.Build(Node.Add(Node.Variable("a"), 3.0)), 1e-20);
         }
