@@ -27,10 +27,10 @@ namespace SpiceSharp.Components
         /// <summary>
         /// Initializes a new instance of the <see cref="BehavioralCurrentSource"/> class.
         /// </summary>
-        /// <param name="name">The name.</param>
+        /// <param name="name">The name of the source.</param>
         /// <param name="pos">The positive node.</param>
         /// <param name="neg">The negative node.</param>
-        /// <param name="expression">The expression.</param>
+        /// <param name="expression">The expression that describes the current.</param>
         public BehavioralCurrentSource(string name, string pos, string neg, string expression)
             : this(name)
         {

@@ -7,13 +7,13 @@ using SpiceSharp.Components.BehavioralComponents;
 using SpiceSharp.ParameterSets;
 using SpiceSharp.Components.CommonBehaviors;
 using SpiceSharp.Attributes;
+using SpiceSharpBehavioral;
 using System.Collections.Generic;
 using SpiceSharpBehavioral.Parsers.Nodes;
-using SpiceSharpBehavioral;
 using SpiceSharpBehavioral.Builders;
 using SpiceSharpBehavioral.Builders.Functions;
 
-namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
+namespace SpiceSharp.Components.BehavioralResistorBehaviors
 {
     /// <summary>
     /// Frequency behavior for a <see cref="BehavioralVoltageSource"/>.
@@ -21,7 +21,7 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
     /// <seealso cref="BiasingBehavior" />
     /// <seealso cref="IFrequencyBehavior" />
     /// <seealso cref="IBranchedBehavior{T}"/>
-    [BehaviorFor(typeof(BehavioralVoltageSource), typeof(IFrequencyBehavior), 1)]
+    [BehaviorFor(typeof(BehavioralResistor), typeof(IFrequencyBehavior), 1)]
     public class FrequencyBehavior : BiasingBehavior,
         IFrequencyBehavior,
         IBranchedBehavior<Complex>
@@ -73,18 +73,25 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
             _branch = state.CreatePrivateVariable(Name.Combine("branch"), Units.Ampere);
 
             // Build the functions
-            var derivatives = new List<Func<Complex>>(Derivatives.Count);
+            var nVariables = new Dictionary<VariableNode, IVariable<Complex>>(Derivatives.Comparer);
+            foreach (var variable in Derivatives.Keys)
+            {
+                var orig = DerivativeVariables[variable];
+                nVariables.Add(variable, new FuncVariable<Complex>(orig.Name, () => orig.Value, orig.Unit));
+            }
             var builder = new ComplexFunctionBuilder();
             builder.VariableFound += (sender, args) =>
             {
                 if (args.Variable == null && DerivativeVariables.TryGetValue(args.Node, out var variable))
                     args.Variable = new FuncVariable<Complex>(variable.Name, () => variable.Value, variable.Unit);
-            }; var rhsLocs = state.Map[_branch];
+            };
             bp.RegisterBuilder(context, builder);
+            var derivatives = new List<Func<Complex>>(Derivatives.Count);
+            var rhsLocs = state.Map[_branch];
             var matLocs = new List<MatrixLocation>(Derivatives.Count);
             foreach (var pair in Derivatives)
             {
-                var variable = context.MapNode(state, pair.Key);
+                var variable = context.MapNode(state, pair.Key, _branch);
                 if (state.Map.Contains(variable))
                 {
                     derivatives.Add(builder.Build(pair.Value));
@@ -107,7 +114,7 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         }
 
         /// <summary>
-        /// Initializes the parameters.
+        /// Initializes the frequency behavior.
         /// </summary>
         void IFrequencyBehavior.InitializeParameters()
         {

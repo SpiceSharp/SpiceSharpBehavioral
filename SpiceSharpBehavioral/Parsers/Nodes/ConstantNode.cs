@@ -68,7 +68,7 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
                 return true;
             if (obj is ConstantNode cn)
             {
-                if (!Functions.Equals(Literal, cn.Literal, RelativeTolerance, AbsoluteTolerance))
+                if (!HelperFunctions.Equals(Literal, cn.Literal, RelativeTolerance, AbsoluteTolerance))
                     return false;
                 return true;
             }

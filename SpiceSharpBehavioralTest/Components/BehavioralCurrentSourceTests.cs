@@ -66,6 +66,45 @@ namespace SpiceSharpBehavioralTest.Components
             op.Run(ckt);
         }
 
+        [Test]
+        public void When_CapacitorTransient_Expect_Reference()
+        {
+            var ckt = new Circuit(
+                new VoltageSource("V1", "in", "0", new Sine(0, 1, 100)),
+                new Capacitor("C1", "in", "0", 1e-6),
+                new BehavioralCurrentSource("C2", "in", "0", "1u*ddt(V(in))"));
+            var tran = new Transient("tran", 1e-6, 0.1);
+
+            var reference = new RealPropertyExport(tran, "C1", "i");
+            var actual = new RealPropertyExport(tran, "C2", "i");
+            tran.ExportSimulationData += (sender, args) =>
+            {
+                Assert.AreEqual(reference.Value, actual.Value, 1e-12);
+            };
+            tran.Run(ckt);
+        }
+
+        [Test]
+        public void When_CapacitorAC_Expect_Reference()
+        {
+            var ckt = new Circuit(
+                new VoltageSource("V1", "in", "0", new Sine(0, 1, 100)),
+                new Capacitor("C1", "in", "0", 1e-6),
+                new BehavioralCurrentSource("C2", "in", "0", "1u*ddt(V(in))"));
+            var ac = new AC("tran", new DecadeSweep(1, 1e6, 2));
+
+            var reference = new ComplexPropertyExport(ac, "C1", "i");
+            var actual = new ComplexPropertyExport(ac, "C2", "i");
+            ac.ExportSimulationData += (sender, args) =>
+            {
+                var r = reference.Value;
+                var a = actual.Value;
+                Assert.AreEqual(r.Real, a.Real, 1e-12);
+                Assert.AreEqual(r.Imaginary, a.Imaginary, 1e-12);
+            };
+            ac.Run(ckt);
+        }
+
         public static IEnumerable<TestCaseData> Op
         {
             get

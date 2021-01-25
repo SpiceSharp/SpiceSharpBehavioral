@@ -1,26 +1,25 @@
 ﻿using SpiceSharp.Algebra;
-using SpiceSharp.ParameterSets;
+using SpiceSharp.Attributes;
 using SpiceSharp.Behaviors;
 using SpiceSharp.Components.BehavioralComponents;
 using SpiceSharp.Components.CommonBehaviors;
 using SpiceSharp.Simulations;
-using SpiceSharpBehavioral.Parsers.Nodes;
-using System;
-using SpiceSharp.Attributes;
-using System.Collections.Generic;
-using System.Linq;
 using SpiceSharpBehavioral.Builders;
 using SpiceSharpBehavioral.Builders.Functions;
+using SpiceSharpBehavioral.Parsers.Nodes;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
+namespace SpiceSharp.Components.BehavioralResistorBehaviors
 {
     /// <summary>
-    /// Biasing behavior for a <see cref="BehavioralVoltageSource"/>.
+    /// Biasing behavior for a <see cref="BehavioralResistor"/>.
     /// </summary>
-    /// <seealso cref="Behavior" />
-    /// <seealso cref="IBiasingBehavior" />
+    /// <seealso cref="Behavior"/>
+    /// <seealso cref="IBiasingBehavior"/>
     /// <seealso cref="IBranchedBehavior{T}"/>
-    [BehaviorFor(typeof(BehavioralVoltageSource), typeof(IBiasingBehavior))]
+    [BehaviorFor(typeof(BehavioralResistor), typeof(IBiasingBehavior))]
     public class BiasingBehavior : Behavior,
         IBiasingBehavior,
         IBranchedBehavior<double>
@@ -61,7 +60,6 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         /// <value>
         /// The voltage.
         /// </value>
-        [ParameterName("v"), ParameterInfo("The instantaneous voltage")]
         public double Voltage { get; private set; }
 
         /// <summary>
@@ -70,7 +68,6 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         /// <value>
         /// The current.
         /// </value>
-        [ParameterName("i"), ParameterName("c"), ParameterInfo("The instantaneous current")]
         public double Current => _branch.Value;
 
         /// <summary>
@@ -78,7 +75,7 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         /// </summary>
         /// <param name="context">The context.</param>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="context"/> is <c>null</c>.</exception>
-        public BiasingBehavior(BehavioralBindingContext context) 
+        public BiasingBehavior(BehavioralBindingContext context)
             : base(context)
         {
             var bp = context.GetParameterSet<Parameters>();
@@ -89,9 +86,11 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
             _branch = state.CreatePrivateVariable(Name.Combine("branch"), Units.Ampere);
 
             // Let's build the derivative functions and get their matrix locations/rhs locations
-            Function = bp.Function;
+            Function = Node.Multiply(Node.Current(Name), bp.Function);
             Derivatives = context.CreateDerivatives(Function);
             DerivativeVariables = Derivatives.Keys.ToDictionary(d => d, d => context.MapNode(state, d, _branch), Derivatives.Comparer);
+            var derivatives = new List<Func<double>>(Derivatives.Count);
+            var derivativeVariables = new List<IVariable<double>>(Derivatives.Count);
             var builder = new RealFunctionBuilder();
             builder.VariableFound += (sender, args) =>
             {
@@ -99,8 +98,6 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
                     args.Variable = variable;
             };
             bp.RegisterBuilder(context, builder);
-            var derivatives = new List<Func<double>>(Derivatives.Count);
-            var derivativeVariables = new List<IVariable<double>>(Derivatives.Count);
             var matLocs = new List<MatrixLocation>(Derivatives.Count);
             var rhsLocs = state.Map[_branch];
             foreach (var pair in Derivatives)
@@ -137,7 +134,9 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         {
             double[] values = new double[_derivatives.Length];
             var total = Voltage = _value();
-            for (var i = 0; i < _derivatives.Length; i++)
+
+            int i;
+            for (i = 0; i < values.Length; i++)
             {
                 var df = _derivatives[i]();
                 total -= _derivativeVariables[i].Value * df;
