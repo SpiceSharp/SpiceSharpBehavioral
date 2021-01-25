@@ -16,7 +16,7 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         /// <value>
         /// The map.
         /// </value>
-        public HashSet<VariableNode> Variables { get; } = new HashSet<VariableNode>();
+        public HashSet<VariableNode> Variables { get; set; }
 
         /// <summary>
         /// Gets or sets derivative definitions.
@@ -27,31 +27,15 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         public Dictionary<string, FunctionRule> FunctionRules { get; set; } = DerivativesHelper.Defaults;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Derivatives"/> class.
-        /// </summary>
-        /// <param name="variables">The variables to which the derivative should be computed.</param>
-        public Derivatives(IEnumerable<VariableNode> variables)
-        {
-            foreach (var variable in variables)
-                Variables.Add(variable);
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Derivatives"/> class.
-        /// </summary>
-        /// <param name="variables">The variables.</param>
-        public Derivatives(params VariableNode[] variables)
-            : this((IEnumerable<VariableNode>)variables)
-        {
-        }
-
-        /// <summary>
         /// Derives the specified node to the variables.
         /// </summary>
         /// <param name="node">The nodes.</param>
         /// <returns>The derived nodes, or <c>null</c> if all derivatives are zero.</returns>
         public virtual Dictionary<VariableNode, Node> Derive(Node node)
         {
+            if (Variables == null)
+                return null;
+
             // We can skip anything that is constant!
             if ((node.Properties & NodeProperties.Constant) != 0)
                 return null;
@@ -60,16 +44,31 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
             switch (node)
             {
                 case UnaryOperatorNode un:
+                    if (un.NodeType == NodeTypes.Not)
+                        return null;
                     a = Derive(un.Argument);
                     switch (un.NodeType)
                     {
                         case NodeTypes.Plus: return Apply(a, n => Node.Plus(n));
                         case NodeTypes.Minus: return Apply(a, n => Node.Minus(n));
-                        case NodeTypes.Not: return null;
                     }
                     break;
 
                 case BinaryOperatorNode bn:
+                    switch (bn.NodeType)
+                    {
+                        case NodeTypes.And:
+                        case NodeTypes.Or:
+                        case NodeTypes.Xor:
+                        case NodeTypes.GreaterThan:
+                        case NodeTypes.GreaterThanOrEqual:
+                        case NodeTypes.LessThan:
+                        case NodeTypes.LessThanOrEqual:
+                        case NodeTypes.Equals:
+                        case NodeTypes.NotEquals:
+                            return null;
+                    }
+
                     a = Derive(bn.Left);
                     b = Derive(bn.Right);
                     switch (bn.NodeType)
@@ -91,13 +90,6 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
                                 n1 => n1,
                                 n2 => n2 * -bn,
                                 (n1, n2) => n1 - n2 * bn);
-                        case NodeTypes.GreaterThan:
-                        case NodeTypes.GreaterThanOrEqual:
-                        case NodeTypes.LessThan:
-                        case NodeTypes.LessThanOrEqual:
-                        case NodeTypes.Equals:
-                        case NodeTypes.NotEquals:
-                            return null;
                     }
                     break;
 
@@ -114,7 +106,7 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
                         return null;
 
                     // Build the derived arguments
-                    var lst = new Dictionary<VariableNode, Node[]>();
+                    var lst = new Dictionary<VariableNode, Node[]>(Variables.Comparer);
                     for (var i = 0; i < fn.Arguments.Count; i++)
                     {
                         var darg = Derive(fn.Arguments[i]);
@@ -139,7 +131,7 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
                     // Give a chance to our function rules
                     if (FunctionRules == null || !FunctionRules.TryGetValue(fn.Name, out var rule))
                         rule = (fn, darg) => ChainRule(fn, darg, "d{0}({1})");
-                    a = new Dictionary<VariableNode, Node>();
+                    a = new Dictionary<VariableNode, Node>(Variables.Comparer);
                     foreach (var pair in lst)
                     {
                         var df = rule(fn, pair.Value);
@@ -153,7 +145,7 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
                 case VariableNode vn:
                     if (Variables.Contains(vn))
                     {
-                        a = new Dictionary<VariableNode, Node>
+                        a = new Dictionary<VariableNode, Node>(Variables.Comparer)
                         {
                             { vn, Node.One }
                         };
@@ -195,11 +187,11 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         /// <param name="argument">The argument.</param>
         /// <param name="func">The function.</param>
         /// <returns></returns>
-        public static Dictionary<VariableNode, Node> Apply(Dictionary<VariableNode, Node> argument, Func<Node, Node> func)
+        public Dictionary<VariableNode, Node> Apply(Dictionary<VariableNode, Node> argument, Func<Node, Node> func)
         {
             if (argument == null)
                 return null;
-            var result = new Dictionary<VariableNode, Node>();
+            var result = new Dictionary<VariableNode, Node>(Variables.Comparer);
             foreach (var pair in argument)
                 result.Add(pair.Key, func(pair.Value));
             return result;
@@ -214,7 +206,7 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         /// <param name="rightOnly">The function called when the right argument is not zero.</param>
         /// <param name="both">The function called when both arguments are not zero.</param>
         /// <returns>The result.</returns>
-        public static Dictionary<VariableNode, Node> Combine(Dictionary<VariableNode, Node> left, Dictionary<VariableNode, Node> right,
+        public Dictionary<VariableNode, Node> Combine(Dictionary<VariableNode, Node> left, Dictionary<VariableNode, Node> right,
             Func<Node, Node> leftOnly, Func<Node, Node> rightOnly, Func<Node, Node, Node> both = null)
         {
             // Deal with special cases
@@ -226,7 +218,7 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
                 return Apply(right, rightOnly);
 
             // General case
-            var result = new Dictionary<VariableNode, Node>();
+            var result = new Dictionary<VariableNode, Node>(Variables.Comparer);
             foreach (var key in left.Keys.Union(right.Keys).Distinct())
             {
                 var hasL = left.TryGetValue(key, out var valueL);

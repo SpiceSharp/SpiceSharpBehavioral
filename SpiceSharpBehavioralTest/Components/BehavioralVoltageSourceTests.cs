@@ -2,6 +2,7 @@
 using SpiceSharp;
 using SpiceSharp.Components;
 using SpiceSharp.Simulations;
+using SpiceSharp.Simulations.IntegrationMethods;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -62,6 +63,87 @@ namespace SpiceSharpBehavioralTest.Components
                 Assert.AreEqual(expected, args.GetVoltage("out"), 1e-12);
             };
             op.Run(ckt);
+        }
+
+        [Test]
+        public void When_TimeDependent_Expect_Reference()
+        {
+            var ckt = new Circuit(
+                new VoltageSource("Vtmp", "a", "0", 0.0), // Needed to have at least one independent source
+                new BehavioralVoltageSource("V1", "in", "0", "5*sin(time*10*pi)"));
+            var tran = new Transient("tran", 1e-3, 1);
+
+            tran.ExportSimulationData += (sender, args) =>
+            {
+                Assert.AreEqual(5 * Math.Sin(args.Time * 10 * Math.PI), args.GetVoltage("in"), 1e-9);
+            };
+            tran.Run(ckt);
+        }
+
+        [Test]
+        public void When_DerivativeTransient_Expect_Reference()
+        {
+            var ckt = new Circuit(
+                new VoltageSource("Vtmp", "a", "0", new Sine(0, 1, 100)),
+                new Capacitor("C1", "a", "0", 1.0), // this will derive the variable
+                new BehavioralVoltageSource("V1", "in", "0", "ddt(V(a))"));
+            var tran = new Transient("tran", 1e-3, 0.1);
+
+            var expectedExport = new RealCurrentExport(tran, "Vtmp");
+            var actualExport = new RealVoltageExport(tran, "in");
+            tran.ExportSimulationData += (sender, args) =>
+            {
+                if (args.Time > 0)
+                {
+                    var expected = expectedExport.Value;
+                    var actual = -actualExport.Value;
+                    Assert.AreEqual(expected, actual, 1e-9);
+                }
+            };
+            tran.Run(ckt);
+        }
+
+        [Test]
+        public void When_IntegrateTransient_Expect_Reference()
+        {
+            var ckt = new Circuit(
+                new CurrentSource("Itmp", "a", "0", new Sine(0, 1, 100)),
+                new Capacitor("C1", "a", "0", 1.0), // this will integrate the variable
+                new VoltageSource("Vtmp", "b", "0", new Sine(0, 1, 100)),
+                new BehavioralVoltageSource("V1", "in", "0", "idt(V(b))"));
+            var tran = new Transient("tran", 1e-3, 0.1);
+            tran.TimeParameters.InitialConditions["a"] = 0.0;
+
+            var expectedExport = new RealVoltageExport(tran, "a");
+            var actualExport = new RealVoltageExport(tran, "in");
+            tran.ExportSimulationData += (sender, args) =>
+            {
+                if (args.Time > 0)
+                {
+                    var expected = expectedExport.Value;
+                    var actual = -actualExport.Value;
+                    Assert.AreEqual(expected, actual, 1e-9);
+                }
+            };
+            tran.Run(ckt);
+        }
+
+        [Test]
+        public void When_CurrentSourceReference_Expect_Reference()
+        {
+            var ckt = new Circuit(
+                new CurrentSource("I1", "a", "0", new Sine(0, 1, 100)),
+                new Resistor("R1", "a", "0", 1e3),
+                new BehavioralVoltageSource("V1", "b", "0", "I(I1)"));
+            var tran = new Transient("tran", 1e-3, 0.1);
+
+            tran.ExportSimulationData += (sender, args) =>
+            {
+                var expected = Math.Sin(2 * Math.PI * 100 * args.Time);
+                var actual = args.GetVoltage("b");
+                Assert.AreEqual(expected, actual, 1e-9);
+            };
+            tran.Run(ckt);
         }
     }
 

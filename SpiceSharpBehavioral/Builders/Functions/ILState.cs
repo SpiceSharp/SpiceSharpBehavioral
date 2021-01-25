@@ -1,4 +1,5 @@
 ﻿using SpiceSharp;
+using SpiceSharp.Simulations;
 using SpiceSharpBehavioral.Diagnostics;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
@@ -6,19 +7,17 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace SpiceSharpBehavioral.Builders
+namespace SpiceSharpBehavioral.Builders.Functions
 {
     /// <summary>
     /// An instance for building functions.
     /// </summary>
-    public class ILState
+    public abstract class ILState<T> : IILState<T>
     {
-        private static readonly MethodInfo _safeDiv = ((Func<double, double, double, double>)Functions.SafeDivide).GetMethodInfo();
-        private static readonly MethodInfo _power = ((Func<double, double, double>)Functions.Power).GetMethodInfo();
-        private static readonly MethodInfo _equals = ((Func<double, double, double, double, bool>)Functions.Equals).GetMethodInfo();
-        private static readonly MethodInfo _invoke0 = typeof(Func<double>).GetTypeInfo().GetMethod("Invoke");
-        private static readonly MethodInfo _invoke1 = typeof(Func<double, double>).GetTypeInfo().GetMethod("Invoke");
-        private static readonly MethodInfo _invoke2 = typeof(Func<double, double, double>).GetTypeInfo().GetMethod("Invoke");
+        private static readonly MethodInfo _invoke0 = typeof(Func<T>).GetTypeInfo().GetMethod("Invoke");
+        private static readonly MethodInfo _invoke1 = typeof(Func<T, T>).GetTypeInfo().GetMethod("Invoke");
+        private static readonly MethodInfo _invoke2 = typeof(Func<T, T, T>).GetTypeInfo().GetMethod("Invoke");
+
         private readonly DynamicMethod _method;
         private readonly Dictionary<object, int> _referenceMap = new Dictionary<object, int>();
 
@@ -28,7 +27,7 @@ namespace SpiceSharpBehavioral.Builders
         /// <value>
         /// The builder.
         /// </value>
-        public FunctionBuilder Builder { get; }
+        public IFunctionBuilder<T> Builder { get; }
 
         /// <summary>
         /// Gets the IL generator.
@@ -39,20 +38,43 @@ namespace SpiceSharpBehavioral.Builders
         public ILGenerator Generator { get; private set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ILState"/> class.
+        /// Occurs when a function was encountered.
         /// </summary>
-        public ILState(FunctionBuilder parent)
+        public event EventHandler<FunctionFoundEventArgs<T>> FunctionFound;
+
+        /// <summary>
+        /// Occurs when a variable was encountered.
+        /// </summary>
+        public event EventHandler<VariableFoundEventArgs<T>> VariableFound;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ILState{T}"/> class.
+        /// </summary>
+        /// <param name="parent">The parent function builder.</param>
+        protected ILState(IFunctionBuilder<T> parent)
         {
             Builder = parent.ThrowIfNull(nameof(parent));
-            _method = new DynamicMethod("function", typeof(double), new[] { typeof(object[]) });
+            _method = new DynamicMethod("function", typeof(T), new[] { typeof(object[]) });
             Generator = _method.GetILGenerator();
         }
+
+        /// <summary>
+        /// Call when a function has been encountered.
+        /// </summary>
+        /// <param name="args">The event arguments.</param>
+        protected void OnFunctionFound(FunctionFoundEventArgs<T> args) => FunctionFound?.Invoke(this, args);
+
+        /// <summary>
+        /// Call when a variable has been encountered.
+        /// </summary>
+        /// <param name="args">The event arguments.</param>
+        protected void OnVariableFound(VariableFoundEventArgs<T> args) => VariableFound?.Invoke(this, args);
 
         /// <summary>
         /// Creates the function.
         /// </summary>
         /// <returns>The function.</returns>
-        public Func<double> CreateFunction()
+        public Func<T> CreateFunction()
         {
             Generator.Emit(OpCodes.Ret);
             if (_referenceMap.Count > 0)
@@ -61,91 +83,17 @@ namespace SpiceSharpBehavioral.Builders
                 var context = new object[_referenceMap.Count];
                 foreach (var pair in _referenceMap)
                     context[pair.Value] = pair.Key;
-                return (Func<double>)_method.CreateDelegate(typeof(Func<double>), context);
+                return (Func<T>)_method.CreateDelegate(typeof(Func<T>), context);
             }
             else
-                return (Func<double>)_method.CreateDelegate(typeof(Func<double>));
-        }
-
-        /// <summary>
-        /// Pushes an expression on the stack.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        public void Push(Node node)
-        {
-            switch (node)
-            {
-                case BinaryOperatorNode bn:
-                    Push(bn.Left);
-                    Push(bn.Right);
-
-                    // Execution
-                    switch (bn.NodeType)
-                    {
-                        case NodeTypes.Add: Generator.Emit(OpCodes.Add); return;
-                        case NodeTypes.Subtract: Generator.Emit(OpCodes.Sub); return;
-                        case NodeTypes.Multiply: Generator.Emit(OpCodes.Mul); return;
-                        case NodeTypes.Divide: Generator.Emit(OpCodes.Ldc_R8, Builder.FudgeFactor); Generator.Emit(OpCodes.Call, _safeDiv); return;
-                        case NodeTypes.Modulo: Generator.Emit(OpCodes.Rem); return;
-                        case NodeTypes.GreaterThan: PushCheck(OpCodes.Bgt_S); return;
-                        case NodeTypes.LessThan: PushCheck(OpCodes.Blt_S); return;
-                        case NodeTypes.GreaterThanOrEqual: PushCheck(OpCodes.Bge_S); return;
-                        case NodeTypes.LessThanOrEqual: PushCheck(OpCodes.Ble_S); return;
-                        case NodeTypes.Equals:
-                            Generator.Emit(OpCodes.Ldc_R8, Builder.RelativeTolerance);
-                            Generator.Emit(OpCodes.Ldc_R8, Builder.AbsoluteTolerance);
-                            Generator.Emit(OpCodes.Call, _equals);
-                            PushCheck(OpCodes.Brtrue_S);
-                            return;
-                        case NodeTypes.NotEquals:
-                            Generator.Emit(OpCodes.Ldc_R8, Builder.RelativeTolerance);
-                            Generator.Emit(OpCodes.Ldc_R8, Builder.AbsoluteTolerance);
-                            Generator.Emit(OpCodes.Call, _equals);
-                            PushCheck(OpCodes.Brfalse_S);
-                            return;
-                        case NodeTypes.Pow: Generator.Emit(OpCodes.Call, _power); return;
-                    }
-                    break;
-
-                case ConstantNode cn:
-                    Generator.Emit(OpCodes.Ldc_R8, cn.Literal);
-                    return;
-                
-                case UnaryOperatorNode un:
-                    Push(un.Argument);
-                    switch (un.NodeType)
-                    {
-                        case NodeTypes.Plus: return;
-                        case NodeTypes.Minus: Generator.Emit(OpCodes.Neg); return;
-                    }
-                    break;
-
-                case FunctionNode fn:
-                    if (Builder.FunctionDefinitions != null && Builder.FunctionDefinitions.TryGetValue(fn.Name, out var definition))
-                    {
-                        definition.ThrowIfNull(nameof(definition));
-                        definition.Invoke(this, fn.Arguments);
-                        return;
-                    }
-                    break;
-
-                case VariableNode vn:
-                    if (Builder.Variables != null && Builder.Variables.TryGetValue(vn, out var variable))
-                    {
-                        Call(() => variable.Value);
-                        return;
-                    }
-                    break;
-            }
-
-            throw new Exception("Unrecognized node {0}".FormatString(node));
+                return (Func<T>)_method.CreateDelegate(typeof(Func<T>));
         }
 
         /// <summary>
         /// Pushes the specified index.
         /// </summary>
         /// <param name="index">The index.</param>
-        public void Push(int index)
+        public void PushInt(int index)
         {
             // Set the index in the array
             switch (index)
@@ -165,30 +113,38 @@ namespace SpiceSharpBehavioral.Builders
         }
 
         /// <summary>
-        /// Pushes the specified value.
+        /// Pushes the specified double value.
         /// </summary>
         /// <param name="value">The value.</param>
-        public void Push(double value) => Generator.Emit(OpCodes.Ldc_R8, value);
+        public void PushDouble(double value) => Generator.Emit(OpCodes.Ldc_R8, value);
 
         /// <summary>
-        /// Pushes a check.
+        /// Pushes a value on the stack.
         /// </summary>
-        /// <param name="opCode">The operator code.</param>
-        /// <exception cref="Exception">Thrown if the operator code is invalid.</exception>
-        public void PushCheck(OpCode opCode)
+        /// <param name="value">The value.</param>
+        public abstract void Push(T value);
+
+        /// <inheritdoc/>
+        public void PushCheck(OpCode opCode, Node ifTrue, Node ifFalse)
         {
             // Check the op-code to make sure it can be used here
             if (opCode.OperandType != OperandType.InlineBrTarget && opCode.OperandType != OperandType.ShortInlineBrTarget)
-                throw new Exception("Operation code is invalid");
+                throw new SpiceSharpException("Operation code is invalid");
             var trueLbl = Generator.DefineLabel();
             var exitLbl = Generator.DefineLabel();
             Generator.Emit(opCode, trueLbl);
-            Generator.Emit(OpCodes.Ldc_R8, 0.0);
+            Push(ifFalse);
             Generator.Emit(OpCodes.Br_S, exitLbl);
             Generator.MarkLabel(trueLbl);
-            Generator.Emit(OpCodes.Ldc_R8, 1.0);
+            Push(ifTrue);
             Generator.MarkLabel(exitLbl);
         }
+
+        /// <summary>
+        /// Pushes an expression on the stack.
+        /// </summary>
+        /// <param name="node">The node.</param>
+        public abstract void Push(Node node);
 
         /// <summary>
         /// Calls the specified method where all arguments are doubles.
@@ -206,10 +162,10 @@ namespace SpiceSharpBehavioral.Builders
                     index = _referenceMap.Count;
                     _referenceMap.Add(target, index);
                 }
-
+                
                 // Add the target
                 Generator.Emit(OpCodes.Ldarg_0);
-                Push(index);
+                PushInt(index);
                 Generator.Emit(OpCodes.Ldelem_Ref);
                 Generator.Emit(OpCodes.Castclass, target.GetType());
             }
@@ -232,7 +188,7 @@ namespace SpiceSharpBehavioral.Builders
         /// Calls the specified function.
         /// </summary>
         /// <param name="function">The function.</param>
-        public void Call(Func<double> function)
+        public void Call(Func<T> function)
         {
             if (function.Target == null)
                 Call(null, function.GetMethodInfo(), null);
@@ -246,7 +202,7 @@ namespace SpiceSharpBehavioral.Builders
         /// <param name="function">The function.</param>
         /// <param name="args">The arguments.</param>
         /// <exception cref="ArgumentMismatchException">Thrown if there isn't one argument.</exception>
-        public void Call(Func<double, double> function, IReadOnlyList<Node> args)
+        public void Call(Func<T, T> function, IReadOnlyList<Node> args)
         {
             if (args == null || args.Count != 1)
                 throw new ArgumentMismatchException(1, args?.Count ?? 0);
@@ -254,7 +210,6 @@ namespace SpiceSharpBehavioral.Builders
                 Call(null, function.GetMethodInfo(), args);
             else
                 Call(function, _invoke1, args);
-
         }
 
         /// <summary>
@@ -263,7 +218,7 @@ namespace SpiceSharpBehavioral.Builders
         /// <param name="function">The function.</param>
         /// <param name="args">The arguments.</param>
         /// <exception cref="ArgumentMismatchException">Thrown if there aren't two arguments.</exception>
-        public void Call(Func<double, double, double> function, IReadOnlyList<Node> args)
+        public void Call(Func<T, T, T> function, IReadOnlyList<Node> args)
         {
             if (args == null || args.Count != 2)
                 throw new ArgumentMismatchException(2, args?.Count ?? 0);

@@ -3,13 +3,15 @@ using SpiceSharpBehavioral.Diagnostics;
 using System;
 using System.Collections.Generic;
 
-namespace SpiceSharpBehavioral.Builders
+namespace SpiceSharpBehavioral.Builders.Direct
 {
     /// <summary>
-    /// Helper methods for a <see cref="DoubleBuilder"/>.
+    /// Helper methods for a <see cref="RealBuilder"/>.
     /// </summary>
-    public static class DoubleBuilderHelper
+    public static class RealBuilderHelper
     {
+        private static readonly Random _rnd = new Random();
+
         /// <summary>
         /// A set of default functions.
         /// </summary>
@@ -18,8 +20,10 @@ namespace SpiceSharpBehavioral.Builders
             { "abs", Abs },
             { "sgn", Sgn },
             { "sqrt", Sqrt },
+            { "pow", Pow },
             { "pwr", Pwr },
-            { "log", Log },
+            { "pwrs", Pwrs },
+            { "log", Log }, { "ln", Log },
             { "log10", Log10 },
             { "exp", Exp },
             { "sin", Sin },
@@ -28,9 +32,9 @@ namespace SpiceSharpBehavioral.Builders
             { "sinh", Sinh },
             { "cosh", Cosh },
             { "tanh", Tanh },
-            { "asin", Asin },
-            { "acos", Acos },
-            { "atan", Atan },
+            { "asin", Asin }, { "arcsin", Asin },
+            { "acos", Acos }, { "arccos", Acos },
+            { "atan", Atan }, { "arctan", Atan },
             { "u", U },
             { "u2", U2 },
             { "uramp", URamp },
@@ -39,9 +43,15 @@ namespace SpiceSharpBehavioral.Builders
             { "nint", Nint },
             { "round", Round },
             { "square", Square },
-            { "pwl", Pwl },
+            { "pwl", Pwl }, { "dpwl(0)", PwlDerivative },
+            { "table", Pwl }, { "dtable(0)", PwlDerivative },
+            { "tbl", Pwl }, { "dtbl(0)", PwlDerivative },
             { "min", Min },
             { "max", Max },
+            { "atan2", Atan2 },
+            { "hypot", Hypot },
+            { "rnd", Random }, { "rand", Random },
+            { "if", If }
         };
 
         private static double[] Check(this double[] args, int expected)
@@ -54,21 +64,35 @@ namespace SpiceSharpBehavioral.Builders
         /// <summary>
         /// Registers the default functions.
         /// </summary>
-        /// <param name="definitions">The definitions.</param>
-        public static void RegisterDefaultFunctions(this Dictionary<string, Func<double[], double>> definitions)
+        /// <param name="builder">The builder.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="builder"/> is <c>null</c>.</exception>
+        public static void RegisterDefaultFunctions(this IDirectBuilder<double> builder)
         {
-            definitions.ThrowIfNull(nameof(definitions));
-            foreach (var pair in Defaults)
-                definitions.Add(pair.Key, pair.Value);
+            builder.ThrowIfNull(nameof(builder));
+            builder.FunctionFound += OnFunctionFound;
         }
 
-        private static double Zero(double[] args) => 0.0;
+        private static void OnFunctionFound(object sender, FunctionFoundEventArgs<double> args)
+        {
+            if (!args.Created && Defaults.TryGetValue(args.Function.Name, out var definition))
+            {
+                var arguments = new double[args.Function.Arguments.Count];
+                for (var i = 0; i < arguments.Length; i++)
+                    arguments[i] = args.Builder.Build(args.Function.Arguments[i]);
+                args.Result = definition(arguments);
+            }
+        }
+
+        // No-argument functions
+        private static double Random(double[] args) { args.Check(0); return _rnd.NextDouble(); }
+
+        // One-argument functions
         private static double Abs(double[] args) => Math.Abs(args.Check(1)[0]);
         private static double Sgn(double[] args) => Math.Sign(args.Check(1)[0]);
-        private static double Sqrt(double[] args) => Functions.Sqrt(args.Check(1)[0]);
-        private static double URamp(double[] args) => Functions.Ramp(args.Check(1)[0]);
-        private static double U(double[] args) => Functions.Step(args.Check(1)[0]);
-        private static double U2(double[] args) => Functions.Step2(args.Check(1)[0]);
+        private static double Sqrt(double[] args) => HelperFunctions.Sqrt(args.Check(1)[0]);
+        private static double URamp(double[] args) => HelperFunctions.Ramp(args.Check(1)[0]);
+        private static double U(double[] args) => HelperFunctions.Step(args.Check(1)[0]);
+        private static double U2(double[] args) => HelperFunctions.Step2(args.Check(1)[0]);
         private static double Sin(double[] args) => Math.Sin(args.Check(1)[0]);
         private static double Cos(double[] args) => Math.Cos(args.Check(1)[0]);
         private static double Tan(double[] args) => Math.Tan(args.Check(1)[0]);
@@ -81,16 +105,23 @@ namespace SpiceSharpBehavioral.Builders
         private static double Ceil(double[] args) => Math.Ceiling(args.Check(1)[0]);
         private static double Floor(double[] args) => Math.Floor(args.Check(1)[0]);
         private static double Exp(double[] args) => Math.Exp(args.Check(1)[0]);
-        private static double Log(double[] args) => Functions.Log(args.Check(1)[0]);
-        private static double Log10(double[] args) => Functions.Log10(args.Check(1)[0]);
+        private static double Log(double[] args) => HelperFunctions.Log(args.Check(1)[0]);
+        private static double Log10(double[] args) => HelperFunctions.Log10(args.Check(1)[0]);
         private static double Square(double[] args) { var x = args.Check(1)[0]; return x * x; }
         private static double Nint(double[] args) => Math.Round(args.Check(1)[0], 0);
 
         // Two-argument functions
-        private static double Pwr(double[] args) { args.Check(2); return Functions.Power2(args[0], args[1]); }
+        private static double Pow(double[] args) { args.Check(2); return Math.Pow(args[0], args[1]); }
+        private static double Pwr(double[] args) { args.Check(2); return HelperFunctions.Power(args[0], args[1]); }
+        private static double Pwrs(double[] args) { args.Check(2); return HelperFunctions.Power2(args[0], args[1]); }
         private static double Min(double[] args) { args.Check(2); return Math.Min(args[0], args[1]); }
         private static double Max(double[] args) { args.Check(2); return Math.Max(args[0], args[1]); }
         private static double Round(double[] args) { args.Check(2); return Math.Round(args[0], (int)args[1]); }
+        private static double Atan2(double[] args) { args.Check(2); return Math.Atan2(args[0], args[1]); }
+        private static double Hypot(double[] args) { args.Check(2); return HelperFunctions.Hypot(args[0], args[1]); }
+
+        // Three-argument functions
+        private static double If(double[] args) { args.Check(3); return args[0] > 0.5 ? args[1] : args[2]; }
 
         // N-argument functions
         private static double Pwl(double[] args)
@@ -104,7 +135,7 @@ namespace SpiceSharpBehavioral.Builders
             var data = new Point[points];
             for (var i = 0; i < points; i++)
                 data[i] = new Point(args[i * 2 + 1], args[i * 2 + 2]);
-            return Functions.Pwl(args[0], data);
+            return HelperFunctions.Pwl(args[0], data);
         }
         private static double PwlDerivative(double[] args)
         {
@@ -117,7 +148,7 @@ namespace SpiceSharpBehavioral.Builders
             var data = new Point[points];
             for (var i = 0; i < points; i++)
                 data[i] = new Point(args[i * 2 + 1], args[i * 2 + 2]);
-            return Functions.PwlDerivative(args[0], data);
+            return HelperFunctions.PwlDerivative(args[0], data);
         }
     }
 }

@@ -1,11 +1,15 @@
 ﻿using SpiceSharp.ParameterSets;
 using SpiceSharp.Simulations;
+using SpiceSharp.Simulations.Variables;
+using SpiceSharpBehavioral;
 using SpiceSharpBehavioral.Builders;
+using SpiceSharpBehavioral.Builders.Functions;
 using SpiceSharpBehavioral.Parsers;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 
 namespace SpiceSharp.Components.BehavioralComponents
 {
@@ -42,21 +46,13 @@ namespace SpiceSharp.Components.BehavioralComponents
         /// </value>
         public IEnumerable<VariableNode> VariableNodes => _nodeFinder.Build(Function);
 
-
         /// <summary>
-        /// Gets the default builder for building expressions.
+        /// Gets or sets the variable comparer.
         /// </summary>
         /// <value>
-        /// The default builder.
+        /// The variable comparer.
         /// </value>
-        public static IBuilder<Func<double>> DefaultBuilderFactory(Dictionary<VariableNode, IVariable<double>> variables)
-        {
-            return new FunctionBuilder()
-            {
-                FunctionDefinitions = FunctionBuilderHelper.Defaults,
-                Variables = variables
-            };
-        }
+        public IEqualityComparer<string> VariableComparer { get; set; } = StringComparer.OrdinalIgnoreCase;
 
         /// <summary>
         /// Gets or sets the expression.
@@ -119,18 +115,38 @@ namespace SpiceSharp.Components.BehavioralComponents
         private Func<string, Node> _parseAction = e => new Parser().Parse(e);
 
         /// <summary>
-        /// Gets or sets the builder factory.
+        /// Occurs when a builder has been created that uses real values.
         /// </summary>
-        /// <value>
-        /// The builder factory.
-        /// </value>
-        public BuilderFactoryMethod BuilderFactory { get; set; } = DefaultBuilderFactory;
+        public event EventHandler<BuilderCreatedEventArgs<double>> RealBuilderCreated;
 
         /// <summary>
-        /// A delegate for creating an <see cref="IBuilder{T}"/>.
+        /// Occurs when a builder has been created that uses complex values.
         /// </summary>
-        /// <param name="variables">The variables.</param>
-        /// <returns>The value.</returns>
-        public delegate IBuilder<Func<double>> BuilderFactoryMethod(Dictionary<VariableNode, IVariable<double>> variables);
+        public event EventHandler<BuilderCreatedEventArgs<Complex>> ComplexBuilderCreated;
+
+        /// <summary>
+        /// Registers a new function builder.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <param name="builder">The builder.</param>
+        public void RegisterBuilder(IComponentBindingContext context, IFunctionBuilder<double> builder) 
+            => RealBuilderCreated?.Invoke(this, new BuilderCreatedEventArgs<double>(context, builder));
+
+        /// <summary>
+        /// Register a new function builder.
+        /// </summary>
+        /// <param name="context">The context.</param>
+        /// <param name="builder">The builder.</param>
+        public void RegisterBuilder(IComponentBindingContext context, IFunctionBuilder<Complex> builder)
+            => ComplexBuilderCreated?.Invoke(this, new BuilderCreatedEventArgs<Complex>(context, builder));
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Parameters"/> class.
+        /// </summary>
+        public Parameters()
+        {
+            RealBuilderCreated += BuilderHelper.RegisterDefaultBuilder;
+            ComplexBuilderCreated += BuilderHelper.RegisterDefaultBuilder;
+        }
     }
 }

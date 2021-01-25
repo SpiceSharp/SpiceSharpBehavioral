@@ -55,6 +55,10 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         public static BinaryOperatorNode Or(Node left, Node right) => BinaryOperatorNode.Or(left, right);
 
         /// <include file='docs.xml' path='docs/members/Binary/*'/>
+        /// <include file='docs.xml' path='docs/members/Xor/*'/>
+        public static BinaryOperatorNode Xor(Node left, Node right) => BinaryOperatorNode.Xor(left, right);
+
+        /// <include file='docs.xml' path='docs/members/Binary/*'/>
         /// <include file='docs.xml' path='docs/members/Equals/*'/>
         public static BinaryOperatorNode Equals(Node left, Node right) => BinaryOperatorNode.Equals(left, right);
 
