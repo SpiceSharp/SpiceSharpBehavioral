@@ -41,6 +41,7 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
             { "round", Zero },
             { "square", (f, da) => Node.Two * da.Check(1)[0] * f.Arguments[0] },
             { "ddt", (f, da) => Node.Function("ddt_slope", new[] { da.Check(1)[0] }) },
+            { "idt", (f, da) => Node.Function("idt_slope", new[] { da.Check(1)[0] }) }
         };
 
         private static IReadOnlyList<Node> Check(this IReadOnlyList<Node> arguments, int expected)

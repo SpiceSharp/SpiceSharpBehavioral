@@ -50,7 +50,7 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
                 state.GetSharedVariable(context.Nodes[1]));
 
             // Build the functions
-            _derivatives = new Func<Complex>[Derivatives.Count];
+            var derivatives = new List<Func<Complex>>(Derivatives.Count);
             var builder = new ComplexFunctionBuilder();
             builder.VariableFound += (sender, args) =>
             {
@@ -59,19 +59,21 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
             };
             bp.RegisterBuilder(context, builder);
             var rhsLocs = _variables.GetRhsIndices(state.Map);
-            var matLocs = new MatrixLocation[Derivatives.Count * 2];
-            int index = 0;
+            var matLocs = new List<MatrixLocation>(Derivatives.Count * 2);
             foreach (var pair in Derivatives)
             {
-                _derivatives[index] = builder.Build(pair.Value);
                 var variable = context.MapNode(state, pair.Key);
-                matLocs[index * 2] = new MatrixLocation(rhsLocs[0], state.Map[variable]);
-                matLocs[index * 2 + 1] = new MatrixLocation(rhsLocs[1], state.Map[variable]);
-                index++;
+                if (state.Map.Contains(variable))
+                {
+                    derivatives.Add(builder.Build(pair.Value));
+                    matLocs.Add(new MatrixLocation(rhsLocs[0], state.Map[variable]));
+                    matLocs.Add(new MatrixLocation(rhsLocs[1], state.Map[variable]));
+                }
             }
 
             // Get the matrix elements
-            _elements = new ElementSet<Complex>(state.Solver, matLocs);
+            _derivatives = derivatives.ToArray();
+            _elements = new ElementSet<Complex>(state.Solver, matLocs.ToArray());
         }
 
         /// <summary>

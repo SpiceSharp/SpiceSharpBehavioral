@@ -86,20 +86,22 @@ namespace SpiceSharp.Components.BehavioralResistorBehaviors
                     args.Variable = new FuncVariable<Complex>(variable.Name, () => variable.Value, variable.Unit);
             };
             bp.RegisterBuilder(context, builder);
-            _derivatives = new Func<Complex>[Derivatives.Count];
+            var derivatives = new List<Func<Complex>>(Derivatives.Count);
             var rhsLocs = state.Map[_branch];
-            var matLocs = new MatrixLocation[Derivatives.Count];
-            int index = 0;
+            var matLocs = new List<MatrixLocation>(Derivatives.Count);
             foreach (var pair in Derivatives)
             {
-                _derivatives[index] = builder.Build(pair.Value);
                 var variable = context.MapNode(state, pair.Key, _branch);
-                matLocs[index] = new MatrixLocation(rhsLocs, state.Map[variable]);
-                index++;
+                if (state.Map.Contains(variable))
+                {
+                    derivatives.Add(builder.Build(pair.Value));
+                    matLocs.Add(new MatrixLocation(rhsLocs, state.Map[variable]));
+                }
             }
 
             // Get the matrix elements
-            _elements = new ElementSet<Complex>(state.Solver, matLocs);
+            _derivatives = derivatives.ToArray();
+            _elements = new ElementSet<Complex>(state.Solver, matLocs.ToArray());
             int br = state.Map[_branch];
             int pos = state.Map[_variables.Positive];
             int neg = state.Map[_variables.Negative];

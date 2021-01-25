@@ -43,6 +43,8 @@ namespace SpiceSharp.Components.BehavioralComponents
             // Time variable
             if (context.TryGetState<IIntegrationMethod>(out var method))
             {
+                var time = context.GetState<ITimeSimulationState>();
+
                 // Time variable
                 variables.Add("time", new FuncVariable<double>("time", () => method.Time, _seconds));
 
@@ -59,8 +61,22 @@ namespace SpiceSharp.Components.BehavioralComponents
                             args.ILState.Call(value =>
                             {
                                 derivative.Value = value;
-                                derivative.Integrate();
+                                derivative.Derive();
                                 return derivative.Derivative;
+                            }, args.Function.Arguments);
+                            args.Created = true;
+                        }
+                        else if (comparer.Equals("idt", args.Function.Name))
+                        {
+                            var integral = method.CreateIntegral();
+                            args.ILState.Call(value =>
+                            {
+                                // Don't integrate if we're doing DC analysis
+                                if (time.UseDc)
+                                    return integral.Value;
+                                integral.Derivative = value;
+                                integral.Integrate();
+                                return integral.Value;
                             }, args.Function.Arguments);
                             args.Created = true;
                         }
@@ -68,6 +84,16 @@ namespace SpiceSharp.Components.BehavioralComponents
                         else if (comparer.Equals("ddt_slope", args.Function.Name))
                         {
                             args.ILState.Call(value => value * method.Slope, args.Function.Arguments);
+                            args.Created = true;
+                        }
+                        else if (comparer.Equals("idt_slope", args.Function.Name))
+                        {
+                            var config = context.GetSimulationParameterSet<BiasingParameters>();
+                            args.ILState.Call(value => {
+                                if (time.UseDc)
+                                    return 1e12; // This is basically putting a large resistance in parallel...
+                                return value / method.Slope;
+                            }, args.Function.Arguments);
                             args.Created = true;
                         }
                     }
@@ -87,6 +113,16 @@ namespace SpiceSharp.Components.BehavioralComponents
                         if (comparer.Equals("ddt", args.Function.Name) || comparer.Equals("ddt_slope", args.Function.Name))
                         {
                             args.ILState.Push(0.0);
+                            args.Created = true;
+                        }
+                        else if (comparer.Equals("idt", args.Function.Name))
+                        {
+                            args.ILState.Push(0.0);
+                            args.Created = true;
+                        }
+                        else if (comparer.Equals("idt_slope", args.Function.Name))
+                        {
+                            args.ILState.Push(1e-12);
                             args.Created = true;
                         }
                     }
@@ -159,6 +195,11 @@ namespace SpiceSharp.Components.BehavioralComponents
                         if (comparer.Equals("ddt_slope", args.Function.Name))
                         {
                             args.ILState.Call(value => value * cplxState.Laplace, args.Function.Arguments);
+                            args.Created = true;
+                        }
+                        else if (comparer.Equals("idt_slope", args.Function.Name))
+                        {
+                            args.ILState.Call(value => cplxState.Laplace.Imaginary.Equals(0.0) ? double.PositiveInfinity : value / cplxState.Laplace, args.Function.Arguments);
                             args.Created = true;
                         }
                     }

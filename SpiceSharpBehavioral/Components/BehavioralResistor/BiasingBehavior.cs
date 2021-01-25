@@ -89,8 +89,8 @@ namespace SpiceSharp.Components.BehavioralResistorBehaviors
             Function = Node.Multiply(Node.Current(Name), bp.Function);
             Derivatives = context.CreateDerivatives(Function);
             DerivativeVariables = Derivatives.Keys.ToDictionary(d => d, d => context.MapNode(state, d, _branch), Derivatives.Comparer);
-            _derivatives = new Func<double>[Derivatives.Count];
-            _derivativeVariables = new IVariable<double>[Derivatives.Count];
+            var derivatives = new List<Func<double>>(Derivatives.Count);
+            var derivativeVariables = new List<IVariable<double>>(Derivatives.Count);
             var builder = new RealFunctionBuilder();
             builder.VariableFound += (sender, args) =>
             {
@@ -98,21 +98,24 @@ namespace SpiceSharp.Components.BehavioralResistorBehaviors
                     args.Variable = variable;
             };
             bp.RegisterBuilder(context, builder);
-            var matLocs = new MatrixLocation[Derivatives.Count];
+            var matLocs = new List<MatrixLocation>(Derivatives.Count);
             var rhsLocs = state.Map[_branch];
-            int index = 0;
             foreach (var pair in Derivatives)
             {
-                _derivatives[index] = builder.Build(pair.Value);
                 var variable = DerivativeVariables[pair.Key];
-                _derivativeVariables[index] = variable;
-                matLocs[index] = new MatrixLocation(rhsLocs, state.Map[variable]);
-                index++;
+                if (state.Map.Contains(variable))
+                {
+                    derivatives.Add(builder.Build(pair.Value));
+                    derivativeVariables.Add(variable);
+                    matLocs.Add(new MatrixLocation(rhsLocs, state.Map[variable]));
+                }
             }
             _value = builder.Build(Function);
 
             // Get the matrix elements
-            _elements = new ElementSet<double>(state.Solver, matLocs);
+            _derivatives = derivatives.ToArray();
+            _derivativeVariables = derivativeVariables.ToArray();
+            _elements = new ElementSet<double>(state.Solver, matLocs.ToArray());
             int br = state.Map[_branch];
             int pos = state.Map[_variables.Positive];
             int neg = state.Map[_variables.Negative];

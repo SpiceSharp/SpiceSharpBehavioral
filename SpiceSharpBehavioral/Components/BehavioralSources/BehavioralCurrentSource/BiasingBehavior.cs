@@ -80,8 +80,8 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
             Function = bp.Function;
             Derivatives = context.CreateDerivatives(Function);
             DerivativeVariables = Derivatives.Keys.ToDictionary(d => d, d => context.MapNode(state, d), Derivatives.Comparer);
-            _derivatives = new Func<double>[Derivatives.Count];
-            _derivativeVariables = new IVariable<double>[Derivatives.Count];
+            var derivatives = new List<Func<double>>(Derivatives.Count);
+            var derivativeVariables = new List<IVariable<double>>(Derivatives.Count);
             var builder = new RealFunctionBuilder();
             builder.VariableFound += (sender, args) =>
             {
@@ -89,22 +89,25 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
                     args.Variable = variable;
             };
             bp.RegisterBuilder(context, builder);
-            var matLocs = new MatrixLocation[Derivatives.Count * 2];
+            var matLocs = new List<MatrixLocation>(Derivatives.Count * 2);
             var rhsLocs = _variables.GetRhsIndices(state.Map);
-            int index = 0;
             foreach (var pair in Derivatives)
             {
-                _derivatives[index] = builder.Build(pair.Value);
                 var variable = DerivativeVariables[pair.Key];
-                _derivativeVariables[index] = variable;
-                matLocs[index * 2] = new MatrixLocation(rhsLocs[0], state.Map[variable]);
-                matLocs[index * 2 + 1] = new MatrixLocation(rhsLocs[1], state.Map[variable]);
-                index++;
+                if (state.Map.Contains(variable))
+                {
+                    derivatives.Add(builder.Build(pair.Value));
+                    derivativeVariables.Add(variable);
+                    matLocs.Add(new MatrixLocation(rhsLocs[0], state.Map[variable]));
+                    matLocs.Add(new MatrixLocation(rhsLocs[1], state.Map[variable]));
+                }
             }
             _value = builder.Build(Function);
+            _derivatives = derivatives.ToArray();
+            _derivativeVariables = derivativeVariables.ToArray();
 
             // Get the matrix elements
-            _elements = new ElementSet<double>(state.Solver, matLocs, rhsLocs);
+            _elements = new ElementSet<double>(state.Solver, matLocs.ToArray(), rhsLocs);
         }
 
         /// <summary>

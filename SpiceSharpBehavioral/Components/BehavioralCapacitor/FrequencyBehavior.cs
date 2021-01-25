@@ -69,8 +69,8 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
                 _state.GetSharedVariable(context.Nodes[0]),
                 _state.GetSharedVariable(context.Nodes[1]));
 
-            _derivatives = new Func<Complex>[Derivatives.Count];
-            _derivativeVariables = new IVariable<Complex>[Derivatives.Count];
+            var derivatives = new List<Func<Complex>>(Derivatives.Count);
+            var derivativeVariables = new List<IVariable<Complex>>(Derivatives.Count);
             var builder = new ComplexFunctionBuilder();
             builder.VariableFound += (sender, args) =>
             {
@@ -78,19 +78,22 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
                     args.Variable = new FuncVariable<Complex>(variable.Name, () => variable.Value, variable.Unit);
             };
             bp.RegisterBuilder(context, builder);
-            var matLocs = new MatrixLocation[Derivatives.Count * 2];
+            var matLocs = new List<MatrixLocation>(Derivatives.Count * 2);
             var rhsLocs = _variables.GetRhsIndices(_state.Map);
-            int index = 0;
             foreach (var pair in Derivatives)
             {
-                _derivatives[index] = builder.Build(pair.Value);
                 var variable = context.MapNode(_state, pair.Key);
-                _derivativeVariables[index] = variable;
-                matLocs[index * 2] = new MatrixLocation(rhsLocs[0], _state.Map[variable]);
-                matLocs[index * 2 + 1] = new MatrixLocation(rhsLocs[1], _state.Map[variable]);
-                index++;
+                if (_state.Map.Contains(variable))
+                {
+                    derivatives.Add(builder.Build(pair.Value));
+                    derivativeVariables.Add(variable);
+                    matLocs.Add(new MatrixLocation(rhsLocs[0], _state.Map[variable]));
+                    matLocs.Add(new MatrixLocation(rhsLocs[1], _state.Map[variable]));
+                }
             }
-            _elements = new ElementSet<Complex>(_state.Solver, matLocs);
+            _derivatives = derivatives.ToArray();
+            _derivativeVariables = derivativeVariables.ToArray();
+            _elements = new ElementSet<Complex>(_state.Solver, matLocs.ToArray());
         }
 
         /// <summary>

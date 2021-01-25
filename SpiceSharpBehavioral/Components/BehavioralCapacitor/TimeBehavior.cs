@@ -7,6 +7,7 @@ using SpiceSharp.Simulations;
 using SpiceSharpBehavioral.Builders;
 using SpiceSharpBehavioral.Builders.Functions;
 using System;
+using System.Collections.Generic;
 
 namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
 {
@@ -48,8 +49,8 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
             _method = context.GetState<IIntegrationMethod>();
             _time = context.GetState<ITimeSimulationState>();
 
-            _derivatives = new Func<double>[Derivatives.Count];
-            _derivativeVariables = new IVariable<double>[Derivatives.Count];
+            var derivatives = new List<Func<double>>(Derivatives.Count);
+            var derivativeVariables = new List<IVariable<double>>(Derivatives.Count);
             var builder = new RealFunctionBuilder();
             builder.VariableFound += (sender, args) =>
             {
@@ -57,22 +58,25 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
                     args.Variable = variable;
             };
             bp.RegisterBuilder(context, builder);
-            var matLocs = new MatrixLocation[Derivatives.Count * 2];
+            var matLocs = new List<MatrixLocation>(Derivatives.Count * 2);
             var rhsLocs = Variables.GetRhsIndices(state.Map);
-            int index = 0;
             foreach (var pair in Derivatives)
             {
-                _derivatives[index] = builder.Build(pair.Value);
                 var variable = DerivativeVariables[pair.Key];
-                _derivativeVariables[index] = variable;
-                matLocs[index * 2] = new MatrixLocation(rhsLocs[0], state.Map[variable]);
-                matLocs[index * 2 + 1] = new MatrixLocation(rhsLocs[1], state.Map[variable]);
-                index++;
+                if (state.Map.Contains(variable))
+                {
+                    derivatives.Add(builder.Build(pair.Value));
+                    derivativeVariables.Add(variable);
+                    matLocs.Add(new MatrixLocation(rhsLocs[0], state.Map[variable]));
+                    matLocs.Add(new MatrixLocation(rhsLocs[1], state.Map[variable]));
+                }
             }
             _value = builder.Build(Function);
+            _derivatives = derivatives.ToArray();
+            _derivativeVariables = derivativeVariables.ToArray();
 
             // Get the matrix elements
-            _elements = new ElementSet<double>(state.Solver, matLocs, rhsLocs);
+            _elements = new ElementSet<double>(state.Solver, matLocs.ToArray(), rhsLocs);
 
             // Create the derivative
             _qcap = _method.CreateDerivative();
@@ -95,7 +99,7 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
                 return;
 
             _qcap.Value = _value();
-            _qcap.Integrate();
+            _qcap.Derive();
             var current = _qcap.Derivative;
 
             // _qcap.Derivative is the current as integrated by the current integration method

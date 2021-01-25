@@ -67,7 +67,7 @@
 
   <ItemGroup>
 	<PackageReference Include="SpiceSharp">
-	  <Version>3.0.3</Version>
+	  <Version>3.0.4</Version>
 	</PackageReference>
 	<PackageReference Include="System.Reflection.Emit.Lightweight">
 	  <Version>4.7.0</Version>

@@ -1,5 +1,6 @@
 ﻿using SpiceSharp.Algebra;
 using SpiceSharp.Behaviors;
+using SpiceSharp.Components.CommonBehaviors;
 using SpiceSharp.Simulations;
 using SpiceSharpBehavioral;
 using SpiceSharpBehavioral.Builders;
@@ -88,8 +89,20 @@ namespace SpiceSharp.Components.BehavioralComponents
                             throw new SpiceSharpException($"The behavior for {Entity.Name} does not define a branch current.");
                         return ownBranch;
                     }
+                    else if (container.TryGetValue<IBranchedBehavior<T>>(out var branched))
+                        return branched.Branch;
+                    else if (typeof(T) == typeof(double) && container.TryGetValue(out IBiasingBehavior tmpb) && tmpb is CurrentSources.Biasing biasing)
+                    {
+                        var result = new FuncVariable<double>($"I({biasing.Name})", () => biasing.Current, Units.Ampere);
+                        return result as IVariable<T>;
+                    }
+                    else if (typeof(T) == typeof(Complex) && container.TryGetValue(out IFrequencyBehavior tmpf) && tmpf is CurrentSources.Frequency frequency)
+                    {
+                        var result = new FuncVariable<Complex>($"I({frequency.Name})", () => frequency.ComplexCurrent, Units.Ampere);
+                        return result as IVariable<T>;
+                    }
                     else
-                        return container.GetValue<IBranchedBehavior<T>>().Branch;
+                        goto default;
 
                 default:
                     throw new SpiceSharpException($"Could not determine the variable {node.Name}");
