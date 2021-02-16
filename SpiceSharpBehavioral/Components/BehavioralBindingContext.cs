@@ -100,8 +100,11 @@ namespace SpiceSharp.Components.BehavioralComponents
                     {
                         var result = new FuncVariable<Complex>($"I({frequency.Name})", () => frequency.ComplexCurrent, Units.Ampere);
                         return result as IVariable<T>;
-                    }
-                    else
+                    }else if (typeof(T) == typeof(double) && container.TryGetValue(out IBiasingBehavior tmprb) && tmprb is Resistors.Biasing rbiasing)
+                    {
+                        var result = new FuncVariable<double>($"I({rbiasing.Name})", () => rbiasing.Current, Units.Ampere);
+                        return result as IVariable<T>;
+                    }else
                         goto default;
 
                 default:
