@@ -57,6 +57,8 @@ namespace SpiceSharpBehavioralTest.Builders
                 yield return new TestCaseData(Node.Function("abs", Node.Add(Node.Multiply(Node.Minus(2.0), 6.0), 7.0)), 5.0).SetName("{m}(abs -2*6+7)");
                 yield return new TestCaseData(Node.Function("min", Node.Minus(2.0), Node.Multiply(6.0, 2.0)), -2.0).SetName("{m}(min -2, 6*2)");
                 yield return new TestCaseData(Node.Function("pwl", 2.0, 0.0, 1.0, 3.0, 4.0), 3.0).SetName("{m}(pwl 2,0,1,3,4)");
+                yield return new TestCaseData(Node.Function("pwl", -1.0, 0.0, 1.0, 3.0, 4.0), 1.0).SetName("{m}(pwl -1,0,1,3,4)");
+                yield return new TestCaseData(Node.Function("pwl", 4.0, 0.0, 1.0, 3.0, 4.0), 4.0).SetName("{m}(pwl 4,0,1,3,4)");
                 yield return new TestCaseData(Node.Function("table", 2.0, 0.0, 1.0, 3.0, 4.0), 3.0).SetName("{m}(table 2,0,1,3,4)");
                 yield return new TestCaseData(Node.Function("tbl", 2.0, 0.0, 1.0, 3.0, 4.0), 3.0).SetName("{m}(tbl 2,0,1,3,4)");
                 yield return new TestCaseData(Node.Function("if", 1.0, 0.25, 0.75), 0.25).SetName("{m}(if 1 0.25 0.75)");
