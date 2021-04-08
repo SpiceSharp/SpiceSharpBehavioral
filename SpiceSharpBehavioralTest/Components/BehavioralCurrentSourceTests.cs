@@ -67,6 +67,23 @@ namespace SpiceSharpBehavioralTest.Components
         }
 
         [Test]
+        public void When_DifferentialVoltage_Expect_Reference()
+        {
+            var ckt = new Circuit(
+                new VoltageSource("V1", "a", "0", new Sine(0, 1, 100)),
+                new VoltageSource("V2", "b", "0", new Sine(0, 2, 65)),
+                new BehavioralCurrentSource("I1", "0", "out", "V(a,b)/2"),
+                new Resistor("R1", "out", "0", 1));
+
+            var tran = new Transient("tran", 1e-6, 1e-3);
+            tran.ExportSimulationData += (sender, args) =>
+            {
+                Assert.AreEqual(0.5 * (args.GetVoltage("a") - args.GetVoltage("b")), args.GetVoltage("out"), 1e-12);
+            };
+            tran.Run(ckt);
+        }
+
+        [Test]
         public void When_CapacitorTransient_Expect_Reference()
         {
             var ckt = new Circuit(
