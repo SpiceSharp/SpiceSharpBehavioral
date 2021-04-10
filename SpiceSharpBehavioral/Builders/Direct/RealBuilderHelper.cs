@@ -11,12 +11,12 @@ namespace SpiceSharpBehavioral.Builders.Direct
     public static class RealBuilderHelper
     {
         // Random generator
-        private static readonly Random _rnd = new();
+        private static readonly Random _rnd = new Random();
 
         /// <summary>
         /// A set of default functions.
         /// </summary>
-        public static readonly Dictionary<string, Func<double[], double>> Defaults = new()
+        public static readonly Dictionary<string, Func<double[], double>> Defaults = new Dictionary<string, Func<double[], double>>()
         {
             { "abs", Abs },
             { "sgn", Sgn },

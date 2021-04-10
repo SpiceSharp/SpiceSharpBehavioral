@@ -83,7 +83,7 @@ namespace SpiceSharpBehavioralTest.Components
             Entry(ckt, "X_entry1", "N1", "0", "N2", a0_entry, b0_entry, density, viscosity, rout_entry, rin_entry, r1_entry1, r2_entry1);
             Entry(ckt, "X_entry2", "N1", "0", "N3", a0_entry, b0_entry, density, viscosity, rout_entry, rin_entry, r1_entry2, r2_entry2);
 
-            OP op = new("op");
+            OP op = new OP("op");
             op.Run(ckt);
 
         }
