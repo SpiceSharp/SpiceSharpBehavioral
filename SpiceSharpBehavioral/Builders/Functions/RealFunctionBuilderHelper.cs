@@ -128,7 +128,7 @@ namespace SpiceSharpBehavioral.Builders.Functions
         private static void Nint(IILState<double> ils, IReadOnlyList<Node> arguments) { ils.Push(arguments.Check(1)[0]); ils.PushInt(0); ils.Generator.Emit(OpCodes.Call, _round); }
 
         // Two-argument functions
-        private static void Pow(IILState<double> ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Pow, arguments);
+        private static void Pow(IILState<double> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Pow, arguments);
         private static void Pwr(IILState<double> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Power, arguments);
         private static void Pwrs(IILState<double> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Power2, arguments);
         private static void Min(IILState<double> ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Min, arguments);

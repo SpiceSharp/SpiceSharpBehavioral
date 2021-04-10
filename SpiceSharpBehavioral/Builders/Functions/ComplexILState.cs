@@ -12,7 +12,7 @@ namespace SpiceSharpBehavioral.Builders.Functions
     /// </summary>
     public class ComplexILState : ILState<Complex>, IILComplexState
     {
-        private static readonly MethodInfo _safeDiv = ((Func<Complex, Complex, double, Complex>)HelperFunctions.SafeDivide).GetMethodInfo();
+        private static readonly MethodInfo _safeDiv = ((Func<Complex, Complex, Complex>)HelperFunctions.SafeDivide).GetMethodInfo();
         private static readonly MethodInfo _equals = ((Func<Complex, Complex, double, double, bool>)HelperFunctions.Equals).GetMethodInfo();
         private static readonly ConstructorInfo _cplx = typeof(Complex).GetTypeInfo().GetConstructor(new[] { typeof(double), typeof(double) });
         private static readonly MethodInfo _realPart = typeof(Complex).GetTypeInfo().GetProperty("Real", typeof(double)).GetGetMethod();
@@ -54,7 +54,6 @@ namespace SpiceSharpBehavioral.Builders.Functions
                         case NodeTypes.Divide:
                             Push(bn.Left);
                             Push(bn.Right);
-                            PushDouble(Builder.FudgeFactor);
                             Generator.Emit(OpCodes.Call, _safeDiv);
                             return;
 

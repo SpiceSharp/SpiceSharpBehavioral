@@ -10,20 +10,24 @@ namespace SpiceSharpBehavioral.Builders
     public static class HelperFunctions
     {
         /// <summary>
+        /// Gets or sets a fudge factor for avoid edge cases (like division by 0).
+        /// </summary>
+        public static double FudgeFactor { get; set; } = 1e-32;
+
+        /// <summary>
         /// Divides two numbers while avoiding division by 0 using a fudge factor.
         /// </summary>
         /// <param name="left">The left argument.</param>
         /// <param name="right">The right argument.</param>
-        /// <param name="fudgeFactor">The fudge factor.</param>
         /// <returns>
         ///     The division.
         /// </returns>
-        public static double SafeDivide(double left, double right, double fudgeFactor)
+        public static double SafeDivide(double left, double right)
         {
             if (right < 0)
-                right -= fudgeFactor;
+                right -= FudgeFactor;
             else
-                right += fudgeFactor;
+                right += FudgeFactor;
             if (right.Equals(0.0))
                 return double.PositiveInfinity;
             return left / right;
@@ -34,18 +38,17 @@ namespace SpiceSharpBehavioral.Builders
         /// </summary>
         /// <param name="left">The left argument.</param>
         /// <param name="right">The right argument.</param>
-        /// <param name="fudgeFactor">The fudge factor.</param>
         /// <returns>
         ///     The division.
         /// </returns>
-        public static Complex SafeDivide(Complex left, Complex right, double fudgeFactor)
+        public static Complex SafeDivide(Complex left, Complex right)
         {
-            if (Math.Abs(right.Imaginary) < fudgeFactor)
+            if (Math.Abs(right.Imaginary).Equals(0.0))
             {
                 if (right.Real < 0)
-                    right -= fudgeFactor;
+                    right -= FudgeFactor;
                 else
-                    right += fudgeFactor;
+                    right += FudgeFactor;
             }
             if (right.Real.Equals(0.0) && right.Imaginary.Equals(0.0))
                 return double.PositiveInfinity;
@@ -82,7 +85,11 @@ namespace SpiceSharpBehavioral.Builders
         /// </returns>
         public static bool Equals(Complex left, Complex right, double relTol, double absTol)
         {
-            if (!Equals(left.Real, right.Real) || !Equals(left.Imaginary, right.Imaginary))
+            var tol = Math.Max(Math.Abs(left.Real), Math.Abs(right.Real)) * relTol + absTol;
+            if (Math.Abs(left.Real - right.Real) > tol)
+                return false;
+            tol = Math.Max(Math.Abs(left.Imaginary), Math.Abs(right.Imaginary)) * relTol + absTol;
+            if (Math.Abs(left.Imaginary - right.Imaginary) > tol)
                 return false;
             return true;
         }
@@ -136,12 +143,30 @@ namespace SpiceSharpBehavioral.Builders
         }
 
         /// <summary>
+        /// Raises a number to a power.
+        /// </summary>
+        /// <param name="left">The left argument.</param>
+        /// <param name="right">The right argument.</param>
+        /// <returns></returns>
+        public static double Pow(double left, double right)
+        {
+            if (left.Equals(0.0) && right <= 0.0)
+                left += FudgeFactor;
+            return Math.Pow(left, right);
+        }
+
+        /// <summary>
         /// Raises a number to a power. The function is made symmetrical. Also known as "pwr".
         /// </summary>
         /// <param name="left">The left argument.</param>
         /// <param name="right">The right argument.</param>
         /// <returns>The result.</returns>
-        public static double Power(double left, double right) => Math.Pow(Math.Abs(left), right);
+        public static double Power(double left, double right)
+        {
+            if (left.Equals(0.0) && right <= 0.0)
+                left += FudgeFactor;
+            return Math.Pow(Math.Abs(left), right);
+        }
 
         /// <summary>
         /// Raises a number to a power. The function is made radially symmetrical. Also known as "pwr".
@@ -162,7 +187,11 @@ namespace SpiceSharpBehavioral.Builders
             if (left < 0)
                 return -Math.Pow(-left, right);
             else
+            {
+                if (left.Equals(0.0) && right < 0.0)
+                    left += FudgeFactor;
                 return Math.Pow(left, right);
+            }
         }
 
         /// <summary>
@@ -178,7 +207,12 @@ namespace SpiceSharpBehavioral.Builders
             if (left.Real < 0)
                 return -Complex.Pow(-left.Real, right);
             else
-                return Complex.Pow(left.Real, right);
+            {
+                double r = left.Real;
+                if (r.Equals(0.0) && right.Real < 0.0)
+                    r += FudgeFactor;
+                return Complex.Pow(r, right);
+            }
         }
 
         /// <summary>

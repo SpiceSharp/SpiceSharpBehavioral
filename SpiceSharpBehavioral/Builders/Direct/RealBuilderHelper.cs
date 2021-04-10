@@ -10,12 +10,13 @@ namespace SpiceSharpBehavioral.Builders.Direct
     /// </summary>
     public static class RealBuilderHelper
     {
-        private static readonly Random _rnd = new Random();
+        // Random generator
+        private static readonly Random _rnd = new();
 
         /// <summary>
         /// A set of default functions.
         /// </summary>
-        public static readonly Dictionary<string, Func<double[], double>> Defaults = new Dictionary<string, Func<double[], double>>
+        public static readonly Dictionary<string, Func<double[], double>> Defaults = new()
         {
             { "abs", Abs },
             { "sgn", Sgn },
@@ -111,7 +112,7 @@ namespace SpiceSharpBehavioral.Builders.Direct
         private static double Nint(double[] args) => Math.Round(args.Check(1)[0], 0);
 
         // Two-argument functions
-        private static double Pow(double[] args) { args.Check(2); return Math.Pow(args[0], args[1]); }
+        private static double Pow(double[] args) { args.Check(2); return HelperFunctions.Pow(args[0], args[1]); }
         private static double Pwr(double[] args) { args.Check(2); return HelperFunctions.Power(args[0], args[1]); }
         private static double Pwrs(double[] args) { args.Check(2); return HelperFunctions.Power2(args[0], args[1]); }
         private static double Min(double[] args) { args.Check(2); return Math.Min(args[0], args[1]); }

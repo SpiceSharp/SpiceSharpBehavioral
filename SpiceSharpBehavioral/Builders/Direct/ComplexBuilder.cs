@@ -20,9 +20,6 @@ namespace SpiceSharpBehavioral.Builders.Direct
         public event EventHandler<VariableFoundEventArgs<Complex>> VariableFound;
 
         /// <inheritdoc/>
-        public double FudgeFactor { get; set; } = 1e-20;
-
-        /// <inheritdoc/>
         public double RelativeTolerance { get; set; } = 1e-6;
 
         /// <inheritdoc/>
@@ -45,7 +42,7 @@ namespace SpiceSharpBehavioral.Builders.Direct
                         case NodeTypes.Add: return Build(bn.Left) + Build(bn.Right);
                         case NodeTypes.Subtract: return Build(bn.Left) - Build(bn.Right);
                         case NodeTypes.Multiply: return Build(bn.Left) * Build(bn.Right);
-                        case NodeTypes.Divide: return HelperFunctions.SafeDivide(Build(bn.Left), Build(bn.Right), FudgeFactor);
+                        case NodeTypes.Divide: return HelperFunctions.SafeDivide(Build(bn.Left), Build(bn.Right));
                         case NodeTypes.Modulo: return Build(bn.Left).Real % Build(bn.Right).Real;
                         case NodeTypes.LessThan: return Build(bn.Left).Real < Build(bn.Right).Real ? 1.0 : 0.0;
                         case NodeTypes.GreaterThan: return Build(bn.Left).Real > Build(bn.Right).Real ? 1.0 : 0.0;
