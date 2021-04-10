@@ -62,6 +62,7 @@
     <Compile Include="Components\BehavioralCurrentSourceTests.cs" />
     <Compile Include="Components\BehavioralResistorTests.cs" />
     <Compile Include="Components\BehavioralVoltageSourceTests.cs" />
+    <Compile Include="Components\MixedTests.cs" />
     <Compile Include="Parsers\DerivativesTests.cs" />
     <Compile Include="Parsers\LexerTests.cs" />
     <Compile Include="Parsers\ParserTests.cs" />

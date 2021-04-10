@@ -13,7 +13,7 @@ namespace SpiceSharpBehavioral.Builders.Functions
     /// </summary>
     public class RealILState : ILState<double>
     {
-        private static readonly MethodInfo _safeDiv = ((Func<double, double, double, double>)HelperFunctions.SafeDivide).GetMethodInfo();
+        private static readonly MethodInfo _safeDiv = ((Func<double, double, double>)HelperFunctions.SafeDivide).GetMethodInfo();
         private static readonly MethodInfo _power = ((Func<double, double, double>)HelperFunctions.Power).GetMethodInfo();
         private static readonly MethodInfo _equals = ((Func<double, double, double, double, bool>)HelperFunctions.Equals).GetMethodInfo();
 
@@ -58,7 +58,6 @@ namespace SpiceSharpBehavioral.Builders.Functions
                         case NodeTypes.Divide:
                             Push(bn.Left);
                             Push(bn.Right);
-                            Push(Builder.FudgeFactor);
                             Generator.Emit(OpCodes.Call, _safeDiv);
                             return;
 
