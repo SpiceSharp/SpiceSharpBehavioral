@@ -13,9 +13,6 @@ namespace SpiceSharpBehavioral.Builders.Functions
     public class ComplexFunctionBuilder : IFunctionBuilder<Complex>
     {
         /// <inheritdoc/>
-        public double FudgeFactor { get; set; } = 1e-20;
-
-        /// <inheritdoc/>
         public double RelativeTolerance { get; set; } = 1e-6;
 
         /// <inheritdoc/>

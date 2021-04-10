@@ -9,14 +9,6 @@ namespace SpiceSharpBehavioral.Builders.Functions
     public interface IFunctionBuilder<T> : IBuilder<Func<T>>
     {
         /// <summary>
-        /// Gets or sets the fudge factor.
-        /// </summary>
-        /// <value>
-        /// The fudging factor.
-        /// </value>
-        double FudgeFactor { get; set; }
-
-        /// <summary>
         /// Gets or sets the relative tolerance.
         /// </summary>
         /// <value>
