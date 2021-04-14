@@ -15,6 +15,24 @@ namespace SpiceSharpBehavioralTest.Components
     public class MixedTests
     {
         [Test]
+        public void When_Resistor_Current_In_Expression_Expected_Reference()
+        {
+            var ckt = new Circuit(
+               new VoltageSource("V1", "2", "0", 200),
+               new Resistor("R1", "2", "0", 100),
+               new VoltageSource("V2", "1", "0", 10),
+               new BehavioralResistor("R2", "1", "0", "I(R1)"));
+            var op = new OP("I(Resistor) used in expression");
+            var refExport = new RealCurrentExport(op, "V2");
+            op.ExportSimulationData += (sender, args) =>
+            {
+                Assert.AreEqual(5, refExport.Value, 1e-8);
+            };
+
+            op.Run(ckt);
+        }
+
+        [Test]
         public void When_MixedSources_Expect_Reference()
         {
 
