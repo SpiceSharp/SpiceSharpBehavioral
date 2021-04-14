@@ -21,8 +21,8 @@ namespace SpiceSharpBehavioralTest.Components
                new VoltageSource("V1", "2", "0", 200),
                new Resistor("R1", "2", "0", 100),
                new VoltageSource("V2", "1", "0", 10),
-               new BehavioralResistor("R2", "1", "0", "I(R1)"));
-            var op = new OP("I(Resistor) used in expression");
+               new BehavioralResistor("R2", "1", "0", "i(R1)"));
+            var op = new OP("i(Resistor) used in expression");
             var refExport = new RealCurrentExport(op, "V2");
             op.ExportSimulationData += (sender, args) =>
             {
