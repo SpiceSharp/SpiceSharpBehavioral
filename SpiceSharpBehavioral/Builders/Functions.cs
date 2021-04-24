@@ -327,6 +327,16 @@ namespace SpiceSharpBehavioral.Builders
         /// <returns>The interpolated value.</returns>
         public static double Pwl(double arg, Point[] data)
         {
+            if (arg <= data[0].X)
+            {
+                return data[0].Y;
+            }
+
+            if (arg >= data[data.Length - 1].X)
+            {
+                return data[data.Length - 1].Y;
+            }
+
             // Narrow in on the index for the piece-wise linear function
             int k0 = 0, k1 = data.Length;
             while (k1 - k0 > 1)
@@ -348,6 +358,11 @@ namespace SpiceSharpBehavioral.Builders
         /// <returns>The interpolated value.</returns>
         public static double PwlDerivative(double arg, Point[] data)
         {
+            if (arg <= data[0].X || arg >= data[data.Length - 1].X)
+            {
+                return 0.0;
+            }
+
             // Narrow in on the index for the piece-wise linear function
             int k0 = 0, k1 = data.Length;
             while (k1 - k0 > 1)
