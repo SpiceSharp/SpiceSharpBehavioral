@@ -1,7 +1,5 @@
-﻿using SpiceSharp.ParameterSets;
-using SpiceSharp.Simulations;
-using SpiceSharp.Simulations.Variables;
-using SpiceSharpBehavioral;
+﻿using SpiceSharp.Attributes;
+using SpiceSharp.ParameterSets;
 using SpiceSharpBehavioral.Builders;
 using SpiceSharpBehavioral.Builders.Functions;
 using SpiceSharpBehavioral.Parsers;
@@ -17,7 +15,8 @@ namespace SpiceSharp.Components.BehavioralComponents
     /// Base parameters for a behavioral component.
     /// </summary>
     /// <seealso cref="ParameterSet" />
-    public class Parameters : ParameterSet
+    [GeneratedParameters]
+    public partial class Parameters : ParameterSet<Parameters>
     {
         private bool _isDirty;
         private readonly NodeFinder _nodeFinder = new NodeFinder();

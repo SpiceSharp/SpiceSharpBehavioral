@@ -17,11 +17,23 @@ namespace SpiceSharpBehavioralTest.Components
                 new BehavioralCapacitor("C2", "in", "0", "1m*x"));
             var tran = new Transient("tran", 1e-6, 1e-3);
 
-            var refExport = new RealPropertyExport(tran, "C1", "i");
-            var actExport = new RealPropertyExport(tran, "C2", "i");
+            // Check currents
+            var refCurrent = new RealPropertyExport(tran, "C1", "i");
+            var actCurrent = new RealPropertyExport(tran, "C2", "i");
+
+            // Check voltages
+            var refVoltage = new RealPropertyExport(tran, "C1", "v");
+            var actVoltage = new RealPropertyExport(tran, "C2", "v");
+
+            // check powers
+            var refPower = new RealPropertyExport(tran, "C1", "p");
+            var actPower = new RealPropertyExport(tran, "C2", "p");
+
             tran.ExportSimulationData += (sender, args) =>
             {
-                Assert.AreEqual(refExport.Value, actExport.Value, 1e-9);
+                Assert.AreEqual(refCurrent.Value, actCurrent.Value, 1e-9);
+                Assert.AreEqual(refVoltage.Value, actVoltage.Value, 1e-9);
+                Assert.AreEqual(refPower.Value, actPower.Value, 1e-9);
             };
             tran.Run(ckt);
         }

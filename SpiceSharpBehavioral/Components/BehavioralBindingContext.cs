@@ -1,4 +1,5 @@
 ﻿using SpiceSharp.Algebra;
+using SpiceSharp.Attributes;
 using SpiceSharp.Behaviors;
 using SpiceSharp.Components.CommonBehaviors;
 using SpiceSharp.Simulations;
@@ -16,6 +17,10 @@ namespace SpiceSharp.Components.BehavioralComponents
     /// A context for behavioral components.
     /// </summary>
     /// <seealso cref="ComponentBindingContext" />
+    [BindingContextFor(typeof(BehavioralCapacitor))]
+    [BindingContextFor(typeof(BehavioralResistor))]
+    [BindingContextFor(typeof(BehavioralVoltageSource))]
+    [BindingContextFor(typeof(BehavioralCurrentSource))]
     public class BehavioralBindingContext : ComponentBindingContext
     {
         /// <summary>
@@ -82,7 +87,16 @@ namespace SpiceSharp.Components.BehavioralComponents
                     return factory.GetSharedVariable(node.Name);
 
                 case NodeTypes.Current:
-                    var container = Simulation.EntityBehaviors[node.Name];
+                    IBehaviorContainer container;
+                    IBiasingBehavior tmpb;
+                    IFrequencyBehavior tmpf;
+                    
+                    // Get the relevant behaviors
+                    if (Simulation.EntityBehaviors.Comparer.Equals(node.Name, Behaviors.Name))
+                        container = Behaviors;
+                    else
+                        container = Simulation.EntityBehaviors[node.Name];
+
                     if (container == Behaviors)
                     {
                         if (ownBranch == null)
@@ -90,19 +104,30 @@ namespace SpiceSharp.Components.BehavioralComponents
                         return ownBranch;
                     }
                     else if (container.TryGetValue<IBranchedBehavior<T>>(out var branched))
-                        return branched.Branch;
-                    else if (typeof(T) == typeof(double) && container.TryGetValue(out IBiasingBehavior tmpb) && tmpb is CurrentSources.Biasing biasing)
                     {
+                        // Best-case scenario! Our behaviors define a branched behavior!
+                        return branched.Branch;
+                    }
+                    else if (typeof(T) == typeof(double) && container.TryGetValue(out tmpb) && tmpb is CurrentSources.Biasing biasing)
+                    {
+                        // If whatever is being is asked is the current from a current source, then we also don't have a problem
                         var result = new FuncVariable<double>($"I({biasing.Name})", () => biasing.Current, Units.Ampere);
                         return result as IVariable<T>;
                     }
-                    else if (typeof(T) == typeof(Complex) && container.TryGetValue(out IFrequencyBehavior tmpf) && tmpf is CurrentSources.Frequency frequency)
+                    else if (typeof(T) == typeof(Complex) && container.TryGetValue(out tmpf) && tmpf is CurrentSources.Frequency frequency)
                     {
+                        // Current source = no problem
                         var result = new FuncVariable<Complex>($"I({frequency.Name})", () => frequency.ComplexCurrent, Units.Ampere);
                         return result as IVariable<T>;
                     }
                     else
-                        goto default;
+                    {
+                        var result = container.CreatePropertyGetter<T>("i");
+                        if (result == null)
+                            goto default;
+                        SpiceSharpWarning.Warning(this, SpiceSharpBehavioral.Properties.Resources.LooseLinkCurrent.FormatString(container.Name));
+                        return new FuncVariable<T>($"@{container.Name}[i]", result, Units.Ampere);
+                    }
 
                 default:
                     throw new SpiceSharpException($"Could not determine the variable {node.Name}");

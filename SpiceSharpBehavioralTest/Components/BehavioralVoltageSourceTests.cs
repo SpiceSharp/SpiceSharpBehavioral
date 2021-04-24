@@ -2,7 +2,6 @@
 using SpiceSharp;
 using SpiceSharp.Components;
 using SpiceSharp.Simulations;
-using SpiceSharp.Simulations.IntegrationMethods;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -12,6 +11,39 @@ namespace SpiceSharpBehavioralTest.Components
     [TestFixture]
     public class BehavioralVoltageSourceTests
     {
+        [Test]
+        public void When_DCSource_Expect_Reference()
+        {
+            var ckt = new Circuit(
+                new VoltageSource("V1", "in1", "0", 1.0),
+                new Resistor("R1", "in1", "0", 1.0),
+                new BehavioralVoltageSource("V2", "in2", "0", "1"),
+                new Resistor("R2", "in2", "0", 1.0));
+
+            var op = new OP("op");
+
+            // Check currents
+            var refCurrent = new RealPropertyExport(op, "V1", "i");
+            var actCurrent = new RealPropertyExport(op, "V2", "i");
+
+            // Check voltages
+            var refVoltage = new RealPropertyExport(op, "V1", "v");
+            var actVoltage = new RealPropertyExport(op, "V2", "v");
+
+            // Check powers
+            var refPower = new RealPropertyExport(op, "V1", "p");
+            var actPower = new RealPropertyExport(op, "V2", "p");
+
+            // Do simulation
+            op.ExportSimulationData += (sender, args) =>
+            {
+                Assert.AreEqual(refCurrent.Value, actCurrent.Value, 1e-9);
+                Assert.AreEqual(refVoltage.Value, actVoltage.Value, 1e-9);
+                Assert.AreEqual(refPower.Value, actPower.Value, 1e-9);
+            };
+            op.Run(ckt);
+        }
+
         [TestCaseSource(typeof(BehavioralVoltageSourceTestData), nameof(BehavioralVoltageSourceTestData.Op))]
         public void When_DirectOutputOp_Expect_Reference(string expression, double dcVoltage, double dcCurrent, double expected)
         {
@@ -168,7 +200,7 @@ namespace SpiceSharpBehavioralTest.Components
                 yield return new TestCaseData("i(V1)*2", 0.0, 0.0, 1.0, 0.0, new Func<Complex, Complex>(s => 0.0));
                 yield return new TestCaseData("i(V1)*2", 0.0, 0.0, 0.0, 1.0, new Func<Complex, Complex>(s => -2.0));
                 yield return new TestCaseData("v(in)^2", 3.0, 1.0, 0.0, 0.0, new Func<Complex, Complex>(s => 6.0)); // Gain is (v^2)' = 2*v
-                yield return new TestCaseData("v(in)*i(V1)", 1.0, 2.0, 3.0, 4.0, new Func<Complex, Complex>(s => -10.0)); // Gain is (3.0
+                yield return new TestCaseData("v(in)*i(V1)", 1.0, 2.0, 3.0, 4.0, new Func<Complex, Complex>(s => -10.0)); // Gain is 3.0
             }
         }
         public static IEnumerable<TestCaseData> AdmittanceOp

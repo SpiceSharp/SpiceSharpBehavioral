@@ -34,11 +34,16 @@ namespace SpiceSharpBehavioralTest.Components
                 new BehavioralResistor("R2", "out", "0", "1k"));
             var dc = new DC("DC", "V1", -5, 5, 0.5);
 
+            // Check power
+            var refPower = new RealPropertyExport(dc, "R1", "p");
+            var actPower = new RealPropertyExport(dc, "R2", "p");
+
             dc.ExportSimulationData += (sender, args) =>
             {
                 var input = args.GetSweepValues()[0];
                 var output = args.GetVoltage("out");
                 Assert.AreEqual(input, output * 2, 1e-9);
+                Assert.AreEqual(refPower.Value, actPower.Value, 1e-9);
             };
             dc.Run(ckt);
         }

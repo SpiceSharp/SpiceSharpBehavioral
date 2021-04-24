@@ -4,13 +4,10 @@ using SpiceSharp.Simulations;
 using System;
 using System.Numerics;
 using SpiceSharp.Components.BehavioralComponents;
-using SpiceSharp.ParameterSets;
 using SpiceSharp.Components.CommonBehaviors;
 using SpiceSharp.Attributes;
 using System.Collections.Generic;
-using SpiceSharpBehavioral.Parsers.Nodes;
 using SpiceSharpBehavioral;
-using SpiceSharpBehavioral.Builders;
 using SpiceSharpBehavioral.Builders.Functions;
 
 namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
@@ -21,8 +18,9 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
     /// <seealso cref="BiasingBehavior" />
     /// <seealso cref="IFrequencyBehavior" />
     /// <seealso cref="IBranchedBehavior{T}"/>
-    [BehaviorFor(typeof(BehavioralVoltageSource), typeof(IFrequencyBehavior), 1)]
-    public class FrequencyBehavior : BiasingBehavior,
+    [BehaviorFor(typeof(BehavioralVoltageSource)), AddBehaviorIfNo(typeof(IFrequencyBehavior))]
+    [GeneratedParameters]
+    public partial class FrequencyBehavior : BiasingBehavior,
         IFrequencyBehavior,
         IBranchedBehavior<Complex>
     {
@@ -30,6 +28,7 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         private readonly IVariable<Complex> _branch;
         private readonly ElementSet<Complex> _elements, _coreElements;
         private readonly Func<Complex>[] _derivatives;
+        private readonly Complex[] _values;
 
         /// <summary>
         /// Gets the branch equation variable.
@@ -45,8 +44,8 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         /// <value>
         /// The complex voltage.
         /// </value>
-        [ParameterName("v"), ParameterName("v_c"), ParameterInfo("The complex voltage")]
-        public Complex ComplexVoltage { get; private set; }
+        [ParameterName("v"), ParameterName("v_c"), ParameterInfo("The complex voltage", Units = "V")]
+        public Complex ComplexVoltage => _variables.Positive.Value - _variables.Negative.Value;
 
         /// <summary>
         /// Gets the complex current.
@@ -54,8 +53,17 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         /// <value>
         /// The complex current.
         /// </value>
-        [ParameterName("i"), ParameterName("i_c"), ParameterInfo("The complex current")]
+        [ParameterName("i"), ParameterName("i_c"), ParameterInfo("The complex current", Units = "A")]
         public Complex ComplexCurrent => _branch.Value;
+
+        /// <summary>
+        /// Gets the complex power.
+        /// </summary>
+        /// <value>
+        /// The complex power.
+        /// </value>
+        [ParameterName("p"), ParameterName("p_c"), ParameterInfo("The complex power", Units = "W")]
+        public Complex ComplexPower => -ComplexVoltage * Complex.Conjugate(_branch.Value);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FrequencyBehavior"/> class.
@@ -94,6 +102,7 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
 
             // Get the matrix elements
             _derivatives = derivatives.ToArray();
+            _values = new Complex[_derivatives.Length];
             _elements = new ElementSet<Complex>(state.Solver, matLocs.ToArray());
             int br = state.Map[_branch];
             int pos = state.Map[_variables.Positive];
@@ -118,10 +127,9 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         /// </summary>
         void IFrequencyBehavior.Load()
         {
-            var values = new Complex[_derivatives.Length];
             for (var i = 0; i < _derivatives.Length; i++)
-                values[i] = -_derivatives[i]();
-            _elements.Add(values);
+                _values[i] = -_derivatives[i]();
+            _elements.Add(_values);
             _coreElements.Add(1.0, -1.0, 1.0, -1.0);
         }
     }

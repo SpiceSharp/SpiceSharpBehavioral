@@ -1,5 +1,4 @@
 ﻿using SpiceSharp.Behaviors;
-using SpiceSharp.ParameterSets;
 using System;
 using SpiceSharp.Components.BehavioralComponents;
 using SpiceSharp.Algebra;
@@ -9,7 +8,6 @@ using SpiceSharpBehavioral.Parsers.Nodes;
 using SpiceSharp.Attributes;
 using System.Collections.Generic;
 using System.Linq;
-using SpiceSharpBehavioral.Builders;
 using SpiceSharpBehavioral.Builders.Functions;
 
 namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
@@ -19,8 +17,9 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
     /// </summary>
     /// <seealso cref="Behavior" />
     /// <seealso cref="IBiasingBehavior" />
-    [BehaviorFor(typeof(BehavioralCurrentSource), typeof(IBiasingBehavior))]
-    public class BiasingBehavior : Behavior,
+    [BehaviorFor(typeof(BehavioralCurrentSource)), AddBehaviorIfNo(typeof(IBiasingBehavior))]
+    [GeneratedParameters]
+    public partial class Biasing : Behavior,
         IBiasingBehavior
     {
         private readonly OnePort<double> _variables;
@@ -28,6 +27,7 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
         private readonly Func<double> _value;
         private readonly Func<double>[] _derivatives;
         private readonly IVariable<double>[] _derivativeVariables;
+        private readonly double[] _values;
 
         /// <summary>
         /// Gets the variables that are associated with each variable node.
@@ -50,7 +50,7 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
         /// <value>
         /// The current.
         /// </value>
-        [ParameterName("i"), ParameterName("c"), ParameterInfo("The instantaneous current")]
+        [ParameterName("i"), ParameterName("c"), ParameterInfo("Instantaneous current", Units = "A")]
         public double Current { get; private set; }
 
         /// <summary>
@@ -59,15 +59,24 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
         /// <value>
         /// The voltage.
         /// </value>
-        [ParameterName("v"), ParameterInfo("The instantaneous voltage")]
+        [ParameterName("v"), ParameterInfo("Instantaneous voltage", Units = "V")]
         public double Voltage => _variables.Positive.Value - _variables.Negative.Value;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BiasingBehavior"/> class.
+        /// Gets the instantaneous power.
+        /// </summary>
+        /// <value>
+        /// The power.
+        /// </value>
+        [ParameterName("p"), ParameterInfo("Instantaneous power", Units = "W")]
+        public double Power => Voltage * -Current;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Biasing"/> class.
         /// </summary>
         /// <param name="context">The context.</param>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="context"/> is <c>null</c>.</exception>
-        public BiasingBehavior(BehavioralBindingContext context)
+        public Biasing(BehavioralBindingContext context)
             : base(context)
         {
             var bp = context.GetParameterSet<Parameters>();
@@ -105,6 +114,7 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
             _value = builder.Build(Function);
             _derivatives = derivatives.ToArray();
             _derivativeVariables = derivativeVariables.ToArray();
+            _values = new double[_derivatives.Length * 2 + 2];
 
             // Get the matrix elements
             _elements = new ElementSet<double>(state.Solver, matLocs.ToArray(), rhsLocs);
@@ -115,20 +125,18 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
         /// </summary>
         void IBiasingBehavior.Load()
         {
-            double[] values = new double[_derivatives.Length * 2 + 2];
             var total = Current = _value();
-
             int i;
             for (i = 0; i < _derivatives.Length; i++)
             {
                 var df = _derivatives[i]();
                 total -= _derivativeVariables[i].Value * df;
-                values[i * 2] = df;
-                values[i * 2 + 1] = -df;
+                _values[i * 2] = df;
+                _values[i * 2 + 1] = -df;
             }
-            values[i * 2] = -total;
-            values[i * 2 + 1] = total;
-            _elements.Add(values);
+            _values[i * 2] = -total;
+            _values[i * 2 + 1] = total;
+            _elements.Add(_values);
         }
     }
 }
