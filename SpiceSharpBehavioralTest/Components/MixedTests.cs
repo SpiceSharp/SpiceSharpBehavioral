@@ -1,13 +1,8 @@
 ﻿using NUnit.Framework;
 using SpiceSharp;
 using SpiceSharp.Components;
-using SpiceSharp.Entities;
 using SpiceSharp.Simulations;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SpiceSharpBehavioralTest.Components
 {
@@ -110,6 +105,32 @@ namespace SpiceSharpBehavioralTest.Components
             // Velocity
             ckt.Add(new BehavioralCurrentSource($"{name}.Guv", "0", v_vel, vel($"V({mss})")));
             ckt.Add(new Resistor($"{name}.Ruv", "0", v_vel, 1.0));
+        }
+
+        [Test]
+        public void When_ResistorCurrent_Expect_ReferenceWarning()
+        {
+            var ckt = new Circuit(
+                new VoltageSource("V1", "in", "0", 1.0),
+                new Resistor("R1", "in", "0", 1e3),
+                new BehavioralVoltageSource("V2", "out", "0", "I(R1)"));
+
+            // Catch the warning
+            int warnings = 0;
+            SpiceSharpWarning.WarningGenerated += (sender, args) =>
+            {
+                warnings++;
+            };
+
+            // Run the simulation
+            var op = new OP("op");
+            op.ExportSimulationData += (sender, args) =>
+            {
+                Assert.AreEqual(1.0 / 1e3, args.GetVoltage("out"), 1e-9);
+            };
+            op.Run(ckt);
+
+            Assert.AreEqual(1, warnings);
         }
     }
 }
