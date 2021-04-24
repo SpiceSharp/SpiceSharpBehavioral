@@ -23,8 +23,8 @@ jobs:
     - name: Compile Spice#
       run: dotnet build SpiceSharpBehavioral\SpiceSharpBehavioral.csproj --configuration Release --no-restore
 
-      - name: Publish to NuGet
-        env:
-          APIKEY: ${{ secrets.NUGET_APIKEY }}
-        run: dotnet nuget push .\SpiceSharpBehavioral\bin\Release\SpiceSharpBehavioral.*.nupkg -k $env:APIKEY -s "https://api.nuget.org/v3/index.json"
+    - name: Publish to NuGet
+      env:
+        APIKEY: ${{ secrets.NUGET_APIKEY }}
+      run: dotnet nuget push .\SpiceSharpBehavioral\bin\Release\SpiceSharpBehavioral.*.nupkg -k $env:APIKEY -s "https://api.nuget.org/v3/index.json"
       
