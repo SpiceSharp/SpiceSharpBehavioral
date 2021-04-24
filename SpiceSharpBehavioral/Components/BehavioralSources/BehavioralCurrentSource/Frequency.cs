@@ -5,9 +5,7 @@ using SpiceSharp.Components.BehavioralComponents;
 using SpiceSharp.Components.CommonBehaviors;
 using SpiceSharp.Simulations;
 using SpiceSharpBehavioral;
-using SpiceSharpBehavioral.Builders;
 using SpiceSharpBehavioral.Builders.Functions;
-using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -17,15 +15,17 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
     /// <summary>
     /// Frequency behavior for a <see cref="BehavioralCurrentSource"/>.
     /// </summary>
-    /// <seealso cref="BiasingBehavior" />
+    /// <seealso cref="Biasing" />
     /// <seealso cref="IFrequencyBehavior" />
-    [BehaviorFor(typeof(BehavioralCurrentSource), typeof(IFrequencyBehavior), 1)]
-    public class FrequencyBehavior : BiasingBehavior,
+    [BehaviorFor(typeof(BehavioralCurrentSource)), AddBehaviorIfNo(typeof(IFrequencyBehavior))]
+    [GeneratedParameters]
+    public partial class Frequency : Biasing,
         IFrequencyBehavior
     {
         private readonly OnePort<Complex> _variables;
         private readonly ElementSet<Complex> _elements;
         private readonly Func<Complex>[] _derivatives;
+        private readonly Complex[] _values;
 
         /// <summary>
         /// Gets the complex current.
@@ -33,14 +33,33 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
         /// <value>
         /// The complex current.
         /// </value>
+        [ParameterName("i"), ParameterName("i_c"), ParameterInfo("The complex current", Units = "A")]
         public Complex ComplexCurrent { get; private set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FrequencyBehavior"/> class.
+        /// Gets the complex voltage.
+        /// </summary>
+        /// <value>
+        /// The complex voltage.
+        /// </value>
+        [ParameterName("v"), ParameterName("v_c"), ParameterInfo("The complex voltage", Units = "V")]
+        public Complex ComplexVoltage => _variables.Positive.Value - _variables.Negative.Value;
+
+        /// <summary>
+        /// Gets the complex power.
+        /// </summary>
+        /// <value>
+        /// The complex power.
+        /// </value>
+        [ParameterName("p"), ParameterName("p_c"), ParameterInfo("The complex power", Units = "W")]
+        public Complex ComplexPower => -ComplexVoltage * Complex.Conjugate(ComplexCurrent);
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Frequency"/> class.
         /// </summary>
         /// <param name="context">The context.</param>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="context"/> is <c>null</c>.</exception>
-        public FrequencyBehavior(BehavioralBindingContext context)
+        public Frequency(BehavioralBindingContext context)
             : base(context)
         {
             var bp = context.GetParameterSet<Parameters>();
@@ -73,6 +92,7 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
 
             // Get the matrix elements
             _derivatives = derivatives.ToArray();
+            _values = new Complex[_derivatives.Length * 2];
             _elements = new ElementSet<Complex>(state.Solver, matLocs.ToArray());
         }
 
@@ -88,14 +108,13 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
         /// </summary>
         void IFrequencyBehavior.Load()
         {
-            var values = new Complex[_derivatives.Length * 2];
             for (var i = 0; i < _derivatives.Length; i++)
             {
                 var g = _derivatives[i]();
-                values[i * 2] = g;
-                values[i * 2 + 1] = -g;
+                _values[i * 2] = g;
+                _values[i * 2 + 1] = -g;
             }
-            _elements.Add(values);
+            _elements.Add(_values);
         }
     }
 }

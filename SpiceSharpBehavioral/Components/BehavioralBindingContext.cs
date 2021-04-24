@@ -1,4 +1,5 @@
 ﻿using SpiceSharp.Algebra;
+using SpiceSharp.Attributes;
 using SpiceSharp.Behaviors;
 using SpiceSharp.Components.CommonBehaviors;
 using SpiceSharp.Simulations;
@@ -16,6 +17,10 @@ namespace SpiceSharp.Components.BehavioralComponents
     /// A context for behavioral components.
     /// </summary>
     /// <seealso cref="ComponentBindingContext" />
+    [BindingContextFor(typeof(BehavioralCapacitor))]
+    [BindingContextFor(typeof(BehavioralResistor))]
+    [BindingContextFor(typeof(BehavioralVoltageSource))]
+    [BindingContextFor(typeof(BehavioralCurrentSource))]
     public class BehavioralBindingContext : ComponentBindingContext
     {
         /// <summary>
@@ -82,7 +87,11 @@ namespace SpiceSharp.Components.BehavioralComponents
                     return factory.GetSharedVariable(node.Name);
 
                 case NodeTypes.Current:
-                    var container = Simulation.EntityBehaviors[node.Name];
+                    IBehaviorContainer container;
+                    if (Simulation.EntityBehaviors.Comparer.Equals(node.Name, Behaviors.Name))
+                        container = Behaviors;
+                    else
+                        container = Simulation.EntityBehaviors[node.Name];
                     if (container == Behaviors)
                     {
                         if (ownBranch == null)

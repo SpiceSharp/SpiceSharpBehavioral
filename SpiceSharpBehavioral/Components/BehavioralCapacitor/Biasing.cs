@@ -13,7 +13,7 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
     /// <summary>
     /// Biasing behavior for a <see cref="BehavioralCapacitor"/>
     /// </summary>
-    public class BiasingBehavior : Behavior
+    public class Biasing : Behavior
     {
         /// <summary>
         /// The variables.
@@ -36,11 +36,11 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
         protected readonly Dictionary<VariableNode, Node> Derivatives;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BiasingBehavior"/> class.
+        /// Initializes a new instance of the <see cref="Biasing"/> class.
         /// </summary>
         /// <param name="context">The context.</param>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="context"/> is <c>null</c>.</exception>
-        public BiasingBehavior(BehavioralBindingContext context)
+        public Biasing(BehavioralBindingContext context)
             : base(context)
         {
             // Make sure that we have access to the voltage over the behavior
