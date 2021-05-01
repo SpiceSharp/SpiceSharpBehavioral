@@ -19,6 +19,8 @@ namespace SpiceSharpBehavioral.Builders.Functions
         private static readonly MethodInfo
             _sgn = ((Func<double, int>)Math.Sign).GetMethodInfo(),
             _round = ((Func<Complex, int, Complex>)HelperFunctions.Round).GetMethodInfo(),
+            _complexSub = ((Func<Complex, Complex, Complex>)Complex.Subtract).GetMethodInfo(),
+            _complexDiv = ((Func<Complex, Complex, Complex>)Complex.Divide).GetMethodInfo(),
             _pwl = ((Func<double, Point[], double>)HelperFunctions.Pwl).GetMethodInfo(),
             _pwlDerivative = ((Func<double, Point[], double>)HelperFunctions.PwlDerivative).GetMethodInfo();
         private static readonly ConstructorInfo _point = typeof(Point).GetTypeInfo().GetConstructor(new[] { typeof(double), typeof(double) });
@@ -54,6 +56,7 @@ namespace SpiceSharpBehavioral.Builders.Functions
             { "acos", Acos }, { "arccos", Acos },
             { "atan", Atan }, { "arctan", Atan },
             { "atan2", Atan2 },
+            { "atanh", Atanh },
             { "hypot", Hypot },
             { "u", U }, { "du(0)", Zero },
             { "u2", U2 }, { "du2(0)", DU2 },
@@ -153,6 +156,19 @@ namespace SpiceSharpBehavioral.Builders.Functions
             ils.Generator.Emit(OpCodes.Call, _round);
         }
         private static void Atan2(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Atan2, arguments);
+
+        private static void Atanh(IILState<Complex> ils, IReadOnlyList<Node> arguments)
+        {
+            arguments.Check(1);
+            var ilsc = (IILComplexState)ils;
+
+            ilsc.Call(HelperFunctions.Log, new List<Node>() { 1.0 + arguments[0] });
+            ilsc.Call(HelperFunctions.Log, new List<Node>() { 1.0 - arguments[0] });
+            ilsc.Generator.Emit(OpCodes.Call, _complexSub);
+            ilsc.Push(new Complex(2.0, 0));
+            ilsc.Generator.Emit(OpCodes.Call, _complexDiv);
+        }
+
         private static void Hypot(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Hypot, arguments);
 
         // Three-argument functions

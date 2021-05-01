@@ -17,6 +17,7 @@ namespace SpiceSharpBehavioral.Builders.Functions
         private static readonly MethodInfo
             _sgn = ((Func<double, int>)Math.Sign).GetMethodInfo(),
             _round = ((Func<double, int, double>)Math.Round).GetMethodInfo(),
+            _ln = ((Func<double, double>)Math.Log).GetMethodInfo(),
             _pwl = ((Func<double, Point[], double>)HelperFunctions.Pwl).GetMethodInfo(),
             _pwlDerivative = ((Func<double, Point[], double>)HelperFunctions.PwlDerivative).GetMethodInfo();
         private static readonly ConstructorInfo _point = typeof(Point).GetTypeInfo().GetConstructor(new[] { typeof(double), typeof(double) });
@@ -52,6 +53,7 @@ namespace SpiceSharpBehavioral.Builders.Functions
             { "acos", Acos }, { "arccos", Acos },
             { "atan", Atan }, { "arctan", Atan },
             { "atan2", Atan2 },
+            { "atanh", Atanh },
             { "hypot", Hypot },
             { "u", U }, { "du(0)", Zero },
             { "u2", U2 }, { "du2(0)", DU2 },
@@ -133,14 +135,31 @@ namespace SpiceSharpBehavioral.Builders.Functions
         private static void Pwrs(IILState<double> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Power2, arguments);
         private static void Min(IILState<double> ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Min, arguments);
         private static void Max(IILState<double> ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Max, arguments);
-        private static void Round(IILState<double> ils, IReadOnlyList<Node> arguments) 
+        private static void Round(IILState<double> ils, IReadOnlyList<Node> arguments)
         {
-            ils.Push(arguments.Check(2)[0]); 
-            ils.Push(arguments[1]); 
-            ils.Generator.Emit(OpCodes.Conv_I4); 
-            ils.Generator.Emit(OpCodes.Call, _round); 
+            ils.Push(arguments.Check(2)[0]);
+            ils.Push(arguments[1]);
+            ils.Generator.Emit(OpCodes.Conv_I4);
+            ils.Generator.Emit(OpCodes.Call, _round);
         }
         private static void Atan2(IILState<double> ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Atan2, arguments);
+
+        private static void Atanh(IILState<double> ils, IReadOnlyList<Node> arguments)
+        {
+            arguments.Check(1);
+            ils.Push(arguments[0]);
+            ils.Generator.Emit(OpCodes.Ldc_R8, 1.0);
+            ils.Generator.Emit(OpCodes.Add);
+            ils.Generator.Emit(OpCodes.Call, _ln);
+            ils.Generator.Emit(OpCodes.Ldc_R8, 1.0);
+            ils.Push(arguments[0]);
+            ils.Generator.Emit(OpCodes.Sub);
+            ils.Generator.Emit(OpCodes.Call, _ln);
+            ils.Generator.Emit(OpCodes.Sub);
+            ils.Generator.Emit(OpCodes.Ldc_R8, 2.0);
+            ils.Generator.Emit(OpCodes.Div);
+        }
+
         private static void Hypot(IILState<double> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Hypot, arguments);
 
         // Three-argument functions

@@ -92,6 +92,14 @@ namespace SpiceSharpBehavioralTest.Parsers
                     { v1, 0.5 * v1 / Node.Function("hypot", v1, v2) },
                     { v2, 0.5 * v2 / Node.Function("hypot", v1, v2) }
                 }).SetName("{m}(hypot v1 v2)");
+                yield return new TestCaseData(
+                    Node.Function("atanh", Node.Function("sin", v1)),
+                    new Dictionary<VariableNode, Node> { 
+                        { 
+                            v1, 
+                            0.5 * (Node.Function("cos", v1) / (Node.Function("sin", v1) + 1) + (Node.Function("cos", v1) / (Node.Function("sin", v1) - 1)))
+                        }
+                    }).SetName("{m}(atanh sin(v1))");
             }
         }
     }

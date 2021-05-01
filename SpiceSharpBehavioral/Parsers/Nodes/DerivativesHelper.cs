@@ -34,6 +34,7 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
             { "acos", (f, da) => -DAsin(f, da) }, { "arccos", (f, da) => -DAsin(f, da) },
             { "atan", DAtan }, { "arctan", DAtan },
             { "atan2", DAtan2 },
+            { "atanh", DAtanh },
             { "hypot", DHypot },
             { "ceil", Zero },
             { "floor", Zero },
@@ -87,6 +88,14 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
             else
                 return (f.Arguments[1] * dargs[0] - f.Arguments[0] * dargs[1]) / (Node.Function("square", f.Arguments[0]) + Node.Function("square", f.Arguments[1]));
         }
+
+        private static Node DAtanh(FunctionNode f, IReadOnlyList<Node> dargs)
+        {
+            dargs.Check(1);
+
+            return 0.5 * (dargs.Check(1)[0] / (f.Arguments[0] + 1) + dargs.Check(1)[0] / (f.Arguments[0] - 1));
+        }
+
         private static Node DHypot(FunctionNode f, IReadOnlyList<Node> dargs)
         {
             dargs.Check(2);
