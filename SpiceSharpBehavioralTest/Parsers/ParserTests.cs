@@ -50,6 +50,20 @@ namespace SpiceSharpBehavioralTest.Parsers
                 yield return new TestCaseData("abs(-2*6+7)", Node.Function("abs", Node.Add(Node.Multiply(Node.Minus(2.0), 6.0), 7.0))); // Function
                 yield return new TestCaseData("min(-2,6*2)", Node.Function("min", Node.Minus(2.0), Node.Multiply(6.0, 2.0))); // Function with multiple arguments
                 yield return new TestCaseData("rnd()", Node.Function("rnd")); // Function without arguments
+                yield return new TestCaseData("2**3+4*5", Node.Add(Node.Power(2.0, 3.0), Node.Multiply(4.0, 5.0)));
+                yield return new TestCaseData("2**3-4*5", Node.Subtract(Node.Power(2.0, 3.0), Node.Multiply(4.0, 5.0)));
+                yield return new TestCaseData("2**3*4*5", Node.Multiply(Node.Multiply(Node.Power(2.0, 3.0), 4.0), 5.0));
+                yield return new TestCaseData("2**(3*4)*5", Node.Multiply(Node.Power(2.0, Node.Multiply(3.0, 4.0)), 5.0));
+                yield return new TestCaseData("2**(3*4)+5", Node.Add(Node.Power(2.0, Node.Multiply(3.0, 4.0)), 5.0));
+                yield return new TestCaseData("2**(3*4)-5", Node.Subtract(Node.Power(2.0, Node.Multiply(3.0, 4.0)), 5.0));
+                yield return new TestCaseData("-2**3+4*5", Node.Add(-Node.Power(2.0, 3.0), Node.Multiply(4.0, 5.0)));
+                yield return new TestCaseData("-2**3-4*5", Node.Subtract(-Node.Power(2.0, 3.0), Node.Multiply(4.0, 5.0)));
+                yield return new TestCaseData("-2**3*4*5", Node.Multiply(Node.Multiply(-Node.Power(2.0, 3.0), 4.0), 5.0));
+                yield return new TestCaseData("-2**(3*4)*5", Node.Multiply(-Node.Power(2.0, Node.Multiply(3.0, 4.0)), 5.0));
+                yield return new TestCaseData("-2**(3*4)+5", Node.Add(-Node.Power(2.0, Node.Multiply(3.0, 4.0)), 5.0));
+                yield return new TestCaseData("-2**(3*4)-5", Node.Subtract(-Node.Power(2.0, Node.Multiply(3.0, 4.0)), 5.0));
+
+
             }
         }
     }

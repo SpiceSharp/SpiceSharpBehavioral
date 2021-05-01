@@ -211,6 +211,12 @@ namespace SpiceSharpBehavioral.Parsers
                 var right = ParsePower(lexer);
                 result = Node.Power(result, right);
             }
+            if (lexer.Token == TokenType.Power2)
+            {
+                lexer.ReadToken();
+                Node right = ParseUnary(lexer);
+                result = Node.Power(result, right);
+            }
             return result;
         }
         private Node ParseTerminal(ILexer lexer)

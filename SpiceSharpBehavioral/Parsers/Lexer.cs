@@ -116,6 +116,10 @@ namespace SpiceSharpBehavioral.Parsers
             var prevToken = Token;
             switch (Token)
             {
+                case TokenType.Times:
+                    if (One(c => c == '*'))
+                        Token = TokenType.Power2;
+                    break;
                 case TokenType.Bang:
                     if (One(c => c == '='))
                         Token = TokenType.NotEquals;
@@ -316,6 +320,11 @@ namespace SpiceSharpBehavioral.Parsers
         /// A power sign.
         /// </summary>
         Power,
+
+        /// <summary>
+        /// A power characters (**)
+        /// </summary>
+        Power2,
 
         /// <summary>
         /// An equality (==).
