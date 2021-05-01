@@ -11,6 +11,39 @@ namespace SpiceSharpBehavioralTest.Components
     [TestFixture]
     public class BehavioralCurrentSourceTests
     {
+        [Test]
+        public void When_DCSource_Expect_Reference()
+        {
+            var ckt = new Circuit(
+                new CurrentSource("I1", "in1", "0", 1.0),
+                new Resistor("R1", "in1", "0", 1.0),
+                new BehavioralCurrentSource("I2", "in2", "0", "1"),
+                new Resistor("R2", "in2", "0", 1.0));
+
+            var op = new OP("op");
+
+            // Check currents
+            var refCurrent = new RealPropertyExport(op, "I1", "i");
+            var actCurrent = new RealPropertyExport(op, "I2", "i");
+
+            // Check voltages
+            var refVoltage = new RealPropertyExport(op, "I1", "v");
+            var actVoltage = new RealPropertyExport(op, "I2", "v");
+
+            // Check powers
+            var refPower = new RealPropertyExport(op, "I1", "p");
+            var actPower = new RealPropertyExport(op, "I2", "p");
+
+            // Do simulation
+            op.ExportSimulationData += (sender, args) =>
+            {
+                Assert.AreEqual(refCurrent.Value, actCurrent.Value, 1e-9);
+                Assert.AreEqual(refVoltage.Value, actVoltage.Value, 1e-9);
+                Assert.AreEqual(refPower.Value, actPower.Value, 1e-9);
+            };
+            op.Run(ckt);
+        }
+
         [TestCaseSource(nameof(Op))]
         public void When_DirectOutputOp_Expect_Reference(string expression, double dcVoltage, double dcCurrent, double expected)
         {
@@ -64,6 +97,23 @@ namespace SpiceSharpBehavioralTest.Components
                 Assert.AreEqual(expected, args.GetVoltage("out"), 1e-12);
             };
             op.Run(ckt);
+        }
+
+        [Test]
+        public void When_DifferentialVoltage_Expect_Reference()
+        {
+            var ckt = new Circuit(
+                new VoltageSource("V1", "a", "0", new Sine(0, 1, 100)),
+                new VoltageSource("V2", "b", "0", new Sine(0, 2, 65)),
+                new BehavioralCurrentSource("I1", "0", "out", "V(a,b)/2"),
+                new Resistor("R1", "out", "0", 1));
+
+            var tran = new Transient("tran", 1e-6, 1e-3);
+            tran.ExportSimulationData += (sender, args) =>
+            {
+                Assert.AreEqual(0.5 * (args.GetVoltage("a") - args.GetVoltage("b")), args.GetVoltage("out"), 1e-12);
+            };
+            tran.Run(ckt);
         }
 
         [Test]

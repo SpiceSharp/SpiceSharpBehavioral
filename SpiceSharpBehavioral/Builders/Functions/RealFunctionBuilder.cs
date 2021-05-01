@@ -12,9 +12,6 @@ namespace SpiceSharpBehavioral.Builders.Functions
     public class RealFunctionBuilder : IFunctionBuilder<double>
     {
         /// <inheritdoc/>
-        public double FudgeFactor { get; set; } = 1e-20;
-
-        /// <inheritdoc/>
         public double RelativeTolerance { get; set; } = 1e-6;
 
         /// <inheritdoc/>

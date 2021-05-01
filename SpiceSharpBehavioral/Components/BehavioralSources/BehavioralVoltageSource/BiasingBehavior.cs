@@ -1,5 +1,4 @@
 ﻿using SpiceSharp.Algebra;
-using SpiceSharp.ParameterSets;
 using SpiceSharp.Behaviors;
 using SpiceSharp.Components.BehavioralComponents;
 using SpiceSharp.Components.CommonBehaviors;
@@ -9,7 +8,6 @@ using System;
 using SpiceSharp.Attributes;
 using System.Collections.Generic;
 using System.Linq;
-using SpiceSharpBehavioral.Builders;
 using SpiceSharpBehavioral.Builders.Functions;
 
 namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
@@ -20,8 +18,9 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
     /// <seealso cref="Behavior" />
     /// <seealso cref="IBiasingBehavior" />
     /// <seealso cref="IBranchedBehavior{T}"/>
-    [BehaviorFor(typeof(BehavioralVoltageSource), typeof(IBiasingBehavior))]
-    public class BiasingBehavior : Behavior,
+    [BehaviorFor(typeof(BehavioralVoltageSource)), AddBehaviorIfNo(typeof(IBiasingBehavior))]
+    [GeneratedParameters]
+    public partial class BiasingBehavior : Behavior,
         IBiasingBehavior,
         IBranchedBehavior<double>
     {
@@ -31,6 +30,7 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         private readonly Func<double> _value;
         private readonly Func<double>[] _derivatives;
         private readonly IVariable<double>[] _derivativeVariables;
+        private readonly double[] _values;
 
         /// <summary>
         /// Gets the variables that are associated with each variable node.
@@ -61,8 +61,8 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         /// <value>
         /// The voltage.
         /// </value>
-        [ParameterName("v"), ParameterInfo("The instantaneous voltage")]
-        public double Voltage { get; private set; }
+        [ParameterName("v"), ParameterInfo("Instantaneous voltage", Units = "V")]
+        public double Voltage => _variables.Positive.Value - _variables.Negative.Value;
 
         /// <summary>
         /// Gets the current.
@@ -70,8 +70,17 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         /// <value>
         /// The current.
         /// </value>
-        [ParameterName("i"), ParameterName("c"), ParameterInfo("The instantaneous current")]
+        [ParameterName("i"), ParameterName("c"), ParameterInfo("Instantaneous current", Units = "A")]
         public double Current => _branch.Value;
+
+        /// <summary>
+        /// Gets the instantaneous power.
+        /// </summary>
+        /// <value>
+        /// The power.
+        /// </value>
+        [ParameterName("p"), ParameterInfo("Instantaneous power", Units = "W")]
+        public double Power => Voltage * -Current;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BiasingBehavior"/> class.
@@ -117,6 +126,7 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
 
             // Get the matrix elements
             _derivatives = derivatives.ToArray();
+            _values = new double[_derivatives.Length];
             _derivativeVariables = derivativeVariables.ToArray();
             _elements = new ElementSet<double>(state.Solver, matLocs.ToArray());
             int br = state.Map[_branch];
@@ -135,15 +145,14 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         /// </summary>
         void IBiasingBehavior.Load()
         {
-            double[] values = new double[_derivatives.Length];
-            var total = Voltage = _value();
+            var total = _value();
             for (var i = 0; i < _derivatives.Length; i++)
             {
                 var df = _derivatives[i]();
                 total -= _derivativeVariables[i].Value * df;
-                values[i] = -df;
+                _values[i] = -df;
             }
-            _elements.Add(values);
+            _elements.Add(_values);
             _coreElements.Add(1.0, -1.0, 1.0, -1.0, total);
         }
     }

@@ -120,4 +120,7 @@
   <data name="ArgumentMismatch" xml:space="preserve">
     <value>Invalid number of arguments: {0} expected but {1} were given.</value>
   </data>
+  <data name="LooseLinkCurrent" xml:space="preserve">
+    <value>The current through {0} is only loosely linked. This might result in less accurate results, or instability. Consider placing a voltage source in series and referencing the current through that instead.</value>
+  </data>
 </root>

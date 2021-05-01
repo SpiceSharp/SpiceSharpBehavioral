@@ -2,9 +2,7 @@
 using SpiceSharp.Attributes;
 using SpiceSharp.Behaviors;
 using SpiceSharp.Components.BehavioralComponents;
-using SpiceSharp.ParameterSets;
 using SpiceSharp.Simulations;
-using SpiceSharpBehavioral.Builders;
 using SpiceSharpBehavioral.Builders.Functions;
 using System;
 using System.Collections.Generic;
@@ -14,10 +12,11 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
     /// <summary>
     /// Time-dependent behavior for a <see cref="BehavioralCapacitor"/>.
     /// </summary>
-    /// <seealso cref="BiasingBehavior"/>
+    /// <seealso cref="Biasing"/>
     /// <seealso cref="ITimeBehavior"/>
-    [BehaviorFor(typeof(BehavioralCapacitor), typeof(ITimeBehavior), 1)]
-    public class TimeBehavior : BiasingBehavior,
+    [BehaviorFor(typeof(BehavioralCapacitor)), AddBehaviorIfNo(typeof(ITimeBehavior))]
+    [GeneratedParameters]
+    public partial class Time : Biasing,
         IBiasingBehavior,
         ITimeBehavior
     {
@@ -28,20 +27,41 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
         private readonly Func<double> _value;
         private readonly Func<double>[] _derivatives;
         private readonly IVariable<double>[] _derivativeVariables;
+        private readonly double[] _values;
 
         /// <summary>
-        /// Gets the instantaneous capacitor.
+        /// Gets the current.
         /// </summary>
-        /// <value>The instantaneous capacitor.</value>
-        [ParameterName("i"), ParameterName("c"), ParameterInfo("The instantaneous current")]
+        /// <value>
+        /// The current.
+        /// </value>
+        [ParameterName("i"), ParameterName("c"), ParameterInfo("Instantaneous current", Units = "A")]
         public double Current => _qcap.Derivative;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="TimeBehavior"/> class.
+        /// Gets the voltage.
+        /// </summary>
+        /// <value>
+        /// The voltage.
+        /// </value>
+        [ParameterName("v"), ParameterInfo("Instantaneous voltage", Units = "V")]
+        public double Voltage => Variables.Positive.Value - Variables.Negative.Value;
+
+        /// <summary>
+        /// Gets the power.
+        /// </summary>
+        /// <value>
+        /// The power.
+        /// </value>
+        [ParameterName("p"), ParameterInfo("Instantaneous power", Units = "W")]
+        public double Power => -Voltage * Current;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Time"/> class.
         /// </summary>
         /// <param name="context">The context.</param>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="context"/> is <c>null</c>.</exception>
-        public TimeBehavior(BehavioralBindingContext context)
+        public Time(BehavioralBindingContext context)
             : base(context)
         {
             var bp = context.GetParameterSet<Parameters>();
@@ -73,6 +93,7 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
             }
             _value = builder.Build(Function);
             _derivatives = derivatives.ToArray();
+            _values = new double[_derivatives.Length * 2 + 2];
             _derivativeVariables = derivativeVariables.ToArray();
 
             // Get the matrix elements
@@ -103,18 +124,17 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
             var current = _qcap.Derivative;
 
             // _qcap.Derivative is the current as integrated by the current integration method
-            double[] values = new double[_derivatives.Length * 2 + 2];
             int i;
             for (i = 0; i < _derivatives.Length; i++)
             {
                 var g = _derivatives[i]() * _method.Slope;
-                values[i * 2] = g;
-                values[i * 2 + 1] = -g;
+                _values[i * 2] = g;
+                _values[i * 2 + 1] = -g;
                 current -= g * _derivativeVariables[i].Value;
             }
-            values[i * 2] = -current;
-            values[i * 2 + 1] = current;
-            _elements.Add(values);
+            _values[i * 2] = -current;
+            _values[i * 2 + 1] = current;
+            _elements.Add(_values);
         }
     }
 }

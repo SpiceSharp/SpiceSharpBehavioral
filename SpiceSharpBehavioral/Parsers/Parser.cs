@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using SpiceSharp;
 using SpiceSharpBehavioral.Parsers.Nodes;
 
 namespace SpiceSharpBehavioral.Parsers
@@ -30,7 +31,7 @@ namespace SpiceSharpBehavioral.Parsers
             lexer.ReadToken();
             var result = ParseConditional(lexer);
             if (lexer.Token != TokenType.EndOfExpression)
-                throw new Exception("Invalid expression");
+                throw new Exception("Invalid expression, encountered '{0}'.".FormatString(lexer.Content));
             return result;
         }
 
