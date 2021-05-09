@@ -33,7 +33,7 @@ namespace SpiceSharpBehavioral.Builders.Functions
         /// <summary>
         /// A set of default functions.
         /// </summary>
-        public static readonly Dictionary<string, ApplyFunction> Defaults = new Dictionary<string, ApplyFunction>(StringComparer.OrdinalIgnoreCase)
+        public static Dictionary<string, ApplyFunction> Defaults { get; set; } = new Dictionary<string, ApplyFunction>(StringComparer.OrdinalIgnoreCase)
         {
             { "abs", Abs },
             { "sgn", Sgn },

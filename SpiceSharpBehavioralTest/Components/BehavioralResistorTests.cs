@@ -65,5 +65,22 @@ namespace SpiceSharpBehavioralTest.Components
             };
             ac.Run(ckt);
         }
+
+        [Test]
+        public void When_ZeroDerivative_Expect_Reference()
+        {
+            var ckt = new Circuit(
+                new VoltageSource("V1", "OUT", "0", 10),
+                new BehavioralResistor("R1", "OUT", "0", "V(OUT,0)"));
+
+            var op = new OP("op");
+            var refExport = new RealCurrentExport(op, "V1");
+            op.ExportSimulationData += (sender, args) =>
+            {
+                Assert.AreEqual(10.0, args.GetVoltage("OUT"), 1e-12);
+                Assert.AreEqual(-1.0, refExport.Value, 1e-12);
+            };
+            op.Run(ckt);
+        }
     }
 }

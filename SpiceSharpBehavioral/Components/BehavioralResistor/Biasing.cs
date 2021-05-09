@@ -20,7 +20,7 @@ namespace SpiceSharp.Components.BehavioralResistorBehaviors
     /// <seealso cref="IBranchedBehavior{T}"/>
     [BehaviorFor(typeof(BehavioralResistor)), AddBehaviorIfNo(typeof(IBiasingBehavior))]
     [GeneratedParameters]
-    public partial class BiasingBehavior : Behavior,
+    public partial class Biasing : Behavior,
         IBiasingBehavior,
         IBranchedBehavior<double>
     {
@@ -83,11 +83,11 @@ namespace SpiceSharp.Components.BehavioralResistorBehaviors
         public double Power => Voltage * Current;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="BiasingBehavior"/> class.
+        /// Initializes a new instance of the <see cref="Biasing"/> class.
         /// </summary>
         /// <param name="context">The context.</param>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="context"/> is <c>null</c>.</exception>
-        public BiasingBehavior(BehavioralBindingContext context)
+        public Biasing(BehavioralBindingContext context)
             : base(context)
         {
             var bp = context.GetParameterSet<Parameters>();
