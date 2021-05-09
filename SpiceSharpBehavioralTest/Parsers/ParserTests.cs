@@ -10,10 +10,10 @@ namespace SpiceSharpBehavioralTest.Parsers
     {
         [TestCaseSource(nameof(SpiceNumbers))]
         [TestCaseSource(nameof(Expressions))]
-        public void When_Expression_Expect_Reference(string input, Node expected)
+        public void When_FasterExpression_Expect_Reference(string input, Node expected)
         {
-            var parser = new Parser();
-            var actual = parser.Parse(input);
+            var lexer = Lexer.FromString(input);
+            var actual = Parser.Parse(lexer);
             Assert.AreEqual(expected, actual);
         }
 

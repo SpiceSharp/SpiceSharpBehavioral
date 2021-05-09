@@ -10,47 +10,44 @@ namespace SpiceSharpBehavioralTest.Parsers
         [TestCaseSource(typeof(LexerTestData), nameof(LexerTestData.Numbers))]
         public void When_Number_Expect_Token(string input)
         {
-            var lexer = new Lexer(input);
-            lexer.ReadToken();
-            Assert.AreEqual(TokenType.Number, lexer.Token);
+            var lexer = Lexer.FromString(input);
+            Assert.AreEqual(TokenType.Number, lexer.Type);
             Assert.AreEqual(input, lexer.Content);
         }
 
         [TestCaseSource(typeof(LexerTestData), nameof(LexerTestData.Operators))]
         public void When_Operator_Expect_Token(string input, TokenType expected)
         {
-            var lexer = new Lexer(input);
-            lexer.ReadToken();
-            Assert.AreEqual(expected, lexer.Token);
+            var lexer = Lexer.FromString(input);
+            Assert.AreEqual(expected, lexer.Type);
         }
 
         [TestCaseSource(typeof(LexerTestData), nameof(LexerTestData.Sequences))]
         public void When_Sequence_Expect_Tokens(string input, TokenType[] expected)
         {
-            var lexer = new Lexer(input);
+            var lexer = Lexer.FromString(input);
             foreach (var token in expected)
             {
-                lexer.ReadToken();
-                Assert.AreEqual(token, lexer.Token);
+                Assert.AreEqual(token, lexer.Type);
+                lexer.Next();
             }
         }
 
         [Test]
         public void When_Nodes_Expect_Identifiers()
         {
-            var lexer = new Lexer("V(a_2.8, 2&#@;k");
-            lexer.ReadToken();
-            Assert.AreEqual(TokenType.Identifier, lexer.Token);
-            lexer.ReadToken();
-            Assert.AreEqual(TokenType.LeftParenthesis, lexer.Token);
-            lexer.ReadNode();
+            var lexer = Lexer.FromString("V(a_2.8, 2&#@;k");
+            Assert.AreEqual(TokenType.Identifier, lexer.Type);
+            lexer.Next();
+            Assert.AreEqual(TokenType.LeftParenthesis, lexer.Type);
+            lexer.Next(); lexer.ContinueWhileNode();
             Assert.AreEqual("a_2.8", lexer.Content);
-            lexer.ReadToken();
-            Assert.AreEqual(TokenType.Comma, lexer.Token);
-            lexer.ReadNode();
-            Assert.AreEqual("2&#@;k", lexer.Content);
-            lexer.ReadToken();
-            Assert.AreEqual(TokenType.EndOfExpression, lexer.Token);
+            lexer.Next();
+            Assert.AreEqual(TokenType.Comma, lexer.Type);
+            lexer.Next(); lexer.ContinueWhileNode();
+            Assert.AreEqual(@"2&#@;k", lexer.Content);
+            lexer.Next();
+            Assert.AreEqual(TokenType.EndOfExpression, lexer.Type);
         }
     }
 

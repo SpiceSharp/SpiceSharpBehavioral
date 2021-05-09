@@ -111,7 +111,7 @@ namespace SpiceSharp.Components.BehavioralComponents
                 _parseAction = value;
             }
         }
-        private Func<string, Node> _parseAction = e => new Parser().Parse(e);
+        private Func<string, Node> _parseAction = e => Parser.Parse(Lexer.FromString(e));
 
         /// <summary>
         /// Occurs when a builder has been created that uses real values.
