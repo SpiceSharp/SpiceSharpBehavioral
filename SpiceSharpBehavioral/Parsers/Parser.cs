@@ -228,6 +228,14 @@ namespace SpiceSharpBehavioral.Parsers
                     break;
 
                 // A number
+                case TokenType.Dot:
+                    lexer.ReadToken();
+                    if (lexer.Token != TokenType.Number)
+                        throw new Exception("Invalid number");
+                    result = Node.Constant(SpiceHelper.ParseNumber("." + lexer.Content));
+                    lexer.ReadToken();
+                    break;
+
                 case TokenType.Number:
                     result = Node.Constant(SpiceHelper.ParseNumber(lexer.Content));
                     lexer.ReadToken();

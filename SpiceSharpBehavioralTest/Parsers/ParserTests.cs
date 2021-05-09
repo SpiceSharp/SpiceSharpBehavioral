@@ -34,6 +34,7 @@ namespace SpiceSharpBehavioralTest.Parsers
                 yield return new TestCaseData("2.22p", Node.Constant(2.22E-12)); // Pico - the rounding-off error is due to the multiplication 2.22 * 1e-12.
                 yield return new TestCaseData("3.78f", Node.Constant(3.78e-15)); // Femto
                 yield return new TestCaseData("3mil", Node.Constant(3 * 25.4e-6)); // Mil
+                yield return new TestCaseData(".5", Node.Constant(0.5)); // No leading zero
             }
         }
         public static IEnumerable<TestCaseData> Expressions
@@ -50,6 +51,7 @@ namespace SpiceSharpBehavioralTest.Parsers
                 yield return new TestCaseData("abs(-2*6+7)", Node.Function("abs", Node.Add(Node.Multiply(Node.Minus(2.0), 6.0), 7.0))); // Function
                 yield return new TestCaseData("min(-2,6*2)", Node.Function("min", Node.Minus(2.0), Node.Multiply(6.0, 2.0))); // Function with multiple arguments
                 yield return new TestCaseData("rnd()", Node.Function("rnd")); // Function without arguments
+                yield return new TestCaseData("-.14e3", Node.Minus(Node.Constant(0.14e3)));
             }
         }
     }
