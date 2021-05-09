@@ -50,6 +50,7 @@ namespace SpiceSharpBehavioral.Builders.Direct
             { "min", Min },
             { "max", Max },
             { "atan2", Atan2 },
+            { "atanh", Atanh },
             { "hypot", Hypot },
             { "rnd", Random }, { "rand", Random },
             { "if", If }
@@ -136,6 +137,13 @@ namespace SpiceSharpBehavioral.Builders.Direct
             return new Complex(Math.Round(arg.Real, n), Math.Round(arg.Imaginary, n));
         }
         private static Complex Atan2(Complex[] args) { args.Check(2); return Math.Atan2(args[0].Real, args[1].Real); }
+
+        private static Complex Atanh(Complex[] args) 
+        {
+            args.Check(1);
+            return (HelperFunctions.Log(1 + args[0]) - HelperFunctions.Log(1 - args[0])) / 2.0;
+        }
+
         private static Complex Hypot(Complex[] args) { args.Check(2); return HelperFunctions.Hypot(args[0], args[1]); }
 
         // Three-argument functions
