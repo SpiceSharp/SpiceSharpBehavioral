@@ -143,23 +143,7 @@ namespace SpiceSharpBehavioral.Builders.Functions
             ils.Generator.Emit(OpCodes.Call, _round);
         }
         private static void Atan2(IILState<double> ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Atan2, arguments);
-
-        private static void Atanh(IILState<double> ils, IReadOnlyList<Node> arguments)
-        {
-            arguments.Check(1);
-            ils.Push(arguments[0]);
-            ils.Generator.Emit(OpCodes.Ldc_R8, 1.0);
-            ils.Generator.Emit(OpCodes.Add);
-            ils.Generator.Emit(OpCodes.Call, _ln);
-            ils.Generator.Emit(OpCodes.Ldc_R8, 1.0);
-            ils.Push(arguments[0]);
-            ils.Generator.Emit(OpCodes.Sub);
-            ils.Generator.Emit(OpCodes.Call, _ln);
-            ils.Generator.Emit(OpCodes.Sub);
-            ils.Generator.Emit(OpCodes.Ldc_R8, 2.0);
-            ils.Generator.Emit(OpCodes.Div);
-        }
-
+        private static void Atanh(IILState<double> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Atanh, arguments);
         private static void Hypot(IILState<double> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Hypot, arguments);
 
         // Three-argument functions

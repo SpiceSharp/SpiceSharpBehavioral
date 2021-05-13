@@ -143,6 +143,20 @@ namespace SpiceSharpBehavioral.Builders
         }
 
         /// <summary>
+        /// Computes the inverse arc tangent hyperbolic.
+        /// </summary>
+        /// <param name="arg">The argument.</param>
+        /// <returns>The result.</returns>
+        public static double Atanh(double arg) => 0.5 * Log(SafeDivide(1 + arg, 1 - arg));
+
+        /// <summary>
+        /// Computes the inverse arc tangent hyperbolic.
+        /// </summary>
+        /// <param name="arg">The argument.</param>
+        /// <returns>The result.</returns>
+        public static Complex Atanh(Complex arg) => 0.5 * Log(SafeDivide(1 + arg, 1 - arg));
+
+        /// <summary>
         /// Raises a number to a power.
         /// </summary>
         /// <param name="left">The left argument.</param>

@@ -138,11 +138,7 @@ namespace SpiceSharpBehavioral.Builders.Direct
         }
         private static Complex Atan2(Complex[] args) { args.Check(2); return Math.Atan2(args[0].Real, args[1].Real); }
 
-        private static Complex Atanh(Complex[] args) 
-        {
-            args.Check(1);
-            return (HelperFunctions.Log(1 + args[0]) - HelperFunctions.Log(1 - args[0])) / 2.0;
-        }
+        private static Complex Atanh(Complex[] args) { args.Check(1); return HelperFunctions.Atanh(args[0]); }
 
         private static Complex Hypot(Complex[] args) { args.Check(2); return HelperFunctions.Hypot(args[0], args[1]); }
 

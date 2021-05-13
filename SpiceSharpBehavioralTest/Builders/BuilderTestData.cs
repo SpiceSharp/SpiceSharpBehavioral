@@ -80,7 +80,7 @@ namespace SpiceSharpBehavioralTest.Builders
                     yield return new TestCaseData(Node.Function("asin", node), Math.Asin(arg)).SetName("{{m}}(asin {0})".FormatString(arg));
                     yield return new TestCaseData(Node.Function("acos", node), Math.Acos(arg)).SetName("{{m}}(acos {0})".FormatString(arg));
                     yield return new TestCaseData(Node.Function("atan", node), Math.Atan(arg)).SetName("{{m}}(atan {0})".FormatString(arg));
-                    yield return new TestCaseData(Node.Function("atanh", node), 0.5 * (Math.Log(1 + arg) - Math.Log(1 - arg))).SetName("{{m}}(atanh {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("atanh", node), HelperFunctions.Atanh(arg)).SetName("{{m}}(atanh {0})".FormatString(arg));
                     yield return new TestCaseData(Node.Function("sinh", node), Math.Sinh(arg)).SetName("{{m}}(sinh {0})".FormatString(arg));
                     yield return new TestCaseData(Node.Function("cosh", node), Math.Cosh(arg)).SetName("{{m}}(cosh {0})".FormatString(arg));
                     yield return new TestCaseData(Node.Function("tanh", node), Math.Tanh(arg)).SetName("{{m}}(tanh {0})".FormatString(arg));
@@ -129,7 +129,7 @@ namespace SpiceSharpBehavioralTest.Builders
                     yield return new TestCaseData(Node.Function("asin", node), Complex.Asin(arg)).SetName("{{m}}(asin {0})".FormatString(arg));
                     yield return new TestCaseData(Node.Function("acos", node), Complex.Acos(arg)).SetName("{{m}}(acos {0})".FormatString(arg));
                     yield return new TestCaseData(Node.Function("atan", node), Complex.Atan(arg)).SetName("{{m}}(atan {0})".FormatString(arg));
-                    yield return new TestCaseData(Node.Function("atanh", node), 0.5 * (HelperFunctions.Log(1 + arg) - HelperFunctions.Log(1 - arg))).SetName("{{m}}(atanh {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("atanh", node), HelperFunctions.Atanh(arg)).SetName("{{m}}(atanh {0})".FormatString(arg));
                     yield return new TestCaseData(Node.Function("sinh", node), Complex.Sinh(arg)).SetName("{{m}}(sinh {0})".FormatString(arg));
                     yield return new TestCaseData(Node.Function("cosh", node), Complex.Cosh(arg)).SetName("{{m}}(cosh {0})".FormatString(arg));
                     yield return new TestCaseData(Node.Function("tanh", node), Complex.Tanh(arg)).SetName("{{m}}(tanh {0})".FormatString(arg));
