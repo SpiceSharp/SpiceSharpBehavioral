@@ -63,6 +63,9 @@ namespace SpiceSharpBehavioralTest.Builders
                 yield return new TestCaseData(Node.Function("tbl", 2.0, 0.0, 1.0, 3.0, 4.0), 3.0).SetName("{m}(tbl 2,0,1,3,4)");
                 yield return new TestCaseData(Node.Function("if", 1.0, 0.25, 0.75), 0.25).SetName("{m}(if 1 0.25 0.75)");
                 yield return new TestCaseData(Node.Function("if", 0.0, 0.25, 0.75), 0.75).SetName("{m}(if 0 0.25 0.75)");
+                yield return new TestCaseData(Node.Function("limit", 0.4, 0.25, 0.75), 0.4).SetName("{m}(limit 0.4 0.25 0.75)");
+                yield return new TestCaseData(Node.Function("limit", 0.4, 0.25, 0.3), 0.3).SetName("{m}(limit 0.4 0.25 0.3)");
+                yield return new TestCaseData(Node.Function("limit", 0.4, 0.5, 0.7), 0.5).SetName("{m}(limit 0.4 0.5 0.7)");
 
                 foreach (var data in Single)
                 {
@@ -112,6 +115,8 @@ namespace SpiceSharpBehavioralTest.Builders
                 yield return new TestCaseData(Node.Function("tbl", 2.0, 0.0, 1.0, 3.0, 4.0), new Complex(3, 0)).SetName("{m}(tbl 2,0,1,3,4)");
                 yield return new TestCaseData(Node.Function("if", 1.0, 0.25, 0.75), new Complex(0.25, 0)).SetName("{m}(if 1 0.25 0.75)");
                 yield return new TestCaseData(Node.Function("if", 0.0, 0.25, 0.75), new Complex(0.75, 0)).SetName("{m}(if 0 0.25 0.75)");
+                yield return new TestCaseData(Node.Function("limit", 0.4, 0.25, 0.3), new Complex(0.3, 0)).SetName("{m}(limit 0.4 0.25 0.3)");
+                yield return new TestCaseData(Node.Function("limit", 0.4, 0.5, 0.7), new Complex(0.5, 0)).SetName("{m}(limit 0.4 0.5 0.7)");
 
                 foreach (var data in Single)
                 {

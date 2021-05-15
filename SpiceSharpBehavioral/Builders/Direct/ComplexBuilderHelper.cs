@@ -53,7 +53,8 @@ namespace SpiceSharpBehavioral.Builders.Direct
             { "atanh", Atanh },
             { "hypot", Hypot },
             { "rnd", Random }, { "rand", Random },
-            { "if", If }
+            { "if", If },
+            { "limit", Limit }
         };
 
         private static Complex[] Check(this Complex[] args, int expected)
@@ -144,6 +145,8 @@ namespace SpiceSharpBehavioral.Builders.Direct
 
         // Three-argument functions
         private static Complex If(Complex[] args) { args.Check(3); return args[0].Real > 0.5 ? args[1] : args[2]; }
+        
+        private static Complex Limit(Complex[] args) { args.Check(3); return HelperFunctions.Limit(args[0], args[1], args[2]); }
 
         // N-argument functions
         private static Complex Pwl(Complex[] args)

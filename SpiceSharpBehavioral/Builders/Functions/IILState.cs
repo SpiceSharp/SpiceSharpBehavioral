@@ -85,5 +85,12 @@ namespace SpiceSharpBehavioral.Builders.Functions
         /// <param name="function">The function.</param>
         /// <param name="args">The arguments.</param>
         void Call(Func<T, T, T> function, IReadOnlyList<Node> args);
+
+        /// <summary>
+        /// Shorthand for calling a function with three arguments.
+        /// </summary>
+        /// <param name="function">The function.</param>
+        /// <param name="args">The arguments.</param>
+        void Call(Func<T, T, T, T> function, IReadOnlyList<Node> args);
     }
 }

@@ -38,6 +38,7 @@ namespace SpiceSharpBehavioralTest.Parsers
             {
                 var v1 = VariableNode.Voltage("v1");
                 var v2 = VariableNode.Voltage("v2");
+                var v3 = VariableNode.Voltage("v3");
                 var i1 = VariableNode.Current("i1");
 
                 yield return new TestCaseData(v1, new Dictionary<VariableNode, Node> { { v1, Node.One } }).SetName("{m}(v1)");
@@ -100,6 +101,13 @@ namespace SpiceSharpBehavioralTest.Parsers
                             Node.Function("cos", v1) / (1 - Node.Function("square", Node.Function("sin", v1)))
                         }
                     }).SetName("{m}(atanh sin(v1))");
+
+                yield return new TestCaseData(Node.Function("limit", v1, v2, v3), new Dictionary<VariableNode, Node>
+                {
+                    { v1, Node.Conditional(Node.GreaterThan(v1, v3), Node.Zero, Node.Conditional(Node.LessThan(v1, v2), Node.Zero, Node.Constant(1))) },
+                    { v2, Node.Conditional(Node.GreaterThan(v1, v3), Node.Zero, Node.Conditional(Node.LessThan(v1, v2), Node.Constant(1), Node.Zero)) },
+                    { v3, Node.Conditional(Node.GreaterThan(v1, v3), Node.Constant(1), Node.Conditional(Node.LessThan(v1, v2), Node.Zero, Node.Zero)) }
+                }).SetName("{m}(limit v1 v2 v3)");
             }
         }
     }

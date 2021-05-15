@@ -451,6 +451,29 @@ namespace SpiceSharpBehavioral.Builders
         public static double Hypot(double y, double x) => Math.Sqrt(x * x + y * y);
 
         /// <summary>
+        /// Returns the intermediate value of x, y, z.
+        /// </summary>
+        /// <param name="x">The argument</param>
+        /// <param name="y">Mininum value.</param>
+        /// <param name="z">Max value.</param>
+        /// <returns></returns>
+        public static double Limit(double x, double y, double z)
+        {
+            return Math.Min(Math.Max(x, y), z);
+        }
+
+        /// <summary>
+        /// Returns the intermediate value of x, y, z.
+        /// </summary>
+        /// <param name="x">The argument</param>
+        /// <param name="y">Mininum value.</param>
+        /// <param name="z">Max value.</param>
+        /// <returns></returns>
+        public static Complex Limit(Complex x, Complex y, Complex z)
+        {
+            return Math.Min(Math.Max(x.Real, y.Real), z.Real);
+        }
+        /// <summary>
         /// Returns the hypothenuse (sqrt(|x|^2+|y|^2)).
         /// </summary>
         /// <param name="y">The first argument.</param>

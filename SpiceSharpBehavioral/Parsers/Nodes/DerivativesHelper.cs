@@ -42,7 +42,8 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
             { "round", Zero },
             { "square", (f, da) => Node.Two * da.Check(1)[0] * f.Arguments[0] },
             { "ddt", (f, da) => Node.Function("ddt_slope", new[] { da.Check(1)[0] }) },
-            { "idt", (f, da) => Node.Function("idt_slope", new[] { da.Check(1)[0] }) }
+            { "idt", (f, da) => Node.Function("idt_slope", new[] { da.Check(1)[0] }) },
+            { "limit", Limit },
         };
 
         private static IReadOnlyList<Node> Check(this IReadOnlyList<Node> arguments, int expected)
@@ -104,5 +105,19 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
                 return 0.5 * (f.Arguments[0] * dargs[0] + f.Arguments[1] * dargs[1]) / f;
         }
         private static Node DPassThrough(FunctionNode f, IReadOnlyList<Node> dargs) => Node.Function(f.Name, dargs);
+
+        private static Node Limit(FunctionNode f, IReadOnlyList<Node> dargs)
+        {
+            dargs.Check(3);
+
+            Node result = Node.Conditional(
+                Node.GreaterThan(f.Arguments[0], f.Arguments[2]),
+                    dargs[2] ?? Node.Zero,
+                    Node.Conditional(Node.LessThan(f.Arguments[0], f.Arguments[1]),
+                        dargs[1] ?? Node.Zero,
+                        dargs[0] ?? Node.Zero));
+
+            return result;
+        }
     }
 }
