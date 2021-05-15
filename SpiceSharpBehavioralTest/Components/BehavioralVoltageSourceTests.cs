@@ -113,6 +113,36 @@ namespace SpiceSharpBehavioralTest.Components
         }
 
         [Test]
+        public void When_TimeDependentWithMaxFunction_Expect_Reference()
+        {
+            var ckt = new Circuit(
+                new VoltageSource("Vtmp", "a", "0", 0.0), // Needed to have at least one independent source
+                new BehavioralVoltageSource("V1", "in", "0", "max(0, 5*sin(time*10*pi))"));
+            var tran = new Transient("tran", 1e-3, 1);
+
+            tran.ExportSimulationData += (sender, args) =>
+            {
+                Assert.AreEqual(5 * Math.Max(0, Math.Sin(args.Time * 10 * Math.PI)), args.GetVoltage("in"), 1e-9);
+            };
+            tran.Run(ckt);
+        }
+
+        [Test]
+        public void When_TimeDependentWithMinFunction_Expect_Reference()
+        {
+            var ckt = new Circuit(
+                new VoltageSource("Vtmp", "a", "0", 0.0), // Needed to have at least one independent source
+                new BehavioralVoltageSource("V1", "in", "0", "min(0, 5*sin(time*10*pi))"));
+            var tran = new Transient("tran", 1e-3, 1);
+
+            tran.ExportSimulationData += (sender, args) =>
+            {
+                Assert.AreEqual(5 * Math.Min(0, Math.Sin(args.Time * 10 * Math.PI)), args.GetVoltage("in"), 1e-9);
+            };
+            tran.Run(ckt);
+        }
+
+        [Test]
         public void When_DerivativeTransient_Expect_Reference()
         {
             var ckt = new Circuit(

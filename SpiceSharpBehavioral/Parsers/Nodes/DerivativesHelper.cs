@@ -40,6 +40,8 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
             { "floor", Zero },
             { "nint", Zero },
             { "round", Zero },
+            { "min", Min },
+            { "max", Max },
             { "square", (f, da) => Node.Two * da.Check(1)[0] * f.Arguments[0] },
             { "ddt", (f, da) => Node.Function("ddt_slope", new[] { da.Check(1)[0] }) },
             { "idt", (f, da) => Node.Function("idt_slope", new[] { da.Check(1)[0] }) }
@@ -52,6 +54,26 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
             return arguments;
         }
         private static Node Zero(FunctionNode f, IReadOnlyList<Node> dargs) => null;
+        private static Node Min(FunctionNode f, IReadOnlyList<Node> dargs)
+        {
+            dargs.Check(2);
+            Node result = null;
+            if (dargs[0] != null) 
+                result = Node.Conditional(Node.LessThan(f.Arguments[0], f.Arguments[1]), dargs[0], Node.Zero);
+            if (dargs[1] != null)
+                result += Node.Conditional(Node.GreaterThan(f.Arguments[0], f.Arguments[1]), dargs[1], Node.Zero);
+            return result;
+        }
+        private static Node Max(FunctionNode f, IReadOnlyList<Node> dargs)
+        {
+            dargs.Check(2);
+            Node result = null;
+            if (dargs[0] != null)
+                result = Node.Conditional(Node.GreaterThan(f.Arguments[0], f.Arguments[1]), dargs[0], Node.Zero);
+            if (dargs[1] != null)
+                result += Node.Conditional(Node.LessThan(f.Arguments[0], f.Arguments[1]), dargs[1], Node.Zero);
+            return result;
+        }
         private static Node DAsin(FunctionNode f, IReadOnlyList<Node> dargs) => dargs.Check(1)[0] / Node.Function("sqrt", Node.One - Node.Power(f.Arguments[0], Node.Two));
         private static Node DAtan(FunctionNode f, IReadOnlyList<Node> dargs) =>  dargs.Check(1)[0] / (Node.One + Node.Power(f.Arguments[0], Node.Two));
         private static Node DPwr(FunctionNode f, IReadOnlyList<Node> dargs)

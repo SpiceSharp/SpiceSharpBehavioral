@@ -100,6 +100,29 @@ namespace SpiceSharpBehavioralTest.Parsers
                             Node.Function("cos", v1) / (1 - Node.Function("square", Node.Function("sin", v1)))
                         }
                     }).SetName("{m}(atanh sin(v1))");
+                yield return new TestCaseData(Node.Function("min", v1, v2), new Dictionary<VariableNode, Node>
+                {
+                    { v1, Node.Conditional(Node.LessThan(v1, v2), Node.Constant(1), Node.Zero)},
+                    { v2, Node.Conditional(Node.GreaterThan(v1, v2), Node.Constant(1), Node.Zero)},
+                }).SetName("{m}(min v1 v2)");
+
+                yield return new TestCaseData(Node.Function("min", Node.Function("sin", v1), v2), new Dictionary<VariableNode, Node>
+                {
+                    { v1, Node.Conditional(Node.LessThan(Node.Function("sin", v1), v2), Node.Function("cos", v1), Node.Zero)},
+                    { v2, Node.Conditional(Node.GreaterThan(Node.Function("sin", v1), v2), Node.Constant(1), Node.Zero)},
+                }).SetName("{m}(min sin v1 v2)");
+
+                yield return new TestCaseData(Node.Function("max", v1, v2), new Dictionary<VariableNode, Node>
+                {
+                    { v1, Node.Conditional(Node.GreaterThan(v1, v2), Node.Constant(1), Node.Zero)},
+                    { v2, Node.Conditional(Node.LessThan(v1, v2), Node.Constant(1), Node.Zero)},
+                }).SetName("{m}(max v1 v2)");
+
+                yield return new TestCaseData(Node.Function("max", Node.Function("sin", v1), v2), new Dictionary<VariableNode, Node>
+                {
+                    { v1, Node.Conditional(Node.GreaterThan(Node.Function("sin", v1), v2), Node.Function("cos", v1), Node.Zero)},
+                    { v2, Node.Conditional(Node.LessThan(Node.Function("sin", v1), v2), Node.Constant(1), Node.Zero)},
+                }).SetName("{m}(max sin v1 v2)");
             }
         }
     }
