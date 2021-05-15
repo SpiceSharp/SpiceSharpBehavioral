@@ -117,7 +117,8 @@ namespace SpiceSharpBehavioralTest.Components
         {
             var ckt = new Circuit(
                 new VoltageSource("Vtmp", "a", "0", 0.0), // Needed to have at least one independent source
-                new BehavioralVoltageSource("V1", "in", "0", "max(0, 5*sin(time*10*pi))"));
+                new VoltageSource("Vtmp2", "b", "0", 1.0),
+                new BehavioralVoltageSource("V1", "in", "0", "max(0, V(b)*5*sin(time*10*pi))"));
             var tran = new Transient("tran", 1e-3, 1);
 
             tran.ExportSimulationData += (sender, args) =>
@@ -132,7 +133,8 @@ namespace SpiceSharpBehavioralTest.Components
         {
             var ckt = new Circuit(
                 new VoltageSource("Vtmp", "a", "0", 0.0), // Needed to have at least one independent source
-                new BehavioralVoltageSource("V1", "in", "0", "min(0, 5*sin(time*10*pi))"));
+                new VoltageSource("Vtmp2", "b", "0", 1.0), 
+                new BehavioralVoltageSource("V1", "in", "0", "min(0, V(b)*5*sin(time*10*pi))"));
             var tran = new Transient("tran", 1e-3, 1);
 
             tran.ExportSimulationData += (sender, args) =>
