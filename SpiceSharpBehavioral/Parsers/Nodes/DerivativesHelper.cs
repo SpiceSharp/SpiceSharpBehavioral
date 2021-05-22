@@ -110,12 +110,40 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         {
             dargs.Check(3);
 
-            Node result = Node.Conditional(
-                Node.GreaterThan(f.Arguments[0], f.Arguments[2]),
-                    dargs[2] ?? Node.Zero,
-                    Node.Conditional(Node.LessThan(f.Arguments[0], f.Arguments[1]),
-                        dargs[1] ?? Node.Zero,
-                        dargs[0] ?? Node.Zero));
+            var x = f.Arguments[0];
+            var y = f.Arguments[1];
+            var z = f.Arguments[2];
+
+            Node result = null;
+            if (dargs[0] != null)
+            {
+                result = Node.Conditional(
+                    Node.And(
+                        Node.GreaterThan(x, Node.Function("min", y, z)),
+                        Node.LessThan(x, Node.Function("max", y, z))),
+                    dargs[0],
+                    Node.Zero);
+            }
+
+            if (dargs[1] != null)
+            {
+                result += Node.Conditional(
+                    Node.And(
+                        Node.LessThanOrEqual(y, z),
+                        Node.LessThanOrEqual(x, Node.Function("min", y, z))),
+                    dargs[1],
+                    Node.Zero);
+            }
+
+            if (dargs[2] != null)
+            {
+                result += Node.Conditional(
+                    Node.And(
+                        Node.GreaterThanOrEqual(y, z),
+                        Node.GreaterThanOrEqual(x, Node.Function("max", y, z))),
+                    dargs[2],
+                    Node.Zero);
+            }
 
             return result;
         }
