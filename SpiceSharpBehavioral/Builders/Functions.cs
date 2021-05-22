@@ -459,7 +459,7 @@ namespace SpiceSharpBehavioral.Builders
         /// <returns></returns>
         public static double Limit(double x, double y, double z)
         {
-            return Math.Min(Math.Max(x, y), z);
+            return Math.Min(Math.Max(x, Math.Min(y, z)), Math.Max(y, z));
         }
 
         /// <summary>
@@ -471,7 +471,7 @@ namespace SpiceSharpBehavioral.Builders
         /// <returns></returns>
         public static Complex Limit(Complex x, Complex y, Complex z)
         {
-            return Math.Min(Math.Max(x.Real, y.Real), z.Real);
+            return Math.Min(Math.Max(x.Real, Math.Min(y.Real, z.Real)), Math.Max(y.Real, z.Real));
         }
         /// <summary>
         /// Returns the hypothenuse (sqrt(|x|^2+|y|^2)).

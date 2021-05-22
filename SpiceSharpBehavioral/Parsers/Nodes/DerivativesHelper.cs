@@ -153,7 +153,7 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
             {
                 result += Node.Conditional(
                     Node.And(
-                        Node.GreaterThanOrEqual(y, z),
+                        Node.LessThan(y, z),
                         Node.GreaterThanOrEqual(x, Node.Function("max", y, z))),
                     dargs[2],
                     Node.Zero);

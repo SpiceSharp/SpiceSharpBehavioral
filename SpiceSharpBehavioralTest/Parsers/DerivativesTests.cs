@@ -139,9 +139,10 @@ namespace SpiceSharpBehavioralTest.Parsers
 
                 yield return new TestCaseData(Node.Function("limit", v1, v2, v3), new Dictionary<VariableNode, Node>
                 {
-                    { v1, Node.Conditional(Node.GreaterThan(v1, v3), Node.Zero, Node.Conditional(Node.LessThan(v1, v2), Node.Zero, Node.Constant(1))) },
-                    { v2, Node.Conditional(Node.GreaterThan(v1, v3), Node.Zero, Node.Conditional(Node.LessThan(v1, v2), Node.Constant(1), Node.Zero)) },
-                    { v3, Node.Conditional(Node.GreaterThan(v1, v3), Node.Constant(1), Node.Conditional(Node.LessThan(v1, v2), Node.Zero, Node.Zero)) }
+                    { v1, Node.Conditional(Node.And(Node.GreaterThan(v1, Node.Function("min", v2, v3)), Node.LessThan(v1, Node.Function("max", v2, v3))), Node.Constant(1), Node.Zero) },
+                    { v2, Node.Conditional(Node.And(Node.LessThanOrEqual(v2, v3), Node.LessThanOrEqual(v1, Node.Function("min", v2, v3))), Node.Constant(1), Node.Zero) },
+                    { v3, Node.Conditional(Node.And(Node.LessThan(v2, v3), Node.GreaterThanOrEqual(v1, Node.Function("max", v2, v3))), Node.Constant(1), Node.Zero) },
+
                 }).SetName("{m}(limit v1 v2 v3)");
             }
         }
