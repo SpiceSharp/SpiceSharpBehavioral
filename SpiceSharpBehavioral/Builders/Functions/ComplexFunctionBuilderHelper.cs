@@ -72,7 +72,8 @@ namespace SpiceSharpBehavioral.Builders.Functions
             { "min", Min },
             { "max", Max },
             { "rnd", Random }, { "rand", Random },
-            { "if", If }
+            { "if", If },
+            { "limit", Limit },
         };
 
         private static IReadOnlyList<Node> Check(this IReadOnlyList<Node> nodes, int expected)
@@ -168,6 +169,7 @@ namespace SpiceSharpBehavioral.Builders.Functions
             ilsc.PushDouble(0.5);
             ilsc.PushCheck(OpCodes.Bgt_S, arguments[1], arguments[2]);
         }
+        private static void Limit(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Limit, arguments);
 
         // N-argument functions
         private static void Pwl(IILState<Complex> ils, IReadOnlyList<Node> arguments)
