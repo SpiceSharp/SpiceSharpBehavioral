@@ -34,14 +34,22 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
             { "acos", (f, da) => -DAsin(f, da) }, { "arccos", (f, da) => -DAsin(f, da) },
             { "atan", DAtan }, { "arctan", DAtan },
             { "atan2", DAtan2 },
+            { "atanh", DAtanh },
             { "hypot", DHypot },
             { "ceil", Zero },
             { "floor", Zero },
             { "nint", Zero },
             { "round", Zero },
+            { "min", Min },
+            { "max", Max },
             { "square", (f, da) => Node.Two * da.Check(1)[0] * f.Arguments[0] },
             { "ddt", (f, da) => Node.Function("ddt_slope", new[] { da.Check(1)[0] }) },
-            { "idt", (f, da) => Node.Function("idt_slope", new[] { da.Check(1)[0] }) }
+            { "idt", (f, da) => Node.Function("idt_slope", new[] { da.Check(1)[0] }) },
+            { "limit", Limit },
+            { "db", (f, da) => Node.Constant(8.68588963807) * da.Check(1)[0] / f.Arguments[0] },
+            { "real", (f, da) => Node.Function("real", da.Check(1)[0]) },
+            { "imag", (f, da) => Node.Function("imag", da.Check(1)[0]) },
+            { "arg", (f, da) => DAtan2(f, new[] { Node.Function("imag", da.Check(1)[0]), Node.Function("real", da[0]) }) },
         };
 
         private static IReadOnlyList<Node> Check(this IReadOnlyList<Node> arguments, int expected)
@@ -51,6 +59,18 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
             return arguments;
         }
         private static Node Zero(FunctionNode f, IReadOnlyList<Node> dargs) => null;
+        private static Node Min(FunctionNode f, IReadOnlyList<Node> dargs)
+        {
+            dargs.Check(2);
+            Node result = Node.Conditional(Node.LessThan(f.Arguments[0], f.Arguments[1]), dargs[0] ?? Node.Zero, dargs[1] ?? Node.Zero);
+            return result;
+        }
+        private static Node Max(FunctionNode f, IReadOnlyList<Node> dargs)
+        {
+            dargs.Check(2);
+            Node result = Node.Conditional(Node.GreaterThan(f.Arguments[0], f.Arguments[1]), dargs[0] ?? Node.Zero, dargs[1] ?? Node.Zero);
+            return result;
+        }
         private static Node DAsin(FunctionNode f, IReadOnlyList<Node> dargs) => dargs.Check(1)[0] / Node.Function("sqrt", Node.One - Node.Power(f.Arguments[0], Node.Two));
         private static Node DAtan(FunctionNode f, IReadOnlyList<Node> dargs) =>  dargs.Check(1)[0] / (Node.One + Node.Power(f.Arguments[0], Node.Two));
         private static Node DPwr(FunctionNode f, IReadOnlyList<Node> dargs)
@@ -87,6 +107,7 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
             else
                 return (f.Arguments[1] * dargs[0] - f.Arguments[0] * dargs[1]) / (Node.Function("square", f.Arguments[0]) + Node.Function("square", f.Arguments[1]));
         }
+        private static Node DAtanh(FunctionNode f, IReadOnlyList<Node> dargs) => dargs.Check(1)[0] / (1 - Node.Function("square", f.Arguments[0]));
         private static Node DHypot(FunctionNode f, IReadOnlyList<Node> dargs)
         {
             dargs.Check(2);
@@ -102,5 +123,47 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
                 return 0.5 * (f.Arguments[0] * dargs[0] + f.Arguments[1] * dargs[1]) / f;
         }
         private static Node DPassThrough(FunctionNode f, IReadOnlyList<Node> dargs) => Node.Function(f.Name, dargs);
+
+        private static Node Limit(FunctionNode f, IReadOnlyList<Node> dargs)
+        {
+            dargs.Check(3);
+
+            var x = f.Arguments[0];
+            var y = f.Arguments[1];
+            var z = f.Arguments[2];
+
+            Node result = null;
+            if (dargs[0] != null)
+            {
+                result = Node.Conditional(
+                    Node.And(
+                        Node.GreaterThan(x, Node.Function("min", y, z)),
+                        Node.LessThan(x, Node.Function("max", y, z))),
+                    dargs[0],
+                    Node.Zero);
+            }
+
+            if (dargs[1] != null)
+            {
+                result += Node.Conditional(
+                    Node.And(
+                        Node.LessThanOrEqual(y, z),
+                        Node.LessThanOrEqual(x, Node.Function("min", y, z))),
+                    dargs[1],
+                    Node.Zero);
+            }
+
+            if (dargs[2] != null)
+            {
+                result += Node.Conditional(
+                    Node.And(
+                        Node.LessThan(y, z),
+                        Node.GreaterThanOrEqual(x, Node.Function("max", y, z))),
+                    dargs[2],
+                    Node.Zero);
+            }
+
+            return result;
+        }
     }
 }

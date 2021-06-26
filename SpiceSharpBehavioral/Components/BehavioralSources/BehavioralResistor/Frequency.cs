@@ -16,12 +16,12 @@ namespace SpiceSharp.Components.BehavioralResistorBehaviors
     /// <summary>
     /// Frequency behavior for a <see cref="BehavioralVoltageSource"/>.
     /// </summary>
-    /// <seealso cref="BiasingBehavior" />
+    /// <seealso cref="Biasing" />
     /// <seealso cref="IFrequencyBehavior" />
     /// <seealso cref="IBranchedBehavior{T}"/>
     [BehaviorFor(typeof(BehavioralResistor)), AddBehaviorIfNo(typeof(IFrequencyBehavior))]
     [GeneratedParameters]
-    public partial class FrequencyBehavior : BiasingBehavior,
+    public partial class Frequency : Biasing,
         IFrequencyBehavior,
         IBranchedBehavior<Complex>
     {
@@ -67,11 +67,11 @@ namespace SpiceSharp.Components.BehavioralResistorBehaviors
         public Complex ComplexPower => ComplexVoltage * Complex.Conjugate(ComplexCurrent);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FrequencyBehavior"/> class.
+        /// Initializes a new instance of the <see cref="Frequency"/> class.
         /// </summary>
         /// <param name="context">The context.</param>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="context"/> is <c>null</c>.</exception>
-        public FrequencyBehavior(BehavioralBindingContext context)
+        public Frequency(BehavioralBindingContext context)
             : base(context)
         {
             var bp = context.GetParameterSet<Parameters>();

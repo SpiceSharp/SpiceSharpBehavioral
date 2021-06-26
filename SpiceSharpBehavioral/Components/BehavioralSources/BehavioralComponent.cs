@@ -1,7 +1,5 @@
-﻿using SpiceSharp.Behaviors;
-using SpiceSharp.Entities;
+﻿using SpiceSharp.Entities;
 using SpiceSharp.ParameterSets;
-using SpiceSharp.Simulations;
 using System;
 using System.Collections.Generic;
 

@@ -16,7 +16,7 @@ namespace SpiceSharpBehavioral.Builders.Direct
         /// <summary>
         /// A set of default functions.
         /// </summary>
-        public static readonly Dictionary<string, Func<double[], double>> Defaults = new Dictionary<string, Func<double[], double>>()
+        public static Dictionary<string, Func<double[], double>> Defaults { get; set; } = new Dictionary<string, Func<double[], double>>()
         {
             { "abs", Abs },
             { "sgn", Sgn },
@@ -50,9 +50,15 @@ namespace SpiceSharpBehavioral.Builders.Direct
             { "min", Min },
             { "max", Max },
             { "atan2", Atan2 },
+            { "atanh", Atanh },
             { "hypot", Hypot },
             { "rnd", Random }, { "rand", Random },
-            { "if", If }
+            { "if", If },
+            { "limit", Limit },
+            { "real", args => args.Check(1)[0] },
+            { "imag", args => 0.0 },
+            { "arg", args => 0.0 },
+            { "db", args => 20 * Log10(args) }
         };
 
         private static double[] Check(this double[] args, int expected)
@@ -82,6 +88,20 @@ namespace SpiceSharpBehavioral.Builders.Direct
                     arguments[i] = args.Builder.Build(args.Function.Arguments[i]);
                 args.Result = definition(arguments);
             }
+        }
+
+        /// <summary>
+        /// Helper methods that changes the equality comparer for function names.
+        /// </summary>
+        /// <param name="comparer">The name comparer.</param>
+        public static void RemapFunctions(IEqualityComparer<string> comparer)
+        {
+            var nmap = new Dictionary<string, Func<double[], double>>(comparer);
+            foreach (var map in Defaults)
+            {
+                nmap.Add(map.Key, map.Value);
+            }
+            Defaults = nmap;
         }
 
         // No-argument functions
@@ -119,10 +139,12 @@ namespace SpiceSharpBehavioral.Builders.Direct
         private static double Max(double[] args) { args.Check(2); return Math.Max(args[0], args[1]); }
         private static double Round(double[] args) { args.Check(2); return Math.Round(args[0], (int)args[1]); }
         private static double Atan2(double[] args) { args.Check(2); return Math.Atan2(args[0], args[1]); }
+        private static double Atanh(double[] args) { args.Check(1); return HelperFunctions.Atanh(args[0]); }
         private static double Hypot(double[] args) { args.Check(2); return HelperFunctions.Hypot(args[0], args[1]); }
 
         // Three-argument functions
         private static double If(double[] args) { args.Check(3); return args[0] > 0.5 ? args[1] : args[2]; }
+        private static double Limit(double[] args) { args.Check(3); return HelperFunctions.Limit(args[0], args[1], args[2]); }
 
         // N-argument functions
         private static double Pwl(double[] args)

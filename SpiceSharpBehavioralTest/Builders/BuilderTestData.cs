@@ -63,6 +63,11 @@ namespace SpiceSharpBehavioralTest.Builders
                 yield return new TestCaseData(Node.Function("tbl", 2.0, 0.0, 1.0, 3.0, 4.0), 3.0).SetName("{m}(tbl 2,0,1,3,4)");
                 yield return new TestCaseData(Node.Function("if", 1.0, 0.25, 0.75), 0.25).SetName("{m}(if 1 0.25 0.75)");
                 yield return new TestCaseData(Node.Function("if", 0.0, 0.25, 0.75), 0.75).SetName("{m}(if 0 0.25 0.75)");
+                yield return new TestCaseData(Node.Function("limit", 0.4, 0.25, 0.75), 0.4).SetName("{m}(limit 0.4 0.25 0.75)");
+                yield return new TestCaseData(Node.Function("limit", 0.4, 0.25, 0.3), 0.3).SetName("{m}(limit 0.4 0.25 0.3)");
+                yield return new TestCaseData(Node.Function("limit", 0.4, 0.5, 0.7), 0.5).SetName("{m}(limit 0.4 0.5 0.7)");
+                yield return new TestCaseData(Node.Function("limit", 0.4, 0.7, 0.5), 0.5).SetName("{m}(limit 0.4 0.7 0.5)");
+
 
                 foreach (var data in Single)
                 {
@@ -80,6 +85,7 @@ namespace SpiceSharpBehavioralTest.Builders
                     yield return new TestCaseData(Node.Function("asin", node), Math.Asin(arg)).SetName("{{m}}(asin {0})".FormatString(arg));
                     yield return new TestCaseData(Node.Function("acos", node), Math.Acos(arg)).SetName("{{m}}(acos {0})".FormatString(arg));
                     yield return new TestCaseData(Node.Function("atan", node), Math.Atan(arg)).SetName("{{m}}(atan {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("atanh", node), HelperFunctions.Atanh(arg)).SetName("{{m}}(atanh {0})".FormatString(arg));
                     yield return new TestCaseData(Node.Function("sinh", node), Math.Sinh(arg)).SetName("{{m}}(sinh {0})".FormatString(arg));
                     yield return new TestCaseData(Node.Function("cosh", node), Math.Cosh(arg)).SetName("{{m}}(cosh {0})".FormatString(arg));
                     yield return new TestCaseData(Node.Function("tanh", node), Math.Tanh(arg)).SetName("{{m}}(tanh {0})".FormatString(arg));
@@ -95,6 +101,10 @@ namespace SpiceSharpBehavioralTest.Builders
                     yield return new TestCaseData(Node.Function("pwrs", node, node + 1.5), HelperFunctions.Power2(arg, arg + 1.5)).SetName("{{m}}(pwrs {0} {1})".FormatString(arg, arg + 1.5));
                     yield return new TestCaseData(Node.Function("atan2", node, node - 5.0), Math.Atan2(arg, arg - 5)).SetName("{{m}}(atan2 {0} {1})".FormatString(arg, arg - 5));
                     yield return new TestCaseData(Node.Function("hypot", node, node - 5.0), HelperFunctions.Hypot(arg, arg - 5)).SetName("{{m}}(hypot {0} {1})".FormatString(arg, arg - 5));
+                    yield return new TestCaseData(Node.Function("db", node), 20 * HelperFunctions.Log10(arg)).SetName("{{m}}(db {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("arg", node), 0.0).SetName("{{m}}(arg {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("real", node), arg).SetName("{{m}}(real {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("imag", node), 0.0).SetName("{{m}}(imag {0})".FormatString(arg));
                 }
             }
         }
@@ -111,6 +121,9 @@ namespace SpiceSharpBehavioralTest.Builders
                 yield return new TestCaseData(Node.Function("tbl", 2.0, 0.0, 1.0, 3.0, 4.0), new Complex(3, 0)).SetName("{m}(tbl 2,0,1,3,4)");
                 yield return new TestCaseData(Node.Function("if", 1.0, 0.25, 0.75), new Complex(0.25, 0)).SetName("{m}(if 1 0.25 0.75)");
                 yield return new TestCaseData(Node.Function("if", 0.0, 0.25, 0.75), new Complex(0.75, 0)).SetName("{m}(if 0 0.25 0.75)");
+                yield return new TestCaseData(Node.Function("limit", 0.4, 0.25, 0.3), new Complex(0.3, 0)).SetName("{m}(limit 0.4 0.25 0.3)");
+                yield return new TestCaseData(Node.Function("limit", 0.4, 0.5, 0.7), new Complex(0.5, 0)).SetName("{m}(limit 0.4 0.5 0.7)");
+                yield return new TestCaseData(Node.Function("limit", 0.4, 0.7, 0.5), new Complex(0.5, 0)).SetName("{m}(limit 0.4 0.7 0.5)");
 
                 foreach (var data in Single)
                 {
@@ -128,6 +141,7 @@ namespace SpiceSharpBehavioralTest.Builders
                     yield return new TestCaseData(Node.Function("asin", node), Complex.Asin(arg)).SetName("{{m}}(asin {0})".FormatString(arg));
                     yield return new TestCaseData(Node.Function("acos", node), Complex.Acos(arg)).SetName("{{m}}(acos {0})".FormatString(arg));
                     yield return new TestCaseData(Node.Function("atan", node), Complex.Atan(arg)).SetName("{{m}}(atan {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("atanh", node), HelperFunctions.Atanh(arg)).SetName("{{m}}(atanh {0})".FormatString(arg));
                     yield return new TestCaseData(Node.Function("sinh", node), Complex.Sinh(arg)).SetName("{{m}}(sinh {0})".FormatString(arg));
                     yield return new TestCaseData(Node.Function("cosh", node), Complex.Cosh(arg)).SetName("{{m}}(cosh {0})".FormatString(arg));
                     yield return new TestCaseData(Node.Function("tanh", node), Complex.Tanh(arg)).SetName("{{m}}(tanh {0})".FormatString(arg));

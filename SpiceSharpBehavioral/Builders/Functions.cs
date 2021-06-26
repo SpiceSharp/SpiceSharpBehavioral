@@ -95,6 +95,20 @@ namespace SpiceSharpBehavioral.Builders
         }
 
         /// <summary>
+        /// Gets the real part of a complex number.
+        /// </summary>
+        /// <param name="arg">The argument.</param>
+        /// <returns>The real part.</returns>
+        public static Complex Real(Complex arg) => arg.Real;
+
+        /// <summary>
+        /// Gets the imaginary part of a complex number.
+        /// </summary>
+        /// <param name="arg">The argument.</param>
+        /// <returns>The imaginary part.</returns>
+        public static Complex Imag(Complex arg) => arg.Imaginary;
+
+        /// <summary>
         /// Takes the natural logarithm.
         /// </summary>
         /// <param name="arg">The argument.</param>
@@ -141,6 +155,34 @@ namespace SpiceSharpBehavioral.Builders
                 return Log10(arg.Real);
             return Complex.Log10(arg);
         }
+
+        /// <summary>
+        /// Gets the magnitude of the complex value in decibels.
+        /// </summary>
+        /// <param name="arg">The argument.</param>
+        /// <returns>The magnitude in decibels.</returns>
+        public static Complex Decibels(Complex arg) => 10 * Log10(arg.Real * arg.Real + arg.Imaginary * arg.Imaginary);
+
+        /// <summary>
+        /// Gets the phase of the complex value in degrees.
+        /// </summary>
+        /// <param name="arg">The argument.</param>
+        /// <returns>The phase in degrees.</returns>
+        public static Complex Phase(Complex arg) => arg.Phase * 180.0 / Math.PI;
+
+        /// <summary>
+        /// Computes the inverse arc tangent hyperbolic.
+        /// </summary>
+        /// <param name="arg">The argument.</param>
+        /// <returns>The result.</returns>
+        public static double Atanh(double arg) => 0.5 * Log(SafeDivide(1 + arg, 1 - arg));
+
+        /// <summary>
+        /// Computes the inverse arc tangent hyperbolic.
+        /// </summary>
+        /// <param name="arg">The argument.</param>
+        /// <returns>The result.</returns>
+        public static Complex Atanh(Complex arg) => 0.5 * Log(SafeDivide(1 + arg, 1 - arg));
 
         /// <summary>
         /// Raises a number to a power.
@@ -436,6 +478,29 @@ namespace SpiceSharpBehavioral.Builders
         /// <returns>The hypothenuse.</returns>
         public static double Hypot(double y, double x) => Math.Sqrt(x * x + y * y);
 
+        /// <summary>
+        /// Returns the intermediate value of x, y, z.
+        /// </summary>
+        /// <param name="x">The argument</param>
+        /// <param name="y">Mininum value.</param>
+        /// <param name="z">Max value.</param>
+        /// <returns></returns>
+        public static double Limit(double x, double y, double z)
+        {
+            return Math.Min(Math.Max(x, Math.Min(y, z)), Math.Max(y, z));
+        }
+
+        /// <summary>
+        /// Returns the intermediate value of x, y, z.
+        /// </summary>
+        /// <param name="x">The argument</param>
+        /// <param name="y">Mininum value.</param>
+        /// <param name="z">Max value.</param>
+        /// <returns></returns>
+        public static Complex Limit(Complex x, Complex y, Complex z)
+        {
+            return Math.Min(Math.Max(x.Real, Math.Min(y.Real, z.Real)), Math.Max(y.Real, z.Real));
+        }
         /// <summary>
         /// Returns the hypothenuse (sqrt(|x|^2+|y|^2)).
         /// </summary>

@@ -38,6 +38,7 @@ namespace SpiceSharpBehavioralTest.Parsers
             {
                 var v1 = VariableNode.Voltage("v1");
                 var v2 = VariableNode.Voltage("v2");
+                var v3 = VariableNode.Voltage("v3");
                 var i1 = VariableNode.Current("i1");
 
                 yield return new TestCaseData(v1, new Dictionary<VariableNode, Node> { { v1, Node.One } }).SetName("{m}(v1)");
@@ -92,6 +93,57 @@ namespace SpiceSharpBehavioralTest.Parsers
                     { v1, 0.5 * v1 / Node.Function("hypot", v1, v2) },
                     { v2, 0.5 * v2 / Node.Function("hypot", v1, v2) }
                 }).SetName("{m}(hypot v1 v2)");
+                yield return new TestCaseData(
+                    Node.Function("atanh", Node.Function("sin", v1)),
+                    new Dictionary<VariableNode, Node> { 
+                        {
+                            v1, 
+                            Node.Function("cos", v1) / (1 - Node.Function("square", Node.Function("sin", v1)))
+                        }
+                    }).SetName("{m}(atanh sin(v1))");
+                yield return new TestCaseData(Node.Function("min", v1, v2), new Dictionary<VariableNode, Node>
+                {
+                    { v1, Node.Conditional(Node.LessThan(v1, v2), Node.Constant(1), Node.Zero)},
+                    { v2, Node.Conditional(Node.LessThan(v1, v2), Node.Zero, Node.Constant(1))},
+                }).SetName("{m}(min v1 v2)");
+
+                yield return new TestCaseData(Node.Function("min", Node.Function("sin", v1), v2), new Dictionary<VariableNode, Node>
+                {
+                    { v1, Node.Conditional(Node.LessThan(Node.Function("sin", v1), v2), Node.Function("cos", v1), Node.Zero)},
+                    { v2, Node.Conditional(Node.LessThan(Node.Function("sin", v1), v2), Node.Zero, Node.Constant(1))},
+                }).SetName("{m}(min sin v1 v2)");
+
+                yield return new TestCaseData(Node.Function("min", Node.Function("sin", v1), Node.Function("sin", v2)), new Dictionary<VariableNode, Node>
+                {
+                    { v1, Node.Conditional(Node.LessThan(Node.Function("sin", v1), Node.Function("sin", v2)), Node.Function("cos", v1), Node.Zero)},
+                    { v2, Node.Conditional(Node.LessThan(Node.Function("sin", v1), Node.Function("sin", v2)), Node.Zero, Node.Function("cos", v2))},
+                }).SetName("{m}(min sin v1 sin v2)");
+
+                yield return new TestCaseData(Node.Function("max", v1, v2), new Dictionary<VariableNode, Node>
+                {
+                    { v1, Node.Conditional(Node.GreaterThan(v1, v2), Node.Constant(1), Node.Zero)},
+                    { v2, Node.Conditional(Node.GreaterThan(v1, v2), Node.Zero, Node.Constant(1))},
+                }).SetName("{m}(max v1 v2)");
+
+                yield return new TestCaseData(Node.Function("max", Node.Function("sin", v1), v2), new Dictionary<VariableNode, Node>
+                {
+                    { v1, Node.Conditional(Node.GreaterThan(Node.Function("sin", v1), v2), Node.Function("cos", v1), Node.Zero)},
+                    { v2, Node.Conditional(Node.GreaterThan(Node.Function("sin", v1), v2), Node.Zero, Node.Constant(1))},
+                }).SetName("{m}(max sin v1 v2)");
+
+                yield return new TestCaseData(Node.Function("max", Node.Function("sin", v1), Node.Function("sin", v2)), new Dictionary<VariableNode, Node>
+                {
+                    { v1, Node.Conditional(Node.GreaterThan(Node.Function("sin", v1), Node.Function("sin", v2)), Node.Function("cos", v1), Node.Zero)},
+                    { v2, Node.Conditional(Node.GreaterThan(Node.Function("sin", v1), Node.Function("sin", v2)), Node.Zero, Node.Function("cos", v2))},
+                }).SetName("{m}(max sin v1 sin v2)");
+
+                yield return new TestCaseData(Node.Function("limit", v1, v2, v3), new Dictionary<VariableNode, Node>
+                {
+                    { v1, Node.Conditional(Node.And(Node.GreaterThan(v1, Node.Function("min", v2, v3)), Node.LessThan(v1, Node.Function("max", v2, v3))), Node.Constant(1), Node.Zero) },
+                    { v2, Node.Conditional(Node.And(Node.LessThanOrEqual(v2, v3), Node.LessThanOrEqual(v1, Node.Function("min", v2, v3))), Node.Constant(1), Node.Zero) },
+                    { v3, Node.Conditional(Node.And(Node.LessThan(v2, v3), Node.GreaterThanOrEqual(v1, Node.Function("max", v2, v3))), Node.Constant(1), Node.Zero) },
+
+                }).SetName("{m}(limit v1 v2 v3)");
             }
         }
     }

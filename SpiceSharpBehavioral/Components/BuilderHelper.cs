@@ -136,6 +136,16 @@ namespace SpiceSharp.Components.BehavioralComponents
                 variables.Add("sourcefactor", new FuncVariable<double>("sourcefactor", () => iterState.SourceFactor, _scalar));
             }
 
+            // Small-signal
+            if (context.TryGetState<IComplexSimulationState>(out var cplxState))
+            {
+                variables.Add("smallsig", new ConstantVariable<double>("smallsig", 1.0, _scalar));
+            }
+            else
+            {
+                variables.Add("smallsig", new ConstantVariable<double>("smallsig", 0.0, _scalar));
+            }
+
             // Some standard constants
             variables.Add("pi", new ConstantVariable<double>("pi", Math.PI, _scalar));
             variables.Add("e", new ConstantVariable<double>("e", Math.Exp(1.0), _scalar));
@@ -204,7 +214,12 @@ namespace SpiceSharp.Components.BehavioralComponents
                         }
                     }
                 };
+                variables.Add("smallsig", new ConstantVariable<Complex>("smallsig", 1.0, _scalar));
             }
+            else
+            {
+                variables.Add("smallsig", new ConstantVariable<Complex>("smallsig", 1.0, _scalar));
+            }    
 
             // Some standard constants
             variables.Add("pi", new ConstantVariable<Complex>("pi", Math.PI, _scalar));

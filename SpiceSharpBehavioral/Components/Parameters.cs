@@ -1,13 +1,10 @@
 ﻿using SpiceSharp.Attributes;
 using SpiceSharp.ParameterSets;
 using SpiceSharpBehavioral.Builders;
-using SpiceSharpBehavioral.Builders.Functions;
-using SpiceSharpBehavioral.Parsers;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 
 namespace SpiceSharp.Components.BehavioralComponents
 {
@@ -16,9 +13,8 @@ namespace SpiceSharp.Components.BehavioralComponents
     /// </summary>
     /// <seealso cref="ParameterSet" />
     [GeneratedParameters]
-    public partial class Parameters : ParameterSet<Parameters>
+    public partial class Parameters : SpiceSharpBehavioral.Components.Parameters<Parameters>
     {
-        private bool _isDirty;
         private readonly NodeFinder _nodeFinder = new NodeFinder();
 
         /// <summary>
@@ -52,92 +48,6 @@ namespace SpiceSharp.Components.BehavioralComponents
         /// The variable comparer.
         /// </value>
         public IEqualityComparer<string> VariableComparer { get; set; } = StringComparer.OrdinalIgnoreCase;
-
-        /// <summary>
-        /// Gets or sets the expression.
-        /// </summary>
-        /// <value>
-        /// The expression.
-        /// </value>
-        [ParameterName("expression"), ParameterName("e"), ParameterInfo("The expression describing the component")]
-        public string Expression 
-        { 
-            get => _expression;
-            set
-            {
-                if (!ReferenceEquals(_expression, value))
-                    _isDirty = true;
-                _expression = value;
-            }
-        }
-        private string _expression;
-
-        /// <summary>
-        /// Gets the function.
-        /// </summary>
-        /// <value>
-        /// The function.
-        /// </value>
-        [ParameterName("node"), ParameterInfo("The node that represents the expression")]
-        public Node Function
-        {
-            get
-            {
-                if (_isDirty)
-                {
-                    if (_parseAction == null || _expression == null)
-                        _function = null;
-                    else
-                        _function = _parseAction(_expression);
-                }
-                return _function;
-            }
-        }
-        private Node _function;
-
-        /// <summary>
-        /// Gets or sets the parse action.
-        /// </summary>
-        /// <value>
-        /// The parse action.
-        /// </value>
-        public Func<string, Node> ParseAction
-        {
-            get => _parseAction;
-            set
-            {
-                if (_parseAction != value)
-                    _isDirty = true;
-                _parseAction = value;
-            }
-        }
-        private Func<string, Node> _parseAction = e => new Parser().Parse(e);
-
-        /// <summary>
-        /// Occurs when a builder has been created that uses real values.
-        /// </summary>
-        public event EventHandler<BuilderCreatedEventArgs<double>> RealBuilderCreated;
-
-        /// <summary>
-        /// Occurs when a builder has been created that uses complex values.
-        /// </summary>
-        public event EventHandler<BuilderCreatedEventArgs<Complex>> ComplexBuilderCreated;
-
-        /// <summary>
-        /// Registers a new function builder.
-        /// </summary>
-        /// <param name="context">The context.</param>
-        /// <param name="builder">The builder.</param>
-        public void RegisterBuilder(IComponentBindingContext context, IFunctionBuilder<double> builder) 
-            => RealBuilderCreated?.Invoke(this, new BuilderCreatedEventArgs<double>(context, builder));
-
-        /// <summary>
-        /// Register a new function builder.
-        /// </summary>
-        /// <param name="context">The context.</param>
-        /// <param name="builder">The builder.</param>
-        public void RegisterBuilder(IComponentBindingContext context, IFunctionBuilder<Complex> builder)
-            => ComplexBuilderCreated?.Invoke(this, new BuilderCreatedEventArgs<Complex>(context, builder));
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Parameters"/> class.

@@ -31,7 +31,7 @@ namespace SpiceSharpBehavioral.Builders.Functions
         /// <summary>
         /// A set of default functions.
         /// </summary>
-        public static readonly Dictionary<string, ApplyFunction> Defaults = new Dictionary<string, ApplyFunction>(StringComparer.OrdinalIgnoreCase)
+        public static Dictionary<string, ApplyFunction> Defaults { get; set; } = new Dictionary<string, ApplyFunction>(StringComparer.OrdinalIgnoreCase)
         {
             { "abs", Abs },
             { "sgn", Sgn },
@@ -52,6 +52,7 @@ namespace SpiceSharpBehavioral.Builders.Functions
             { "acos", Acos }, { "arccos", Acos },
             { "atan", Atan }, { "arctan", Atan },
             { "atan2", Atan2 },
+            { "atanh", Atanh },
             { "hypot", Hypot },
             { "u", U }, { "du(0)", Zero },
             { "u2", U2 }, { "du2(0)", DU2 },
@@ -67,7 +68,12 @@ namespace SpiceSharpBehavioral.Builders.Functions
             { "min", Min },
             { "max", Max },
             { "rnd", Random }, { "rand", Random },
-            { "if", If }
+            { "if", If },
+            { "limit", Limit },
+            { "db", Decibels },
+            { "arg", Zero },
+            { "real", (ils, args) => ils.Push(args.Check(1)[0]) },
+            { "imag", Zero },
         };
 
         private static IReadOnlyList<Node> Check(this IReadOnlyList<Node> nodes, int expected)
@@ -75,6 +81,20 @@ namespace SpiceSharpBehavioral.Builders.Functions
             if (nodes.Count != expected)
                 throw new ArgumentMismatchException(expected, nodes.Count);
             return nodes;
+        }
+
+        /// <summary>
+        /// Helper methods that changes the equality comparer for function names.
+        /// </summary>
+        /// <param name="comparer">The name comparer.</param>
+        public static void RemapFunctions(IEqualityComparer<string> comparer)
+        {
+            var nmap = new Dictionary<string, ApplyFunction>(comparer);
+            foreach (var map in Defaults)
+            {
+                nmap.Add(map.Key, map.Value);
+            }
+            Defaults = nmap;
         }
 
         /// <summary>
@@ -126,6 +146,12 @@ namespace SpiceSharpBehavioral.Builders.Functions
         private static void Log10(IILState<double> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Log10, arguments);
         private static void Square(IILState<double> ils, IReadOnlyList<Node> arguments) { ils.Push(arguments.Check(1)[0]); ils.Generator.Emit(OpCodes.Dup); ils.Generator.Emit(OpCodes.Mul); }
         private static void Nint(IILState<double> ils, IReadOnlyList<Node> arguments) { ils.Push(arguments.Check(1)[0]); ils.PushInt(0); ils.Generator.Emit(OpCodes.Call, _round); }
+        private static void Decibels(IILState<double> ils, IReadOnlyList<Node> arguments)
+        {
+            ils.Call(HelperFunctions.Log10, arguments);
+            ils.Push(20.0);
+            ils.Generator.Emit(OpCodes.Mul);
+        }
 
         // Two-argument functions
         private static void Pow(IILState<double> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Pow, arguments);
@@ -133,17 +159,19 @@ namespace SpiceSharpBehavioral.Builders.Functions
         private static void Pwrs(IILState<double> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Power2, arguments);
         private static void Min(IILState<double> ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Min, arguments);
         private static void Max(IILState<double> ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Max, arguments);
-        private static void Round(IILState<double> ils, IReadOnlyList<Node> arguments) 
+        private static void Round(IILState<double> ils, IReadOnlyList<Node> arguments)
         {
-            ils.Push(arguments.Check(2)[0]); 
-            ils.Push(arguments[1]); 
-            ils.Generator.Emit(OpCodes.Conv_I4); 
-            ils.Generator.Emit(OpCodes.Call, _round); 
+            ils.Push(arguments.Check(2)[0]);
+            ils.Push(arguments[1]);
+            ils.Generator.Emit(OpCodes.Conv_I4);
+            ils.Generator.Emit(OpCodes.Call, _round);
         }
         private static void Atan2(IILState<double> ils, IReadOnlyList<Node> arguments) => ils.Call(Math.Atan2, arguments);
+        private static void Atanh(IILState<double> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Atanh, arguments);
         private static void Hypot(IILState<double> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Hypot, arguments);
 
         // Three-argument functions
+        private static void Limit(IILState<double> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Limit, arguments);
         private static void If(IILState<double> ils, IReadOnlyList<Node> arguments)
         {
             arguments.Check(3);

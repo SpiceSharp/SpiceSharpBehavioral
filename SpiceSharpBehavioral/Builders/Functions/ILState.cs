@@ -1,5 +1,4 @@
 ﻿using SpiceSharp;
-using SpiceSharp.Simulations;
 using SpiceSharpBehavioral.Diagnostics;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
@@ -222,6 +221,22 @@ namespace SpiceSharpBehavioral.Builders.Functions
         {
             if (args == null || args.Count != 2)
                 throw new ArgumentMismatchException(2, args?.Count ?? 0);
+            if (function.Target == null)
+                Call(null, function.GetMethodInfo(), args);
+            else
+                Call(function, _invoke2, args);
+        }
+
+        /// <summary>
+        /// Calls the specified function.
+        /// </summary>
+        /// <param name="function">The function.</param>
+        /// <param name="args">The arguments.</param>
+        /// <exception cref="ArgumentMismatchException">Thrown if there aren't two arguments.</exception>
+        public void Call(Func<T, T, T, T> function, IReadOnlyList<Node> args)
+        {
+            if (args == null || args.Count != 3)
+                throw new ArgumentMismatchException(3, args?.Count ?? 0);
             if (function.Target == null)
                 Call(null, function.GetMethodInfo(), args);
             else
