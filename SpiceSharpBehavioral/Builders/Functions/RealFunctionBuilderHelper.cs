@@ -17,7 +17,6 @@ namespace SpiceSharpBehavioral.Builders.Functions
         private static readonly MethodInfo
             _sgn = ((Func<double, int>)Math.Sign).GetMethodInfo(),
             _round = ((Func<double, int, double>)Math.Round).GetMethodInfo(),
-            _ln = ((Func<double, double>)Math.Log).GetMethodInfo(),
             _pwl = ((Func<double, Point[], double>)HelperFunctions.Pwl).GetMethodInfo(),
             _pwlDerivative = ((Func<double, Point[], double>)HelperFunctions.PwlDerivative).GetMethodInfo();
         private static readonly ConstructorInfo _point = typeof(Point).GetTypeInfo().GetConstructor(new[] { typeof(double), typeof(double) });
@@ -70,7 +69,11 @@ namespace SpiceSharpBehavioral.Builders.Functions
             { "max", Max },
             { "rnd", Random }, { "rand", Random },
             { "if", If },
-            { "limit", Limit }
+            { "limit", Limit },
+            { "db", Decibels },
+            { "arg", Zero },
+            { "real", (ils, args) => ils.Push(args.Check(1)[0]) },
+            { "imag", Zero },
         };
 
         private static IReadOnlyList<Node> Check(this IReadOnlyList<Node> nodes, int expected)
@@ -78,6 +81,20 @@ namespace SpiceSharpBehavioral.Builders.Functions
             if (nodes.Count != expected)
                 throw new ArgumentMismatchException(expected, nodes.Count);
             return nodes;
+        }
+
+        /// <summary>
+        /// Helper methods that changes the equality comparer for function names.
+        /// </summary>
+        /// <param name="comparer">The name comparer.</param>
+        public static void RemapFunctions(IEqualityComparer<string> comparer)
+        {
+            var nmap = new Dictionary<string, ApplyFunction>(comparer);
+            foreach (var map in Defaults)
+            {
+                nmap.Add(map.Key, map.Value);
+            }
+            Defaults = nmap;
         }
 
         /// <summary>
@@ -129,6 +146,12 @@ namespace SpiceSharpBehavioral.Builders.Functions
         private static void Log10(IILState<double> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Log10, arguments);
         private static void Square(IILState<double> ils, IReadOnlyList<Node> arguments) { ils.Push(arguments.Check(1)[0]); ils.Generator.Emit(OpCodes.Dup); ils.Generator.Emit(OpCodes.Mul); }
         private static void Nint(IILState<double> ils, IReadOnlyList<Node> arguments) { ils.Push(arguments.Check(1)[0]); ils.PushInt(0); ils.Generator.Emit(OpCodes.Call, _round); }
+        private static void Decibels(IILState<double> ils, IReadOnlyList<Node> arguments)
+        {
+            ils.Call(HelperFunctions.Log10, arguments);
+            ils.Push(20.0);
+            ils.Generator.Emit(OpCodes.Mul);
+        }
 
         // Two-argument functions
         private static void Pow(IILState<double> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Pow, arguments);
@@ -149,7 +172,6 @@ namespace SpiceSharpBehavioral.Builders.Functions
 
         // Three-argument functions
         private static void Limit(IILState<double> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Limit, arguments);
-
         private static void If(IILState<double> ils, IReadOnlyList<Node> arguments)
         {
             arguments.Check(3);

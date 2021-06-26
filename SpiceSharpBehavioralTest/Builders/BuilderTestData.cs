@@ -101,6 +101,10 @@ namespace SpiceSharpBehavioralTest.Builders
                     yield return new TestCaseData(Node.Function("pwrs", node, node + 1.5), HelperFunctions.Power2(arg, arg + 1.5)).SetName("{{m}}(pwrs {0} {1})".FormatString(arg, arg + 1.5));
                     yield return new TestCaseData(Node.Function("atan2", node, node - 5.0), Math.Atan2(arg, arg - 5)).SetName("{{m}}(atan2 {0} {1})".FormatString(arg, arg - 5));
                     yield return new TestCaseData(Node.Function("hypot", node, node - 5.0), HelperFunctions.Hypot(arg, arg - 5)).SetName("{{m}}(hypot {0} {1})".FormatString(arg, arg - 5));
+                    yield return new TestCaseData(Node.Function("db", node), 20 * HelperFunctions.Log10(arg)).SetName("{{m}}(db {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("arg", node), 0.0).SetName("{{m}}(arg {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("real", node), arg).SetName("{{m}}(real {0})".FormatString(arg));
+                    yield return new TestCaseData(Node.Function("imag", node), 0.0).SetName("{{m}}(imag {0})".FormatString(arg));
                 }
             }
         }

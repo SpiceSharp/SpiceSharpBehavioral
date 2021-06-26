@@ -95,6 +95,20 @@ namespace SpiceSharpBehavioral.Builders
         }
 
         /// <summary>
+        /// Gets the real part of a complex number.
+        /// </summary>
+        /// <param name="arg">The argument.</param>
+        /// <returns>The real part.</returns>
+        public static Complex Real(Complex arg) => arg.Real;
+
+        /// <summary>
+        /// Gets the imaginary part of a complex number.
+        /// </summary>
+        /// <param name="arg">The argument.</param>
+        /// <returns>The imaginary part.</returns>
+        public static Complex Imag(Complex arg) => arg.Imaginary;
+
+        /// <summary>
         /// Takes the natural logarithm.
         /// </summary>
         /// <param name="arg">The argument.</param>
@@ -141,6 +155,20 @@ namespace SpiceSharpBehavioral.Builders
                 return Log10(arg.Real);
             return Complex.Log10(arg);
         }
+
+        /// <summary>
+        /// Gets the magnitude of the complex value in decibels.
+        /// </summary>
+        /// <param name="arg">The argument.</param>
+        /// <returns>The magnitude in decibels.</returns>
+        public static Complex Decibels(Complex arg) => 10 * Log10(arg.Real * arg.Real + arg.Imaginary * arg.Imaginary);
+
+        /// <summary>
+        /// Gets the phase of the complex value in degrees.
+        /// </summary>
+        /// <param name="arg">The argument.</param>
+        /// <returns>The phase in degrees.</returns>
+        public static Complex Phase(Complex arg) => arg.Phase * 180.0 / Math.PI;
 
         /// <summary>
         /// Computes the inverse arc tangent hyperbolic.

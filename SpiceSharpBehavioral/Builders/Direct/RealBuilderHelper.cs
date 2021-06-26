@@ -16,7 +16,7 @@ namespace SpiceSharpBehavioral.Builders.Direct
         /// <summary>
         /// A set of default functions.
         /// </summary>
-        public static readonly Dictionary<string, Func<double[], double>> Defaults = new Dictionary<string, Func<double[], double>>()
+        public static Dictionary<string, Func<double[], double>> Defaults { get; set; } = new Dictionary<string, Func<double[], double>>()
         {
             { "abs", Abs },
             { "sgn", Sgn },
@@ -54,7 +54,11 @@ namespace SpiceSharpBehavioral.Builders.Direct
             { "hypot", Hypot },
             { "rnd", Random }, { "rand", Random },
             { "if", If },
-            { "limit", Limit }
+            { "limit", Limit },
+            { "real", args => args.Check(1)[0] },
+            { "imag", args => 0.0 },
+            { "arg", args => 0.0 },
+            { "db", args => 20 * Log10(args) }
         };
 
         private static double[] Check(this double[] args, int expected)
@@ -84,6 +88,20 @@ namespace SpiceSharpBehavioral.Builders.Direct
                     arguments[i] = args.Builder.Build(args.Function.Arguments[i]);
                 args.Result = definition(arguments);
             }
+        }
+
+        /// <summary>
+        /// Helper methods that changes the equality comparer for function names.
+        /// </summary>
+        /// <param name="comparer">The name comparer.</param>
+        public static void RemapFunctions(IEqualityComparer<string> comparer)
+        {
+            var nmap = new Dictionary<string, Func<double[], double>>(comparer);
+            foreach (var map in Defaults)
+            {
+                nmap.Add(map.Key, map.Value);
+            }
+            Defaults = nmap;
         }
 
         // No-argument functions

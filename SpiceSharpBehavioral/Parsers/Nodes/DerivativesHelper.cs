@@ -46,6 +46,10 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
             { "ddt", (f, da) => Node.Function("ddt_slope", new[] { da.Check(1)[0] }) },
             { "idt", (f, da) => Node.Function("idt_slope", new[] { da.Check(1)[0] }) },
             { "limit", Limit },
+            { "db", (f, da) => Node.Constant(8.68588963807) * da.Check(1)[0] / f.Arguments[0] },
+            { "real", (f, da) => Node.Function("real", da.Check(1)[0]) },
+            { "imag", (f, da) => Node.Function("imag", da.Check(1)[0]) },
+            { "arg", (f, da) => DAtan2(f, new[] { Node.Function("imag", da.Check(1)[0]), Node.Function("real", da[0]) }) },
         };
 
         private static IReadOnlyList<Node> Check(this IReadOnlyList<Node> arguments, int expected)

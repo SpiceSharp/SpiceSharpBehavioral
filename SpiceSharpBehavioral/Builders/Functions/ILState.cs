@@ -1,5 +1,4 @@
 ﻿using SpiceSharp;
-using SpiceSharp.Simulations;
 using SpiceSharpBehavioral.Diagnostics;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using System;

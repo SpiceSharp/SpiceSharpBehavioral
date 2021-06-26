@@ -16,7 +16,7 @@ namespace SpiceSharpBehavioral.Builders.Direct
         /// <summary>
         /// A set of default functions.
         /// </summary>
-        public static readonly Dictionary<string, Func<Complex[], Complex>> Defaults = new Dictionary<string, Func<Complex[], Complex>>(StringComparer.OrdinalIgnoreCase)
+        public static Dictionary<string, Func<Complex[], Complex>> Defaults { get; set; } = new Dictionary<string, Func<Complex[], Complex>>(StringComparer.OrdinalIgnoreCase)
         {
             { "abs", Abs },
             { "sgn", Sgn },
@@ -54,7 +54,11 @@ namespace SpiceSharpBehavioral.Builders.Direct
             { "hypot", Hypot },
             { "rnd", Random }, { "rand", Random },
             { "if", If },
-            { "limit", Limit }
+            { "limit", Limit },
+            { "db", Decibels },
+            { "arg", args => args.Check(1)[0].Phase * 180.0 / Math.PI },
+            { "real", args => args.Check(1)[0].Real },
+            { "imag", args => args.Check(1)[0].Imaginary },
         };
 
         private static Complex[] Check(this Complex[] args, int expected)
@@ -84,6 +88,20 @@ namespace SpiceSharpBehavioral.Builders.Direct
                     arguments[i] = args.Builder.Build(args.Function.Arguments[i]);
                 args.Result = definition(arguments);
             }
+        }
+
+        /// <summary>
+        /// Helper methods that changes the equality comparer for function names.
+        /// </summary>
+        /// <param name="comparer">The name comparer.</param>
+        public static void RemapFunctions(IEqualityComparer<string> comparer)
+        {
+            var nmap = new Dictionary<string, Func<Complex[], Complex>>(comparer);
+            foreach (var map in Defaults)
+            {
+                nmap.Add(map.Key, map.Value);
+            }
+            Defaults = nmap;
         }
 
         // No-argument functions
@@ -123,6 +141,11 @@ namespace SpiceSharpBehavioral.Builders.Direct
         {
             var arg = args.Check(1)[0];
             return new Complex(Math.Round(arg.Real, 0), Math.Round(arg.Imaginary, 0));
+        }
+        private static Complex Decibels(Complex[] args)
+        {
+            var arg = args.Check(1)[0];
+            return 10 * Math.Log10(arg.Real * arg.Real + arg.Imaginary * arg.Imaginary);
         }
 
         // Two-argument functions

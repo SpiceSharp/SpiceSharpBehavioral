@@ -12,6 +12,19 @@ namespace SpiceSharpBehavioralTest.Components
     public class BehavioralCurrentSourceTests
     {
         [Test]
+        public void When_DBSource_Expect_Reference()
+        {
+            var ckt = new Circuit(
+                new CurrentSource("I1", "in1", "0", 1.0),
+                new Resistor("R1", "in1", "0", 1.0),
+                new BehavioralCurrentSource("I2", "in2", "0", "vdb(in1)"),
+                new Resistor("R2", "in2", "0", 1.0));
+
+            var op = new OP("op");
+            op.Run(ckt);
+        }
+
+        [Test]
         public void When_DCSource_Expect_Reference()
         {
             var ckt = new Circuit(

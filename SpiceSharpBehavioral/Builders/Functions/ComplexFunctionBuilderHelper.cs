@@ -19,8 +19,6 @@ namespace SpiceSharpBehavioral.Builders.Functions
         private static readonly MethodInfo
             _sgn = ((Func<double, int>)Math.Sign).GetMethodInfo(),
             _round = ((Func<Complex, int, Complex>)HelperFunctions.Round).GetMethodInfo(),
-            _complexSub = ((Func<Complex, Complex, Complex>)Complex.Subtract).GetMethodInfo(),
-            _complexDiv = ((Func<Complex, Complex, Complex>)Complex.Divide).GetMethodInfo(),
             _pwl = ((Func<double, Point[], double>)HelperFunctions.Pwl).GetMethodInfo(),
             _pwlDerivative = ((Func<double, Point[], double>)HelperFunctions.PwlDerivative).GetMethodInfo();
         private static readonly ConstructorInfo _point = typeof(Point).GetTypeInfo().GetConstructor(new[] { typeof(double), typeof(double) });
@@ -74,6 +72,10 @@ namespace SpiceSharpBehavioral.Builders.Functions
             { "rnd", Random }, { "rand", Random },
             { "if", If },
             { "limit", Limit },
+            { "db", Decibels },
+            { "arg", Argument },
+            { "real", (ils, args) => ils.Call(HelperFunctions.Real, args) },
+            { "imag", (ils, args) => ils.Call(HelperFunctions.Imag, args) },
         };
 
         private static IReadOnlyList<Node> Check(this IReadOnlyList<Node> nodes, int expected)
@@ -100,6 +102,20 @@ namespace SpiceSharpBehavioral.Builders.Functions
                 func(args.ILState, args.Function.Arguments);
                 args.Created = true;
             }    
+        }
+
+        /// <summary>
+        /// Helper methods that changes the equality comparer for function names.
+        /// </summary>
+        /// <param name="comparer">The name comparer.</param>
+        public static void RemapFunctions(IEqualityComparer<string> comparer)
+        {
+            var nmap = new Dictionary<string, ApplyFunction>(comparer);
+            foreach (var map in Defaults)
+            {
+                nmap.Add(map.Key, map.Value);
+            }
+            Defaults = nmap;
         }
 
         // No-argument functions
@@ -142,6 +158,8 @@ namespace SpiceSharpBehavioral.Builders.Functions
             ils.PushInt(0);
             ils.Generator.Emit(OpCodes.Call, _round);
         }
+        private static void Decibels(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Decibels, arguments);
+        private static void Argument(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Phase, arguments);
 
         // Two-argument functions
         private static void Pow(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(Complex.Pow, arguments);

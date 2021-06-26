@@ -240,6 +240,12 @@ namespace SpiceSharpBehavioral.Parsers
                             case "vm":
                                 function = "abs";
                                 goto case "v";
+                            case "vdb":
+                                function = "db";
+                                goto case "v";
+                            case "vp":
+                                function = "arg";
+                                goto case "v";
                             case "v":
                                 // Read the nodes
                                 lexer.ContinueWhileNode();
@@ -264,6 +270,12 @@ namespace SpiceSharpBehavioral.Parsers
                                 goto case "i";
                             case "im":
                                 function = "abs";
+                                goto case "i";
+                            case "idb":
+                                function = "db";
+                                goto case "i";
+                            case "ip":
+                                function = "arg";
                                 goto case "i";
                             case "i":
                                 // Read the nodes
@@ -292,7 +304,9 @@ namespace SpiceSharpBehavioral.Parsers
                                 break;
                         }
                         if (function != null)
-                            result = Node.Function(function, new[] { result });
+                        {
+                            Node.Function(function, new[] { result });
+                        }
                     }
                     else
                         result = Node.Variable(name);
