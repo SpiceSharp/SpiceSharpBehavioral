@@ -67,6 +67,7 @@ namespace SpiceSharpBehavioralTest.Parsers
                 yield return new TestCaseData("1.");
                 yield return new TestCaseData("2.e2A");
                 yield return new TestCaseData("2e3");
+                yield return new TestCaseData(".2");
             }
         }
         public static IEnumerable<TestCaseData> Operators
