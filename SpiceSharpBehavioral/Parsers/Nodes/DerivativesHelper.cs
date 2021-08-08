@@ -12,7 +12,7 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         /// <summary>
         /// The default function rules.
         /// </summary>
-        public static readonly Dictionary<string, FunctionRule> Defaults = new Dictionary<string, FunctionRule>
+        public static Dictionary<string, FunctionRule> Defaults { get; set; } = new Dictionary<string, FunctionRule>
         {
             { "abs", (f, da) => Derivatives.ChainRule(f, da.Check(1), "sgn") },
             { "sgn", Zero },
@@ -51,6 +51,21 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
             { "imag", (f, da) => Node.Function("imag", da.Check(1)[0]) },
             { "arg", (f, da) => DAtan2(f, new[] { Node.Function("imag", da.Check(1)[0]), Node.Function("real", da[0]) }) },
         };
+
+        /// <summary>
+        /// Helper methods that changes the equality comparer for function names.
+        /// </summary>
+        /// <param name="comparer">The name comparer.</param>
+        public static void RemapFunctions(IEqualityComparer<string> comparer)
+        {
+            var nmap = new Dictionary<string, FunctionRule>(comparer);
+            foreach (var map in Defaults)
+            {
+                nmap.Add(map.Key, map.Value);
+            }
+            Defaults = nmap;
+        }
+
 
         private static IReadOnlyList<Node> Check(this IReadOnlyList<Node> arguments, int expected)
         {
