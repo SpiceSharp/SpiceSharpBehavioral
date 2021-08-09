@@ -12,7 +12,7 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
         /// <summary>
         /// The default function rules.
         /// </summary>
-        public static Dictionary<string, FunctionRule> Defaults { get; set; } = new Dictionary<string, FunctionRule>
+        public static Dictionary<string, FunctionRule> Defaults { get; set; } = new Dictionary<string, FunctionRule>(StringComparer.OrdinalIgnoreCase)
         {
             { "abs", (f, da) => Derivatives.ChainRule(f, da.Check(1), "sgn") },
             { "sgn", Zero },
@@ -65,7 +65,6 @@ namespace SpiceSharpBehavioral.Parsers.Nodes
             }
             Defaults = nmap;
         }
-
 
         private static IReadOnlyList<Node> Check(this IReadOnlyList<Node> arguments, int expected)
         {
