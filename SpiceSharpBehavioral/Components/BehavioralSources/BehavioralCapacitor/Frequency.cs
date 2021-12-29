@@ -73,7 +73,7 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
             var builder = new ComplexFunctionBuilder();
             builder.VariableFound += (sender, args) =>
             {
-                if (args.Variable == null && DerivativeVariables.TryGetValue(args.Node, out var variable))
+                if (args.Variable == null && VariableNodes.TryGetValue(args.Node, out var variable))
                     args.Variable = new FuncVariable<Complex>(variable.Name, () => variable.Value, variable.Unit);
             };
             bp.RegisterBuilder(context, builder);

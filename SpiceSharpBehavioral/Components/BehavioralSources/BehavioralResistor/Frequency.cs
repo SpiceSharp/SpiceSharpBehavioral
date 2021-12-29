@@ -85,13 +85,13 @@ namespace SpiceSharp.Components.BehavioralResistorBehaviors
             var nVariables = new Dictionary<VariableNode, IVariable<Complex>>(Derivatives.Comparer);
             foreach (var variable in Derivatives.Keys)
             {
-                var orig = DerivativeVariables[variable];
+                var orig = VariableNodes[variable];
                 nVariables.Add(variable, new FuncVariable<Complex>(orig.Name, () => orig.Value, orig.Unit));
             }
             var builder = new ComplexFunctionBuilder();
             builder.VariableFound += (sender, args) =>
             {
-                if (args.Variable == null && DerivativeVariables.TryGetValue(args.Node, out var variable))
+                if (args.Variable == null && VariableNodes.TryGetValue(args.Node, out var variable))
                     args.Variable = new FuncVariable<Complex>(variable.Name, () => variable.Value, variable.Unit);
             };
             bp.RegisterBuilder(context, builder);

@@ -74,7 +74,7 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
             var builder = new RealFunctionBuilder();
             builder.VariableFound += (sender, args) =>
             {
-                if (args.Variable == null && DerivativeVariables.TryGetValue(args.Node, out var variable))
+                if (args.Variable == null && VariableNodes.TryGetValue(args.Node, out var variable))
                     args.Variable = variable;
             };
             bp.RegisterBuilder(context, builder);
@@ -82,7 +82,7 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
             var rhsLocs = Variables.GetRhsIndices(state.Map);
             foreach (var pair in Derivatives)
             {
-                var variable = DerivativeVariables[pair.Key];
+                var variable = VariableNodes[pair.Key];
                 if (state.Map.Contains(variable))
                 {
                     derivatives.Add(builder.Build(pair.Value));

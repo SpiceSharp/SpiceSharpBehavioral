@@ -32,7 +32,7 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
         /// <summary>
         /// Gets the variables that are associated with each variable node.
         /// </summary>
-        protected Dictionary<VariableNode, IVariable<double>> DerivativeVariables { get; }
+        protected Dictionary<VariableNode, IVariable<double>> VariableNodes { get; }
 
         /// <summary>
         /// The function that computes the value.
@@ -88,13 +88,13 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
             // Let's build the derivative functions and get their matrix locations/rhs locations
             Function = bp.Function;
             Derivatives = context.CreateDerivatives(Function);
-            DerivativeVariables = Derivatives.Keys.ToDictionary(d => d, d => context.MapNode(state, d), Derivatives.Comparer);
+            VariableNodes = context.MapNodes(state, Function);
             var derivatives = new List<Func<double>>(Derivatives.Count);
             var derivativeVariables = new List<IVariable<double>>(Derivatives.Count);
             var builder = new RealFunctionBuilder();
             builder.VariableFound += (sender, args) =>
             {
-                if (args.Variable == null && DerivativeVariables.TryGetValue(args.Node, out var variable))
+                if (args.Variable == null && VariableNodes.TryGetValue(args.Node, out var variable))
                     args.Variable = variable;
             };
             bp.RegisterBuilder(context, builder);
@@ -102,7 +102,7 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
             var rhsLocs = _variables.GetRhsIndices(state.Map);
             foreach (var pair in Derivatives)
             {
-                var variable = DerivativeVariables[pair.Key];
+                var variable = VariableNodes[pair.Key];
                 if (state.Map.Contains(variable))
                 {
                     derivatives.Add(builder.Build(pair.Value));

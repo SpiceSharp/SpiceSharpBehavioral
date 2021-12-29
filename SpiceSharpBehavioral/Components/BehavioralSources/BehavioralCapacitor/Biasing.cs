@@ -6,7 +6,6 @@ using SpiceSharpBehavioral.Builders;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
 {
@@ -23,7 +22,7 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
         /// <summary>
         /// Gets the variables that are associated with each variable node.
         /// </summary>
-        protected Dictionary<VariableNode, IVariable<double>> DerivativeVariables { get; }
+        protected Dictionary<VariableNode, IVariable<double>> VariableNodes { get; }
 
         /// <summary>
         /// The function that computes the value.
@@ -60,9 +59,7 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
             };
             Function = replacer.Build(bp.Function);
             Derivatives = context.CreateDerivatives(Function);
-            DerivativeVariables = new Dictionary<VariableNode, IVariable<double>>(Derivatives.Comparer);
-            foreach (var key in Derivatives.Keys)
-                DerivativeVariables.Add(key, context.MapNode(state, key));
+            VariableNodes = context.MapNodes(state, Function);
         }
     }
 }

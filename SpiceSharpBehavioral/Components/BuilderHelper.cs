@@ -6,6 +6,7 @@ using SpiceSharp.Simulations.Variables;
 using SpiceSharpBehavioral.Builders.Functions;
 using SpiceSharpBehavioral;
 using System.Numerics;
+using SpiceSharpBehavioral.Parsers.Nodes;
 
 namespace SpiceSharp.Components.BehavioralComponents
 {
@@ -218,7 +219,7 @@ namespace SpiceSharp.Components.BehavioralComponents
             }
             else
             {
-                variables.Add("smallsig", new ConstantVariable<Complex>("smallsig", 1.0, _scalar));
+                variables.Add("smallsig", new ConstantVariable<Complex>("smallsig", 0.0, _scalar));
             }    
 
             // Some standard constants

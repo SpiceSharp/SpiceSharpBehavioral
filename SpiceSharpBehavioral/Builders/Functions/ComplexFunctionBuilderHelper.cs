@@ -185,7 +185,7 @@ namespace SpiceSharpBehavioral.Builders.Functions
             arguments.Check(3);
             ilsc.PushReal(arguments[0]);
             ilsc.PushDouble(0.5);
-            ilsc.PushCheck(OpCodes.Bgt_S, arguments[1], arguments[2]);
+            ilsc.PushCheck(OpCodes.Bgt, arguments[1], arguments[2]);
         }
         private static void Limit(IILState<Complex> ils, IReadOnlyList<Node> arguments) => ils.Call(HelperFunctions.Limit, arguments);
 

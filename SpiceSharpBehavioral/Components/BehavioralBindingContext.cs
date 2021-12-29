@@ -24,17 +24,6 @@ namespace SpiceSharp.Components.BehavioralComponents
     public class BehavioralBindingContext : ComponentBindingContext
     {
         /// <summary>
-        /// Gets the current references.
-        /// </summary>
-        /// <value>
-        /// The current references.
-        /// </value>
-        /// <remarks>
-        /// The reason we are tracking branches, is because they reference other components.
-        /// </remarks>
-        public Dictionary<VariableNode, IBehaviorContainer> Branches { get; private set; }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="BehavioralBindingContext" /> class.
         /// </summary>
         /// <param name="component">The component creating the behavior.</param>
@@ -69,6 +58,29 @@ namespace SpiceSharp.Components.BehavioralComponents
                 derivatives.Variables.Add(variable);
             }
             return derivatives.Derive(function) ?? new Dictionary<VariableNode, Node>(comparer);
+        }
+
+        /// <summary>
+        /// Maps all the nodes that are referenced in the function.
+        /// </summary>
+        /// <typeparam name="T">The variable value type.</typeparam>
+        /// <param name="factory">The factory for variables.</param>
+        /// <param name="function">The function containing the variables.</param>
+        /// <param name="ownBranch">Optionally a branch for the current behavior branch current.</param>
+        public Dictionary<VariableNode, IVariable<T>> MapNodes<T>(IVariableFactory<IVariable<T>> factory, Node function, IVariable<T> ownBranch = null)
+        {
+            var state = GetState<IBiasingSimulationState>();
+            var bp = GetParameterSet<Parameters>();
+            var comparer = new VariableNodeComparer(state.Comparer, Simulation.EntityBehaviors.Comparer, bp.VariableComparer);
+            var variables = new Dictionary<VariableNode, IVariable<T>>(comparer);
+
+            var nf = new NodeFinder();
+            foreach (var variable in nf.Build(function).Where(v => v.NodeType == NodeTypes.Voltage || v.NodeType == NodeTypes.Current))
+            {
+                if (!variables.ContainsKey(variable))
+                    variables.Add(variable, MapNode(factory, variable, ownBranch));
+            }
+            return variables;
         }
 
         /// <summary>
