@@ -52,6 +52,7 @@ namespace SpiceSharpBehavioralTest.Parsers
                 yield return new TestCaseData("min(-2,6*2)", Node.Function("min", Node.Minus(2.0), Node.Multiply(6.0, 2.0))).SetName("{m}(\"min(-2,6*2)\")"); // Function with multiple arguments
                 yield return new TestCaseData("rnd()", Node.Function("rnd")).SetName("{m}(\"rnd()\")"); // Function without arguments
                 yield return new TestCaseData("-.14e3", Node.Minus(Node.Constant(0.14e3))).SetName("{m}(-.14e3)");
+                yield return new TestCaseData("V(2,0)", Node.Voltage("2", "0"));
             }
         }
     }

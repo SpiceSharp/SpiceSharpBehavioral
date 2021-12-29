@@ -35,7 +35,7 @@ namespace SpiceSharp.Components.BehavioralResistorBehaviors
         /// <summary>
         /// Gets the variables that are associated with each variable node.
         /// </summary>
-        protected Dictionary<VariableNode, IVariable<double>> DerivativeVariables { get; }
+        protected Dictionary<VariableNode, IVariable<double>> VariableNodes { get; }
 
         /// <summary>
         /// The function that computes the value.
@@ -100,21 +100,24 @@ namespace SpiceSharp.Components.BehavioralResistorBehaviors
             // Let's build the derivative functions and get their matrix locations/rhs locations
             Function = Node.Multiply(Node.Current(Name), bp.Function);
             Derivatives = context.CreateDerivatives(Function);
-            DerivativeVariables = Derivatives.Keys.ToDictionary(d => d, d => context.MapNode(state, d, _branch), Derivatives.Comparer);
+            VariableNodes = context.MapNodes(state, Function, _branch);
             var derivatives = new List<Func<double>>(Derivatives.Count);
             var derivativeVariables = new List<IVariable<double>>(Derivatives.Count);
             var builder = new RealFunctionBuilder();
             builder.VariableFound += (sender, args) =>
             {
-                if (args.Variable == null && DerivativeVariables.TryGetValue(args.Node, out var variable))
-                    args.Variable = variable;
+                if (args.Variable == null)
+                {
+                    if (VariableNodes.TryGetValue(args.Node, out var variable))
+                        args.Variable = variable;
+                }
             };
             bp.RegisterBuilder(context, builder);
             var matLocs = new List<MatrixLocation>(Derivatives.Count);
             var rhsLocs = state.Map[_branch];
             foreach (var pair in Derivatives)
             {
-                var variable = DerivativeVariables[pair.Key];
+                var variable = VariableNodes[pair.Key];
                 if (state.Map.Contains(variable))
                 {
                     derivatives.Add(builder.Build(pair.Value));

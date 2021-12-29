@@ -179,9 +179,9 @@ namespace SpiceSharpBehavioral.Builders.Functions
             ils.Push(0.5);
             var lblElse = ils.Generator.DefineLabel();
             var lblEnd = ils.Generator.DefineLabel();
-            ils.Generator.Emit(OpCodes.Ble_S, lblElse);
+            ils.Generator.Emit(OpCodes.Ble, lblElse);
             ils.Push(arguments[1]);
-            ils.Generator.Emit(OpCodes.Br_S, lblEnd);
+            ils.Generator.Emit(OpCodes.Br, lblEnd);
             ils.Generator.MarkLabel(lblElse);
             ils.Push(arguments[2]);
             ils.Generator.MarkLabel(lblEnd);

@@ -82,5 +82,23 @@ namespace SpiceSharpBehavioralTest.Components
             };
             op.Run(ckt);
         }
+
+        [Test]
+        public void When_If_Expect_Reference()
+        {
+            var ckt = new Circuit(
+                new VoltageSource("V1", "2", "0", 0.5),
+                new VoltageSource("V2", "1", "0", 10),
+                new BehavioralResistor("RSwitch", "1", "0", "IF(v(2, 0) >= 1, 10, (v(2, 0) <= 0 ? 1000000 : (exp(8.05904782547916 + 3 * -11.5129254649702 * (v(2, 0)-0.5)/(2*1) - 2 * -11.5129254649702 * pow(v(2, 0)-0.5, 3)/(pow(1,3))))))")
+                );
+            var op = new OP("Voltage switch simulation");
+            var refExport = new RealCurrentExport(op, "V2");
+            op.ExportSimulationData += (sender, args) =>
+            {
+                Assert.AreEqual(-0.00316228, refExport.Value, 1e-8);
+            };
+
+            op.Run(ckt);
+        }
     }
 }
