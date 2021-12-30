@@ -1,9 +1,7 @@
-﻿using SpiceSharp;
-using SpiceSharp.Simulations;
-using SpiceSharpBehavioral.Builders.Functions;
+﻿using SpiceSharpBehavioral.Builders.Functions;
 using System;
 
-namespace SpiceSharp.Components.BehavioralComponents
+namespace SpiceSharp.Components.BehavioralSources
 {
     /// <summary>
     /// Event arguments for when a builder has been created.

@@ -1,7 +1,7 @@
-﻿using SpiceSharp.Components.BehavioralComponents;
-using SpiceSharp.Attributes;
+﻿using SpiceSharp.Attributes;
 using SpiceSharp.Validation;
 using System.Linq;
+using SpiceSharp.Components.BehavioralSources;
 
 namespace SpiceSharp.Components
 {

@@ -1,17 +1,16 @@
-﻿using SpiceSharp.Algebra;
-using SpiceSharp.Attributes;
+﻿using SpiceSharp.Attributes;
 using SpiceSharp.Behaviors;
-using SpiceSharp.Components.CommonBehaviors;
 using SpiceSharp.Simulations;
 using SpiceSharpBehavioral;
 using SpiceSharpBehavioral.Builders;
+using SpiceSharpBehavioral.Builders.Functions;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
-namespace SpiceSharp.Components.BehavioralComponents
+namespace SpiceSharp.Components.BehavioralSources
 {
     /// <summary>
     /// A context for behavioral components.
@@ -67,7 +66,8 @@ namespace SpiceSharp.Components.BehavioralComponents
         /// <param name="factory">The factory for variables.</param>
         /// <param name="function">The function containing the variables.</param>
         /// <param name="ownBranch">Optionally a branch for the current behavior branch current.</param>
-        public Dictionary<VariableNode, IVariable<T>> MapNodes<T>(IVariableFactory<IVariable<T>> factory, Node function, IVariable<T> ownBranch = null)
+        /// <returns>The variables by their nodes.</returns>
+        public Dictionary<VariableNode, IVariable<T>> GetVariableNodes<T>(IVariableFactory<IVariable<T>> factory, Node function, IVariable<T> ownBranch = null)
         {
             var state = GetState<IBiasingSimulationState>();
             var bp = GetParameterSet<Parameters>();
@@ -78,9 +78,42 @@ namespace SpiceSharp.Components.BehavioralComponents
             foreach (var variable in nf.Build(function).Where(v => v.NodeType == NodeTypes.Voltage || v.NodeType == NodeTypes.Current))
             {
                 if (!variables.ContainsKey(variable))
-                    variables.Add(variable, MapNode(factory, variable, ownBranch));
+                    variables.Add(variable, GetVariableNode(factory, variable, ownBranch));
             }
             return variables;
+        }
+
+        /// <summary>
+        /// Maps all the nodes that are referenced in the function and makes them discoverable by the function builder.
+        /// </summary>
+        /// <typeparam name="T">The variable value type.</typeparam>
+        /// <param name="factory">The factory for variables.</param>
+        /// <param name="function">The function containing the variables.</param>
+        /// <param name="builder">The function builder.</param>
+        /// <param name="ownBranch">Optionally, a branch for the current behavior branch current.</param>
+        /// <returns>The variables by their nodes.</returns>
+        public Dictionary<VariableNode, IVariable<T>> MapVariableNodes<T>(IVariableFactory<IVariable<T>> factory, Node function, IFunctionBuilder<T> builder, IVariable<T> ownBranch = null)
+        {
+            var variables = GetVariableNodes(factory, function, ownBranch);
+            MapVariableNodes(variables, builder);
+            return variables;
+        }
+
+        /// <summary>
+        /// Maps the nodes in the dictionary such that they are discoverable by the function builder.
+        /// </summary>
+        /// <typeparam name="T">The variable value type.</typeparam>
+        /// <param name="variables">The dictionary of variables.</param>
+        /// <param name="builder">The function builder.</param>
+        public void MapVariableNodes<T>(Dictionary<VariableNode, IVariable<T>> variables, IFunctionBuilder<T> builder)
+        {
+            builder.VariableFound += (sender, args) =>
+            {
+                if (args.Variable != null)
+                    return; // Already found
+                if (variables.TryGetValue(args.Node, out var value))
+                    args.Variable = value;
+            };
         }
 
         /// <summary>
@@ -91,7 +124,7 @@ namespace SpiceSharp.Components.BehavioralComponents
         /// <param name="node">The node.</param>
         /// <param name="ownBranch">The branch.</param>
         /// <returns>The variable.</returns>
-        public IVariable<T> MapNode<T>(IVariableFactory<IVariable<T>> factory, VariableNode node, IVariable<T> ownBranch = null)
+        public IVariable<T> GetVariableNode<T>(IVariableFactory<IVariable<T>> factory, VariableNode node, IVariable<T> ownBranch = null)
         {
             switch (node.NodeType)
             {
@@ -144,6 +177,22 @@ namespace SpiceSharp.Components.BehavioralComponents
                 default:
                     throw new SpiceSharpException($"Could not determine the variable {node.Name}");
             }
+        }
+
+        /// <summary>
+        /// Converts any variables in a dictionary for a complex behavior that wishes to reuse it.
+        /// </summary>
+        /// <param name="variables">The variables.</param>
+        /// <param name="builder">The complex function builder.</param>
+        public void ConvertVariables(IReadOnlyDictionary<VariableNode, IVariable<double>> variables, IFunctionBuilder<Complex> builder)
+        {
+            builder.VariableFound += (sender, args) =>
+            {
+                if (args.Variable != null)
+                    return; // Already found
+                if (variables.TryGetValue(args.Node, out var value))
+                    args.Variable = new FuncVariable<Complex>(value.Name, () => value.Value, value.Unit);
+            };
         }
     }
 }

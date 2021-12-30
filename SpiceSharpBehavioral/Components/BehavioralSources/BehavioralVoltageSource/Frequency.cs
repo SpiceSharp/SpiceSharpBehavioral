@@ -3,12 +3,12 @@ using SpiceSharp.Behaviors;
 using SpiceSharp.Simulations;
 using System;
 using System.Numerics;
-using SpiceSharp.Components.BehavioralComponents;
 using SpiceSharp.Components.CommonBehaviors;
 using SpiceSharp.Attributes;
 using System.Collections.Generic;
-using SpiceSharpBehavioral;
 using SpiceSharpBehavioral.Builders.Functions;
+using SpiceSharp.Components.BehavioralSources;
+using System.Linq;
 
 namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
 {
@@ -20,15 +20,14 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
     /// <seealso cref="IBranchedBehavior{T}"/>
     [BehaviorFor(typeof(BehavioralVoltageSource)), AddBehaviorIfNo(typeof(IFrequencyBehavior))]
     [GeneratedParameters]
-    public partial class FrequencyBehavior : Biasing,
+    public partial class Frequency : Biasing,
         IFrequencyBehavior,
         IBranchedBehavior<Complex>
     {
         private readonly OnePort<Complex> _variables;
         private readonly IVariable<Complex> _branch;
-        private readonly ElementSet<Complex> _elements, _coreElements;
-        private readonly Func<Complex>[] _derivatives;
-        private readonly Complex[] _values;
+        private readonly ElementSet<Complex> _coreElements;
+        private readonly BehavioralContributions<Complex> _contributions;
 
         /// <summary>
         /// Gets the branch equation variable.
@@ -66,11 +65,11 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         public Complex ComplexPower => -ComplexVoltage * Complex.Conjugate(_branch.Value);
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FrequencyBehavior"/> class.
+        /// Initializes a new instance of the <see cref="Frequency"/> class.
         /// </summary>
         /// <param name="context">The context.</param>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="context"/> is <c>null</c>.</exception>
-        public FrequencyBehavior(BehavioralBindingContext context)
+        public Frequency(BehavioralBindingContext context)
             : base(context)
         {
             var bp = context.GetParameterSet<Parameters>();
@@ -80,30 +79,17 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
                 state.GetSharedVariable(context.Nodes[1]));
             _branch = state.CreatePrivateVariable(Name.Combine("branch"), Units.Ampere);
 
-            // Build the functions
-            var derivatives = new List<Func<Complex>>(Derivatives.Count);
+            // Make the builder
             var builder = new ComplexFunctionBuilder();
-            builder.VariableFound += (sender, args) =>
-            {
-                if (args.Variable == null && VariableNodes.TryGetValue(args.Node, out var variable))
-                    args.Variable = new FuncVariable<Complex>(variable.Name, () => variable.Value, variable.Unit);
-            }; var rhsLocs = state.Map[_branch];
+            context.ConvertVariables(VariableNodes, builder);
             bp.RegisterBuilder(context, builder);
-            var matLocs = new List<MatrixLocation>(Derivatives.Count);
-            foreach (var pair in Derivatives)
-            {
-                var variable = context.MapNode(state, pair.Key);
-                if (state.Map.Contains(variable))
-                {
-                    derivatives.Add(builder.Build(pair.Value));
-                    matLocs.Add(new MatrixLocation(rhsLocs, state.Map[variable]));
-                }
-            }
 
-            // Get the matrix elements
-            _derivatives = derivatives.ToArray();
-            _values = new Complex[_derivatives.Length];
-            _elements = new ElementSet<Complex>(state.Solver, matLocs.ToArray());
+            // Get the contributions
+            _contributions = new(state, null, _branch, Derivatives
+                .Select(d => (Variable: context.GetVariableNode(state, d.Key, _branch), Derivative: d.Value))
+                .Where(d => state.Map.Contains(d.Variable))
+                .Select(d => (d.Variable, builder.Build(d.Derivative)))
+                .ToList(), null);
             int br = state.Map[_branch];
             int pos = state.Map[_variables.Positive];
             int neg = state.Map[_variables.Negative];
@@ -120,6 +106,7 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         /// </summary>
         void IFrequencyBehavior.InitializeParameters()
         {
+            _contributions.Calculate();
         }
 
         /// <summary>
@@ -127,9 +114,7 @@ namespace SpiceSharp.Components.BehavioralVoltageSourceBehaviors
         /// </summary>
         void IFrequencyBehavior.Load()
         {
-            for (var i = 0; i < _derivatives.Length; i++)
-                _values[i] = -_derivatives[i]();
-            _elements.Add(_values);
+            _contributions.Apply();
             _coreElements.Add(1.0, -1.0, 1.0, -1.0);
         }
     }

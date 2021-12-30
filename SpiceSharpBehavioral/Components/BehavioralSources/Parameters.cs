@@ -1,21 +1,24 @@
 ﻿using SpiceSharp.Attributes;
-using SpiceSharp.Components;
-using SpiceSharp.Components.BehavioralComponents;
 using SpiceSharp.ParameterSets;
+using SpiceSharpBehavioral.Builders;
 using SpiceSharpBehavioral.Builders.Functions;
 using SpiceSharpBehavioral.Parsers;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 
-namespace SpiceSharpBehavioral.Components
+namespace SpiceSharp.Components.BehavioralSources
 {
     /// <summary>
-    /// Base parameters for any behavioral component.
+    /// Base parameters for a behavioral component.
     /// </summary>
-    /// <typeparam name="P">The parameter type.</typeparam>
-    public abstract class Parameters<P> : ParameterSet<P>
+    /// <seealso cref="ParameterSet" />
+    [GeneratedParameters]
+    public partial class Parameters : ParameterSet<Parameters>
     {
+        private readonly NodeFinder _nodeFinder = new NodeFinder();
         private string _expression;
         private Node _function;
         private bool _isDirty;
@@ -89,6 +92,47 @@ namespace SpiceSharpBehavioral.Components
         public event EventHandler<BuilderCreatedEventArgs<Complex>> ComplexBuilderCreated;
 
         /// <summary>
+        /// Gets the voltage nodes.
+        /// </summary>
+        /// <value>
+        /// The voltage nodes.
+        /// </value>
+        public IEnumerable<string> VoltageNodes => _nodeFinder.VoltageNodes(Function).Select(n => n.Name);
+
+        /// <summary>
+        /// Gets the current nodes.
+        /// </summary>
+        /// <value>
+        /// The current nodes.
+        /// </value>
+        public IEnumerable<string> CurrentNodes => _nodeFinder.CurrentNodes(Function).Select(n => n.Name);
+
+        /// <summary>
+        /// Gets all variable nodes.
+        /// </summary>
+        /// <value>
+        /// The variable nodes.
+        /// </value>
+        public IEnumerable<VariableNode> VariableNodes => _nodeFinder.Build(Function);
+
+        /// <summary>
+        /// Gets or sets the variable comparer.
+        /// </summary>
+        /// <value>
+        /// The variable comparer.
+        /// </value>
+        public IEqualityComparer<string> VariableComparer { get; set; } = StringComparer.OrdinalIgnoreCase;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Parameters"/> class.
+        /// </summary>
+        public Parameters()
+        {
+            RealBuilderCreated += BuilderHelper.RegisterDefaultBuilder;
+            ComplexBuilderCreated += BuilderHelper.RegisterDefaultBuilder;
+        }
+
+        /// <summary>
         /// Registers a new function builder.
         /// </summary>
         /// <param name="context">The context.</param>
@@ -103,5 +147,6 @@ namespace SpiceSharpBehavioral.Components
         /// <param name="builder">The builder.</param>
         public virtual void RegisterBuilder(IComponentBindingContext context, IFunctionBuilder<Complex> builder)
             => ComplexBuilderCreated?.Invoke(this, new BuilderCreatedEventArgs<Complex>(context, builder));
+
     }
 }

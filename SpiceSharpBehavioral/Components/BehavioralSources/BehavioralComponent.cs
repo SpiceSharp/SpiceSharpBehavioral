@@ -3,7 +3,7 @@ using SpiceSharp.ParameterSets;
 using System;
 using System.Collections.Generic;
 
-namespace SpiceSharp.Components.BehavioralComponents
+namespace SpiceSharp.Components.BehavioralSources
 {
     /// <summary>
     /// A base implementation for behavioral components.
