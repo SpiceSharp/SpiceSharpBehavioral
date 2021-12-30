@@ -1,5 +1,4 @@
-﻿using SpiceSharp;
-using System;
+﻿using System;
 using System.Numerics;
 
 namespace SpiceSharpBehavioral.Builders

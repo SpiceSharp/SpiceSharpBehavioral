@@ -1,8 +1,6 @@
 ﻿using SpiceSharp;
-using SpiceSharp.Simulations;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
-using System.Collections.Generic;
 using System.Numerics;
 
 namespace SpiceSharpBehavioral.Builders.Direct

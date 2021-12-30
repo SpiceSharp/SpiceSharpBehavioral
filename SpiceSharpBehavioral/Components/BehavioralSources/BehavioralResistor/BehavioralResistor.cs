@@ -1,5 +1,5 @@
-﻿using SpiceSharp.Components.BehavioralComponents;
-using SpiceSharp.Attributes;
+﻿using SpiceSharp.Attributes;
+using SpiceSharp.Components.BehavioralSources;
 
 namespace SpiceSharp.Components
 {

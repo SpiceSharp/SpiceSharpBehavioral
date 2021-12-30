@@ -1,10 +1,7 @@
 ﻿using SpiceSharp.Algebra;
 using SpiceSharp.Components.CommonBehaviors;
 using SpiceSharp.Simulations;
-using System;
-using System.Collections.Generic;
 using System.Numerics;
-using System.Text;
 
 namespace SpiceSharp.Components.LaplaceVoltageControlledCurrentSourceBehaviors
 {

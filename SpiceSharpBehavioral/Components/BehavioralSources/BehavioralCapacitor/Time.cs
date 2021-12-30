@@ -1,11 +1,11 @@
-﻿using SpiceSharp.Algebra;
-using SpiceSharp.Attributes;
+﻿using SpiceSharp.Attributes;
 using SpiceSharp.Behaviors;
-using SpiceSharp.Components.BehavioralComponents;
+using SpiceSharp.Components.BehavioralSources;
 using SpiceSharp.Simulations;
 using SpiceSharpBehavioral.Builders.Functions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
 {
@@ -20,14 +20,12 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
         IBiasingBehavior,
         ITimeBehavior
     {
-        private readonly ElementSet<double> _elements;
         private readonly ITimeSimulationState _time;
         private readonly IIntegrationMethod _method;
         private readonly IDerivative _qcap;
         private readonly Func<double> _value;
-        private readonly Func<double>[] _derivatives;
-        private readonly IVariable<double>[] _derivativeVariables;
-        private readonly double[] _values;
+        private readonly BehavioralContributions<double> _contributions;
+        private double _g;
 
         /// <summary>
         /// Gets the current.
@@ -69,38 +67,22 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
             _method = context.GetState<IIntegrationMethod>();
             _time = context.GetState<ITimeSimulationState>();
 
-            var derivatives = new List<Func<double>>(Derivatives.Count);
-            var derivativeVariables = new List<IVariable<double>>(Derivatives.Count);
+            // Make the builder
             var builder = new RealFunctionBuilder();
-            builder.VariableFound += (sender, args) =>
-            {
-                if (args.Variable == null && VariableNodes.TryGetValue(args.Node, out var variable))
-                    args.Variable = variable;
-            };
+            context.MapVariableNodes(VariableNodes, builder);
             bp.RegisterBuilder(context, builder);
-            var matLocs = new List<MatrixLocation>(Derivatives.Count * 2);
-            var rhsLocs = Variables.GetRhsIndices(state.Map);
-            foreach (var pair in Derivatives)
-            {
-                var variable = VariableNodes[pair.Key];
-                if (state.Map.Contains(variable))
-                {
-                    derivatives.Add(builder.Build(pair.Value));
-                    derivativeVariables.Add(variable);
-                    matLocs.Add(new MatrixLocation(rhsLocs[0], state.Map[variable]));
-                    matLocs.Add(new MatrixLocation(rhsLocs[1], state.Map[variable]));
-                }
-            }
+
+            // Get the contributions
             _value = builder.Build(Function);
-            _derivatives = derivatives.ToArray();
-            _values = new double[_derivatives.Length * 2 + 2];
-            _derivativeVariables = derivativeVariables.ToArray();
-
-            // Get the matrix elements
-            _elements = new ElementSet<double>(state.Solver, matLocs.ToArray(), rhsLocs);
-
-            // Create the derivative
             _qcap = _method.CreateDerivative();
+            _contributions = new(state, Variables, Derivatives
+                .Select(d => (Variable: VariableNodes[d.Key], Derivative: d.Value))
+                .Where(d => state.Map.Contains(d.Variable))
+                .Select(d =>
+                {
+                    var f = builder.Build(d.Derivative);
+                    return (d.Variable, new Func<double>(() => _g * f()));
+                }).ToList(), () => _qcap.Derivative);
         }
 
         /// <summary>
@@ -121,20 +103,8 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
 
             _qcap.Value = _value();
             _qcap.Derive();
-            var current = _qcap.Derivative;
-
-            // _qcap.Derivative is the current as integrated by the current integration method
-            int i;
-            for (i = 0; i < _derivatives.Length; i++)
-            {
-                var g = _derivatives[i]() * _method.Slope;
-                _values[i * 2] = g;
-                _values[i * 2 + 1] = -g;
-                current -= g * _derivativeVariables[i].Value;
-            }
-            _values[i * 2] = -current;
-            _values[i * 2 + 1] = current;
-            _elements.Add(_values);
+            _g = _method.Slope;
+            _contributions.Load();
         }
     }
 }

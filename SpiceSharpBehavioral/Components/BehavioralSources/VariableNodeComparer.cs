@@ -1,7 +1,7 @@
 ﻿using SpiceSharpBehavioral.Parsers.Nodes;
 using System.Collections.Generic;
 
-namespace SpiceSharp.Components.BehavioralComponents
+namespace SpiceSharp.Components.BehavioralSources
 {
     /// <summary>
     /// A specialized comparer for <see cref="VariableNode"/> that can account for

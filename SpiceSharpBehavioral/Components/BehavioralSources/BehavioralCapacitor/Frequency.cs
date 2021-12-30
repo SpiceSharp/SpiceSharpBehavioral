@@ -1,13 +1,13 @@
 ﻿using SpiceSharp.Algebra;
 using SpiceSharp.Attributes;
 using SpiceSharp.Behaviors;
-using SpiceSharp.Components.BehavioralComponents;
+using SpiceSharp.Components.BehavioralSources;
 using SpiceSharp.Components.CommonBehaviors;
 using SpiceSharp.Simulations;
-using SpiceSharpBehavioral;
 using SpiceSharpBehavioral.Builders.Functions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 
 namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
@@ -22,10 +22,7 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
     {
         private readonly IComplexSimulationState _state;
         private readonly OnePort<Complex> _variables;
-        private readonly ElementSet<Complex> _elements;
-        private readonly Func<Complex>[] _derivatives;
-        private readonly IVariable<Complex>[] _derivativeVariables;
-        private readonly Complex[] _values;
+        private readonly BehavioralContributions<Complex> _contributions;
 
         /// <summary>
         /// Gets the complex voltage.
@@ -38,16 +35,7 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
         /// Gets the complex current.
         /// </summary>
         [ParameterName("i"), ParameterInfo("The complex current", Units = "A")]
-        public Complex ComplexCurrent
-        {
-            get
-            {
-                Complex total = 0.0;
-                for (var i = 0; i < _derivatives.Length; i++)
-                    total += _derivatives[i]() * _derivativeVariables[i].Value;
-                return total * _state.Laplace;
-            }
-        }
+        public Complex ComplexCurrent => _contributions.Current;
 
         /// <summary>
         /// Gets the complex power.
@@ -68,32 +56,20 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
                 _state.GetSharedVariable(context.Nodes[0]),
                 _state.GetSharedVariable(context.Nodes[1]));
 
-            var derivatives = new List<Func<Complex>>(Derivatives.Count);
-            var derivativeVariables = new List<IVariable<Complex>>(Derivatives.Count);
+            // Make the builder
             var builder = new ComplexFunctionBuilder();
-            builder.VariableFound += (sender, args) =>
-            {
-                if (args.Variable == null && VariableNodes.TryGetValue(args.Node, out var variable))
-                    args.Variable = new FuncVariable<Complex>(variable.Name, () => variable.Value, variable.Unit);
-            };
+            context.ConvertVariables(VariableNodes, builder);
             bp.RegisterBuilder(context, builder);
-            var matLocs = new List<MatrixLocation>(Derivatives.Count * 2);
-            var rhsLocs = _variables.GetRhsIndices(_state.Map);
-            foreach (var pair in Derivatives)
-            {
-                var variable = context.MapNode(_state, pair.Key);
-                if (_state.Map.Contains(variable))
+
+            // Get the contributions
+            _contributions = new(_state, _variables, Derivatives
+                .Select(d => (Variable: context.GetVariableNode(_state, d.Key), Derivative: d.Value))
+                .Where(d => _state.Map.Contains(d.Variable))
+                .Select(d =>
                 {
-                    derivatives.Add(builder.Build(pair.Value));
-                    derivativeVariables.Add(variable);
-                    matLocs.Add(new MatrixLocation(rhsLocs[0], _state.Map[variable]));
-                    matLocs.Add(new MatrixLocation(rhsLocs[1], _state.Map[variable]));
-                }
-            }
-            _derivatives = derivatives.ToArray();
-            _values = new Complex[_derivatives.Length * 2];
-            _derivativeVariables = derivativeVariables.ToArray();
-            _elements = new ElementSet<Complex>(_state.Solver, matLocs.ToArray());
+                    var f = builder.Build(d.Derivative);
+                    return (d.Variable, new Func<Complex>(() => _state.Laplace * f()));
+                }).ToList(), null);
         }
 
         /// <summary>
@@ -108,13 +84,7 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
         /// </summary>
         void IFrequencyBehavior.Load()
         {
-            for (var i = 0; i < _derivatives.Length; i++)
-            {
-                var g = _state.Laplace * _derivatives[i]();
-                _values[i * 2] = g;
-                _values[i * 2 + 1] = -g;
-            }
-            _elements.Add(_values);
+            _contributions.Load();
         }
     }
 }

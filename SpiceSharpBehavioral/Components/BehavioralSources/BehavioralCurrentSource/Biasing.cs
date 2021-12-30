@@ -1,14 +1,13 @@
 ﻿using SpiceSharp.Behaviors;
 using System;
-using SpiceSharp.Components.BehavioralComponents;
-using SpiceSharp.Algebra;
 using SpiceSharp.Simulations;
 using SpiceSharp.Components.CommonBehaviors;
 using SpiceSharpBehavioral.Parsers.Nodes;
 using SpiceSharp.Attributes;
 using System.Collections.Generic;
-using System.Linq;
 using SpiceSharpBehavioral.Builders.Functions;
+using SpiceSharp.Components.BehavioralSources;
+using System.Linq;
 
 namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
 {
@@ -23,11 +22,7 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
         IBiasingBehavior
     {
         private readonly OnePort<double> _variables;
-        private readonly ElementSet<double> _elements;
-        private readonly Func<double> _value;
-        private readonly Func<double>[] _derivatives;
-        private readonly IVariable<double>[] _derivativeVariables;
-        private readonly double[] _values;
+        private readonly BehavioralContributions<double> _contributions;
 
         /// <summary>
         /// Gets the variables that are associated with each variable node.
@@ -51,7 +46,7 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
         /// The current.
         /// </value>
         [ParameterName("i"), ParameterName("c"), ParameterInfo("Instantaneous current", Units = "A")]
-        public double Current { get; private set; }
+        public double Current => _contributions.Current;
 
         /// <summary>
         /// Gets the voltage.
@@ -88,36 +83,16 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
             // Let's build the derivative functions and get their matrix locations/rhs locations
             Function = bp.Function;
             Derivatives = context.CreateDerivatives(Function);
-            VariableNodes = context.MapNodes(state, Function);
-            var derivatives = new List<Func<double>>(Derivatives.Count);
-            var derivativeVariables = new List<IVariable<double>>(Derivatives.Count);
             var builder = new RealFunctionBuilder();
-            builder.VariableFound += (sender, args) =>
-            {
-                if (args.Variable == null && VariableNodes.TryGetValue(args.Node, out var variable))
-                    args.Variable = variable;
-            };
+            VariableNodes = context.MapVariableNodes(state, Function, builder);
             bp.RegisterBuilder(context, builder);
-            var matLocs = new List<MatrixLocation>(Derivatives.Count * 2);
-            var rhsLocs = _variables.GetRhsIndices(state.Map);
-            foreach (var pair in Derivatives)
-            {
-                var variable = VariableNodes[pair.Key];
-                if (state.Map.Contains(variable))
-                {
-                    derivatives.Add(builder.Build(pair.Value));
-                    derivativeVariables.Add(variable);
-                    matLocs.Add(new MatrixLocation(rhsLocs[0], state.Map[variable]));
-                    matLocs.Add(new MatrixLocation(rhsLocs[1], state.Map[variable]));
-                }
-            }
-            _value = builder.Build(Function);
-            _derivatives = derivatives.ToArray();
-            _derivativeVariables = derivativeVariables.ToArray();
-            _values = new double[_derivatives.Length * 2 + 2];
 
-            // Get the matrix elements
-            _elements = new ElementSet<double>(state.Solver, matLocs.ToArray(), rhsLocs);
+            // Get the contributions
+            _contributions = new(state, _variables, Derivatives
+                .Select(d => (Variable: VariableNodes[d.Key], Derivative: d.Value))
+                .Where(d => state.Map.Contains(d.Variable))
+                .Select(d => (d.Variable, builder.Build(d.Derivative)))
+                .ToList(), builder.Build(Function));
         }
 
         /// <summary>
@@ -125,18 +100,7 @@ namespace SpiceSharp.Components.BehavioralCurrentSourceBehaviors
         /// </summary>
         void IBiasingBehavior.Load()
         {
-            var total = Current = _value();
-            int i;
-            for (i = 0; i < _derivatives.Length; i++)
-            {
-                var df = _derivatives[i]();
-                total -= _derivativeVariables[i].Value * df;
-                _values[i * 2] = df;
-                _values[i * 2 + 1] = -df;
-            }
-            _values[i * 2] = -total;
-            _values[i * 2 + 1] = total;
-            _elements.Add(_values);
+            _contributions.Load();
         }
     }
 }

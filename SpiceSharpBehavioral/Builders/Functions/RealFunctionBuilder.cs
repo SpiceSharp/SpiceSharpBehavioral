@@ -1,7 +1,5 @@
-﻿using SpiceSharp.Simulations;
-using SpiceSharpBehavioral.Parsers.Nodes;
+﻿using SpiceSharpBehavioral.Parsers.Nodes;
 using System;
-using System.Collections.Generic;
 
 namespace SpiceSharpBehavioral.Builders.Functions
 {

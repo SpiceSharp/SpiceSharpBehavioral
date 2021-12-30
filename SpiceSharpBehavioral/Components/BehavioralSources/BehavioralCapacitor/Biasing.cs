@@ -1,5 +1,5 @@
 ﻿using SpiceSharp.Behaviors;
-using SpiceSharp.Components.BehavioralComponents;
+using SpiceSharp.Components.BehavioralSources;
 using SpiceSharp.Components.CommonBehaviors;
 using SpiceSharp.Simulations;
 using SpiceSharpBehavioral.Builders;
@@ -59,7 +59,7 @@ namespace SpiceSharp.Components.BehavioralCapacitorBehaviors
             };
             Function = replacer.Build(bp.Function);
             Derivatives = context.CreateDerivatives(Function);
-            VariableNodes = context.MapNodes(state, Function);
+            VariableNodes = context.GetVariableNodes(state, Function);
         }
     }
 }

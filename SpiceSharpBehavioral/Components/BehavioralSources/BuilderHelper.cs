@@ -1,14 +1,12 @@
 ﻿using SpiceSharp.Simulations;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using SpiceSharp.Simulations.Variables;
 using SpiceSharpBehavioral.Builders.Functions;
 using SpiceSharpBehavioral;
 using System.Numerics;
-using SpiceSharpBehavioral.Parsers.Nodes;
 
-namespace SpiceSharp.Components.BehavioralComponents
+namespace SpiceSharp.Components.BehavioralSources
 {
     /// <summary>
     /// Helper methods for behavioral components.

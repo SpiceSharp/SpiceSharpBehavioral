@@ -1,5 +1,5 @@
 ﻿using SpiceSharp.Attributes;
-using SpiceSharp.Components.BehavioralComponents;
+using SpiceSharp.Components.BehavioralSources;
 using SpiceSharp.Validation;
 using System.Linq;
 
