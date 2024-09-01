@@ -15,16 +15,16 @@ jobs:
     - name: Setup dotnet tooling
       uses: actions/setup-dotnet@master
       with:
-        dotnet-version: '5.0.100'
+        dotnet-version: '8.0.x'
     
     - name: Restore dependencies
       run: dotnet restore
 
-    - name: Compile Spice#
+    - name: Compile Spice#.Behavioral
       run: dotnet build SpiceSharpBehavioral\SpiceSharpBehavioral.csproj --configuration Release --no-restore
 
     - name: Publish to NuGet
       env:
         APIKEY: ${{ secrets.NUGET_APIKEY }}
-      run: dotnet nuget push .\SpiceSharpBehavioral\bin\Release\SpiceSharpBehavioral.*.nupkg -k $env:APIKEY -s "https://api.nuget.org/v3/index.json"
+      run: dotnet nuget push ".\build\bin\SpiceSharpBehavioral\SpiceSharpBehavioral.*.nupkg" -k $env:APIKEY -s "https://api.nuget.org/v3/index.json"
       

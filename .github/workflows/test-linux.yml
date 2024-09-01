@@ -19,7 +19,7 @@ jobs:
     - name: Setup dotnet tooling
       uses: actions/setup-dotnet@master
       with:
-        dotnet-version: '5.0.100'
+        dotnet-version: '8.0.x'
     
     - name: Restore dependencies
       run: dotnet restore
@@ -27,5 +27,5 @@ jobs:
     - name: Compile Spice#.Behavioral
       run: dotnet build SpiceSharpBehavioral/SpiceSharpBehavioral.csproj --configuration Debug --no-restore
 
-    - name: Compile Spice#.Behavioral.Test
-      run: dotnet test SpiceSharpBehavioralTest/SpiceSharpBehavioralTest.csproj --configuration Debug --no-restore
+    - name: Compile Spice#.Behavioral.Tests
+      run: dotnet test SpiceSharpBehavioralTests/SpiceSharpBehavioralTests.csproj --configuration Debug --no-restore

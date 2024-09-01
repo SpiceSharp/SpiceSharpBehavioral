@@ -2,6 +2,7 @@
 using SpiceSharp;
 using SpiceSharp.Components;
 using SpiceSharp.Simulations;
+using System;
 using System.Numerics;
 
 namespace SpiceSharpBehavioralTest.Components
@@ -20,11 +21,11 @@ namespace SpiceSharpBehavioralTest.Components
             var op = new OP("op");
             var r = new RealVoltageExport(op, "ref");
             var a = new RealVoltageExport(op, "act");
-            op.ExportSimulationData += (sender, args) =>
+
+            foreach (int _ in op.Run(ckt, OP.ExportOperatingPoint))
             {
-                Assert.AreEqual(r.Value, a.Value, 1e-12);
-            };
-            op.Run(ckt);
+                Assert.That(a.Value, Is.EqualTo(r.Value).Within(1e-12));
+            }
         }
 
         [Test]
@@ -40,11 +41,11 @@ namespace SpiceSharpBehavioralTest.Components
             var tran = new Transient("tran", 1e-7, 5e-6);
             var r = new RealVoltageExport(tran, "out");
             var a = new RealVoltageExport(tran, "act");
-            tran.ExportSimulationData += (sender, args) =>
+
+            foreach (int _ in tran.Run(ckt, Transient.ExportTransient))
             {
-                Assert.AreEqual(r.Value, a.Value, 1e-12);
-            };
-            tran.Run(ckt);
+                Assert.That(a.Value, Is.EqualTo(r.Value).Within(1e-12));
+            }
         }
 
         [Test]
@@ -61,11 +62,11 @@ namespace SpiceSharpBehavioralTest.Components
             var tran = new Transient("tran", 1e-7, 5e-6);
             var r = new RealVoltageExport(tran, "out");
             var a = new RealVoltageExport(tran, "act");
-            tran.ExportSimulationData += (sender, args) =>
+
+            foreach (int _ in tran.Run(ckt, Transient.ExportTransient))
             {
-                Assert.AreEqual(r.Value, a.Value, 1e-12);
-            };
-            tran.Run(ckt);
+                Assert.That(a.Value, Is.EqualTo(r.Value).Within(1e-12));
+            }
         }
 
         [Test]
@@ -81,11 +82,11 @@ namespace SpiceSharpBehavioralTest.Components
             var tran = new Transient("tran", 1e-7, 5e-6);
             var r = new RealVoltageExport(tran, "out");
             var a = new RealVoltageExport(tran, "act");
-            tran.ExportSimulationData += (sender, args) =>
+
+            foreach (int _ in tran.Run(ckt, Transient.ExportTransient))
             {
-                Assert.AreEqual(r.Value, a.Value, 1e-12);
-            };
-            tran.Run(ckt);
+                Assert.That(a.Value, Is.EqualTo(r.Value).Within(1e-12));
+            }
         }
 
         [Test]
@@ -97,14 +98,14 @@ namespace SpiceSharpBehavioralTest.Components
 
             var ac = new AC("ac", new DecadeSweep(1.0, 1e6, 3));
             var a = new ComplexVoltageExport(ac, "act");
-            ac.ExportSimulationData += (sender, args) =>
+
+            foreach (int _ in ac.Run(ckt, AC.ExportSmallSignal))
             {
-                var s = args.Laplace;
-                Complex r = 1.0 / (1.0 + 1e-3 * s);
-                Assert.AreEqual(r.Real, a.Value.Real, 1e-20);
-                Assert.AreEqual(r.Imaginary, a.Value.Imaginary, 1e-20);
-            };
-            ac.Run(ckt);
+                var s = new Complex(0.0, ac.Frequency * 2 * Math.PI);
+                var r = 1.0 / (1.0 + 1e-3 * s);
+                Assert.That(a.Value.Real, Is.EqualTo(r.Real).Within(1e-20));
+                Assert.That(a.Value.Imaginary, Is.EqualTo(r.Imaginary).Within(1e-20));
+            }
         }
     }
 }

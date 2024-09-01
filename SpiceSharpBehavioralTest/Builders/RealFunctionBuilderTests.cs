@@ -14,7 +14,7 @@ namespace SpiceSharpBehavioralTest.Builders
         public void When_BuildNode_Expect_Reference(Node node, double expected)
         {
             var builder = new RealFunctionBuilder();
-            Assert.AreEqual(expected, builder.Build(node).Invoke(), 1e-20);
+            Assert.That(builder.Build(node).Invoke(), Is.EqualTo(expected).Within(1e-20));
         }
 
         [TestCaseSource(typeof(BuilderTestData), nameof(BuilderTestData.FunctionNodes))]
@@ -22,7 +22,7 @@ namespace SpiceSharpBehavioralTest.Builders
         {
             var builder = new RealFunctionBuilder();
             builder.RegisterDefaultFunctions();
-            Assert.AreEqual(expected, builder.Build(node).Invoke(), 1e-20);
+            Assert.That(builder.Build(node).Invoke(), Is.EqualTo(expected).Within(1e-20));
         }
 
         [Test]
@@ -48,7 +48,7 @@ namespace SpiceSharpBehavioralTest.Builders
                 }
             };
             var func = builder.Build(Node.Function("f") * 2.0);
-            Assert.AreEqual(6.0, func(), 1e-20);
+            Assert.That(func(), Is.EqualTo(6.0).Within(1e-20));
         }
 
         [Test]
@@ -63,7 +63,7 @@ namespace SpiceSharpBehavioralTest.Builders
             };
 
             variable.Value = 2.0;
-            Assert.AreEqual(5.0, builder.Build(Node.Variable("a") + 3.0).Invoke(), 1e-20);
+            Assert.That(builder.Build(Node.Variable("a") + 3.0).Invoke(), Is.EqualTo(5.0).Within(1e-20));
         }
     }
 }

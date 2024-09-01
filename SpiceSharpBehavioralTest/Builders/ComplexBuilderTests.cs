@@ -16,8 +16,8 @@ namespace SpiceSharpBehavioralTest.Builders
         {
             var builder = new ComplexBuilder();
             var act = builder.Build(node);
-            Assert.AreEqual(expected, act.Real, 1e-20);
-            Assert.AreEqual(0.0, act.Imaginary, 1e-20);
+            Assert.That(act.Real, Is.EqualTo(expected).Within(1e-20));
+            Assert.That(act.Imaginary, Is.EqualTo(0.0).Within(1e-20));
         }
 
         [TestCaseSource(typeof(BuilderTestData), nameof(BuilderTestData.ComplexFunctionNodes))]
@@ -26,8 +26,8 @@ namespace SpiceSharpBehavioralTest.Builders
             var builder = new ComplexBuilder();
             builder.RegisterDefaultFunctions();
             var act = builder.Build(node);
-            Assert.AreEqual(expected.Real, act.Real, 1e-20);
-            Assert.AreEqual(expected.Imaginary, act.Imaginary, 1e-20);
+            Assert.That(act.Real, Is.EqualTo(expected.Real).Within(1e-20));
+            Assert.That(act.Imaginary, Is.EqualTo(expected.Imaginary).Within(1e-20));
         }
 
         [Test]
@@ -42,8 +42,8 @@ namespace SpiceSharpBehavioralTest.Builders
             };
             variable.Value = 2.0;
             var act = builder.Build(Node.Add(Node.Variable("a"), 3.0));
-            Assert.AreEqual(5.0, act.Real, 1e-20);
-            Assert.AreEqual(0.0, act.Imaginary, 1e-20);
+            Assert.That(act.Real, Is.EqualTo(5.0).Within(1e-20));
+            Assert.That(act.Imaginary, Is.EqualTo(0.0).Within(1e-20));
         }
     }
 }
