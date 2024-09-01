@@ -9,7 +9,7 @@ namespace SpiceSharpBehavioralTest.Components
     public class BehavioralResistorTests
     {
         [Test]
-        public void When_ComplexResitor_Expect_Reference()
+        public void When_ComplexResistor_Expect_Reference()
         {
             var ckt = new Circuit(
                 new VoltageSource("V1", "2", "0", 0.5),
@@ -17,12 +17,11 @@ namespace SpiceSharpBehavioralTest.Components
                 new BehavioralResistor("RSwitch", "1", "0", "v(2, 0) >= 1 ? 10 : (v(2, 0) <= 0 ? 1000000 : (exp(8.05904782547916 + 3 * -11.5129254649702 * (v(2, 0)-0.5)/(2*1) - 2 * -11.5129254649702 * pow(v(2, 0)-0.5, 3)/(pow(1,3)))))"));
             var op = new OP("Voltage switch simulation");
             var refExport = new RealCurrentExport(op, "V2");
-            op.ExportSimulationData += (sender, args) =>
-            {
-                Assert.AreEqual(-0.00316228, refExport.Value, 1e-8);
-            };
 
-            op.Run(ckt);
+            foreach (int _ in op.Run(ckt, OP.ExportOperatingPoint))
+            {
+                Assert.That(refExport.Value, Is.EqualTo(-0.00316228).Within(1e-8));
+            }
         }
 
         [Test]
@@ -38,14 +37,13 @@ namespace SpiceSharpBehavioralTest.Components
             var refPower = new RealPropertyExport(dc, "R1", "p");
             var actPower = new RealPropertyExport(dc, "R2", "p");
 
-            dc.ExportSimulationData += (sender, args) =>
+            foreach (int _ in dc.Run(ckt, DC.ExportSweep))
             {
-                var input = args.GetSweepValues()[0];
-                var output = args.GetVoltage("out");
-                Assert.AreEqual(input, output * 2, 1e-9);
-                Assert.AreEqual(refPower.Value, actPower.Value, 1e-9);
-            };
-            dc.Run(ckt);
+                var input = dc.GetCurrentSweepValue()[0];
+                var output = dc.GetVoltage("out");
+                Assert.That(output * 2, Is.EqualTo(input).Within(1e-9));
+                Assert.That(actPower.Value, Is.EqualTo(refPower.Value).Within(1e-9));
+            }
         }
 
         [Test]
@@ -57,13 +55,12 @@ namespace SpiceSharpBehavioralTest.Components
                 new BehavioralResistor("R2", "out", "0", "1k"));
             var ac = new AC("ac", new DecadeSweep(1, 1e3, 2));
 
-            ac.ExportSimulationData += (sender, args) =>
+            foreach (int _ in ac.Run(ckt, AC.ExportSmallSignal))
             {
-                var output = args.GetComplexVoltage("out");
-                Assert.AreEqual(0.5, output.Real, 1e-9);
-                Assert.AreEqual(0.0, output.Imaginary, 1e-9);
-            };
-            ac.Run(ckt);
+                var output = ac.GetComplexVoltage("out");
+                Assert.That(output.Real, Is.EqualTo(0.5).Within(1e-9));
+                Assert.That(output.Imaginary, Is.EqualTo(0.0).Within(1e-9));
+            }
         }
 
         [Test]
@@ -75,12 +72,12 @@ namespace SpiceSharpBehavioralTest.Components
 
             var op = new OP("op");
             var refExport = new RealCurrentExport(op, "V1");
-            op.ExportSimulationData += (sender, args) =>
+
+            foreach (int _ in op.Run(ckt, OP.ExportOperatingPoint))
             {
-                Assert.AreEqual(10.0, args.GetVoltage("OUT"), 1e-12);
-                Assert.AreEqual(-1.0, refExport.Value, 1e-12);
-            };
-            op.Run(ckt);
+                Assert.That(op.GetVoltage("OUT"), Is.EqualTo(10.0).Within(1e-12));
+                Assert.That(refExport.Value, Is.EqualTo(-1.0).Within(1e-12));
+            }
         }
 
         [Test]
@@ -93,12 +90,11 @@ namespace SpiceSharpBehavioralTest.Components
                 );
             var op = new OP("Voltage switch simulation");
             var refExport = new RealCurrentExport(op, "V2");
-            op.ExportSimulationData += (sender, args) =>
-            {
-                Assert.AreEqual(-0.00316228, refExport.Value, 1e-8);
-            };
 
-            op.Run(ckt);
+            foreach (int _ in op.Run(ckt, OP.ExportOperatingPoint))
+            {
+                Assert.That(refExport.Value, Is.EqualTo(-0.00316228).Within(1e-8));
+            }
         }
     }
 }

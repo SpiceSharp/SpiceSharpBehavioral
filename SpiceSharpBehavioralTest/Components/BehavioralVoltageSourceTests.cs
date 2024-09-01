@@ -35,13 +35,12 @@ namespace SpiceSharpBehavioralTest.Components
             var actPower = new RealPropertyExport(op, "V2", "p");
 
             // Do simulation
-            op.ExportSimulationData += (sender, args) =>
+            foreach (int _ in op.Run(ckt, OP.ExportOperatingPoint))
             {
-                Assert.AreEqual(refCurrent.Value, actCurrent.Value, 1e-9);
-                Assert.AreEqual(refVoltage.Value, actVoltage.Value, 1e-9);
-                Assert.AreEqual(refPower.Value, actPower.Value, 1e-9);
-            };
-            op.Run(ckt);
+                Assert.That(actCurrent.Value, Is.EqualTo(refCurrent.Value).Within(1e-9));
+                Assert.That(actVoltage.Value, Is.EqualTo(refVoltage.Value).Within(1e-9));
+                Assert.That(actPower.Value, Is.EqualTo(refPower.Value).Within(1e-9));
+            }
         }
 
         [TestCaseSource(typeof(BehavioralVoltageSourceTestData), nameof(BehavioralVoltageSourceTestData.Op))]
@@ -53,11 +52,10 @@ namespace SpiceSharpBehavioralTest.Components
                 new BehavioralVoltageSource("B1", "out", "0", expression));
             var op = new OP("op");
 
-            op.ExportSimulationData += (sender, args) =>
+            foreach (int _ in op.Run(ckt, OP.ExportOperatingPoint))
             {
-                Assert.AreEqual(expected, args.GetVoltage("out"), 1e-12);
-            };
-            op.Run(ckt);
+                Assert.That(op.GetVoltage("out"), Is.EqualTo(expected).Within(1e-12));
+            }
         }
 
         [TestCaseSource(typeof(BehavioralVoltageSourceTestData), nameof(BehavioralVoltageSourceTestData.Ac))]
@@ -69,14 +67,13 @@ namespace SpiceSharpBehavioralTest.Components
                 new BehavioralVoltageSource("B1", "out", "0", expression));
             var ac = new AC("op", new DecadeSweep(1, 1e3, 2));
 
-            ac.ExportSimulationData += (sender, args) =>
+            foreach (int _ in ac.Run(ckt, AC.ExportSmallSignal))
             {
-                var e = expected(args.Laplace);
-                var a = args.GetComplexVoltage("out");
-                Assert.AreEqual(e.Real, a.Real, 1e-12);
-                Assert.AreEqual(e.Imaginary, a.Imaginary, 1e-12);
-            };
-            ac.Run(ckt);
+                var e = expected(new Complex(0.0, ac.Frequency * 2.0 * Math.PI));
+                var a = ac.GetComplexVoltage("out");
+                Assert.That(a.Real, Is.EqualTo(e.Real).Within(1e-12));
+                Assert.That(a.Imaginary, Is.EqualTo(e.Imaginary).Within(1e-12));
+            }
         }
 
         [TestCaseSource(typeof(BehavioralVoltageSourceTestData), nameof(BehavioralVoltageSourceTestData.AdmittanceOp))]
@@ -90,11 +87,10 @@ namespace SpiceSharpBehavioralTest.Components
                 );
             var op = new OP("op");
 
-            op.ExportSimulationData += (sender, args) =>
+            foreach (int _ in op.Run(ckt, OP.ExportOperatingPoint))
             {
-                Assert.AreEqual(expected, args.GetVoltage("out"), 1e-12);
-            };
-            op.Run(ckt);
+                Assert.That(op.GetVoltage("out"), Is.EqualTo(expected).Within(1e-12));
+            }
         }
 
         [Test]
@@ -105,11 +101,10 @@ namespace SpiceSharpBehavioralTest.Components
                 new BehavioralVoltageSource("V1", "in", "0", "5*sin(time*10*pi)"));
             var tran = new Transient("tran", 1e-3, 1);
 
-            tran.ExportSimulationData += (sender, args) =>
+            foreach (int _ in tran.Run(ckt, Transient.ExportTransient))
             {
-                Assert.AreEqual(5 * Math.Sin(args.Time * 10 * Math.PI), args.GetVoltage("in"), 1e-9);
-            };
-            tran.Run(ckt);
+                Assert.That(tran.GetVoltage("in"), Is.EqualTo(5 * Math.Sin(tran.Time * 10 * Math.PI)).Within(1e-9));
+            }
         }
 
         [Test]
@@ -121,11 +116,10 @@ namespace SpiceSharpBehavioralTest.Components
                 new BehavioralVoltageSource("V1", "in", "0", "max(0, V(b)*5*sin(time*10*pi))"));
             var tran = new Transient("tran", 1e-3, 1);
 
-            tran.ExportSimulationData += (sender, args) =>
+            foreach (int _ in tran.Run(ckt, Transient.ExportTransient))
             {
-                Assert.AreEqual(5 * Math.Max(0, Math.Sin(args.Time * 10 * Math.PI)), args.GetVoltage("in"), 1e-9);
-            };
-            tran.Run(ckt);
+                Assert.That(tran.GetVoltage("in"), Is.EqualTo(5 * Math.Max(0, Math.Sin(tran.Time * 10 * Math.PI))).Within(1e-9));
+            }
         }
 
         [Test]
@@ -137,11 +131,10 @@ namespace SpiceSharpBehavioralTest.Components
                 new BehavioralVoltageSource("V1", "in", "0", "min(0, V(b)*5*sin(time*10*pi))"));
             var tran = new Transient("tran", 1e-3, 1);
 
-            tran.ExportSimulationData += (sender, args) =>
+            foreach (int _ in tran.Run(ckt, Transient.ExportTransient))
             {
-                Assert.AreEqual(5 * Math.Min(0, Math.Sin(args.Time * 10 * Math.PI)), args.GetVoltage("in"), 1e-9);
-            };
-            tran.Run(ckt);
+                Assert.That(tran.GetVoltage("in"), Is.EqualTo(5 * Math.Min(0, Math.Sin(tran.Time * 10 * Math.PI))).Within(1e-9));
+            }
         }
 
         [Test]
@@ -155,16 +148,16 @@ namespace SpiceSharpBehavioralTest.Components
 
             var expectedExport = new RealCurrentExport(tran, "Vtmp");
             var actualExport = new RealVoltageExport(tran, "in");
-            tran.ExportSimulationData += (sender, args) =>
+
+            foreach (int _ in tran.Run(ckt, Transient.ExportTransient))
             {
-                if (args.Time > 0)
+                if (tran.Time > 0)
                 {
                     var expected = expectedExport.Value;
                     var actual = -actualExport.Value;
-                    Assert.AreEqual(expected, actual, 1e-9);
+                    Assert.That(actual, Is.EqualTo(expected).Within(1e-9));
                 }
-            };
-            tran.Run(ckt);
+            }
         }
 
         [Test]
@@ -180,16 +173,16 @@ namespace SpiceSharpBehavioralTest.Components
 
             var expectedExport = new RealVoltageExport(tran, "a");
             var actualExport = new RealVoltageExport(tran, "in");
-            tran.ExportSimulationData += (sender, args) =>
+
+            foreach (int _ in tran.Run(ckt, Transient.ExportTransient))
             {
-                if (args.Time > 0)
+                if (tran.Time > 0)
                 {
                     var expected = expectedExport.Value;
                     var actual = -actualExport.Value;
-                    Assert.AreEqual(expected, actual, 1e-9);
+                    Assert.That(actual, Is.EqualTo(expected).Within(1e-9));
                 }
-            };
-            tran.Run(ckt);
+            }
         }
 
         [Test]
@@ -201,13 +194,12 @@ namespace SpiceSharpBehavioralTest.Components
                 new BehavioralVoltageSource("V1", "b", "0", "I(I1)"));
             var tran = new Transient("tran", 1e-3, 0.1);
 
-            tran.ExportSimulationData += (sender, args) =>
+            foreach (int _ in tran.Run(ckt, Transient.ExportTransient))
             {
-                var expected = Math.Sin(2 * Math.PI * 100 * args.Time);
-                var actual = args.GetVoltage("b");
-                Assert.AreEqual(expected, actual, 1e-9);
-            };
-            tran.Run(ckt);
+                var expected = Math.Sin(2 * Math.PI * 100 * tran.Time);
+                var actual = tran.GetVoltage("b");
+                Assert.That(actual, Is.EqualTo(expected).Within(1e-9));
+            }
         }
     }
 

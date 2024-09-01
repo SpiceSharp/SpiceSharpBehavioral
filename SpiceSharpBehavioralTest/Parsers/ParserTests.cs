@@ -14,7 +14,7 @@ namespace SpiceSharpBehavioralTest.Parsers
         {
             var lexer = Lexer.FromString(input);
             var actual = Parser.Parse(lexer);
-            Assert.AreEqual(expected, actual);
+            Assert.That(actual, Is.EqualTo(expected));
         }
 
         public static IEnumerable<TestCaseData> SpiceNumbers

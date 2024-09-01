@@ -78,7 +78,7 @@ namespace SpiceSharpBehavioralTest.Components
             Entry(ckt, "X_entry1", "N1", "0", "N2", a0_entry, b0_entry, density, viscosity, rout_entry, rin_entry, r1_entry1, r2_entry1);
             Entry(ckt, "X_entry2", "N1", "0", "N3", a0_entry, b0_entry, density, viscosity, rout_entry, rin_entry, r1_entry2, r2_entry2);
 
-            OP op = new OP("op");
+            var op = new OP("op");
             op.Run(ckt);
 
         }
@@ -124,13 +124,13 @@ namespace SpiceSharpBehavioralTest.Components
 
             // Run the simulation
             var op = new OP("op");
-            op.ExportSimulationData += (sender, args) =>
-            {
-                Assert.AreEqual(1.0 / 1e3, args.GetVoltage("out"), 1e-9);
-            };
-            op.Run(ckt);
 
-            Assert.AreEqual(1, warnings);
+            foreach (int _ in op.Run(ckt, OP.ExportOperatingPoint))
+            {
+                Assert.That(op.GetVoltage("out"), Is.EqualTo(1.0 / 1e3).Within(1e-9));
+            }
+
+            Assert.That(warnings, Is.EqualTo(1));
         }
     }
 }

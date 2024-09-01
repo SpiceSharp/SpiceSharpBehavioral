@@ -11,12 +11,12 @@ namespace SpiceSharpBehavioralTest.Parsers
         private static void CompareDictionary<K, V>(Dictionary<K, V> expected, Dictionary<K, V> actual)
         {
             if (expected == null)
-                Assert.AreEqual(null, actual);
+                Assert.That(actual, Is.Null);
             else
             {
-                Assert.AreEqual(expected.Count, actual.Count);
+                Assert.That(actual.Count, Is.EqualTo(expected.Count));
                 foreach (var pair in expected)
-                    Assert.AreEqual(pair.Value, actual[pair.Key]);
+                    Assert.That(actual[pair.Key], Is.EqualTo(pair.Value));
             }
         }
 

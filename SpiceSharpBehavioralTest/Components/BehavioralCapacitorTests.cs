@@ -30,13 +30,12 @@ namespace SpiceSharpBehavioralTest.Components
             var refPower = new RealPropertyExport(tran, "C1", "p");
             var actPower = new RealPropertyExport(tran, "C2", "p");
 
-            tran.ExportSimulationData += (sender, args) =>
+            foreach (int _ in tran.Run(ckt, Transient.ExportTransient))
             {
-                Assert.AreEqual(refCurrent.Value, actCurrent.Value, 1e-9);
-                Assert.AreEqual(refVoltage.Value, actVoltage.Value, 1e-9);
-                Assert.AreEqual(refPower.Value, actPower.Value, 1e-9);
-            };
-            tran.Run(ckt);
+                Assert.That(actCurrent.Value, Is.EqualTo(refCurrent.Value).Within(1e-9));
+                Assert.That(actVoltage.Value, Is.EqualTo(refVoltage.Value).Within(1e-9));
+                Assert.That(actPower.Value, Is.EqualTo(refPower.Value).Within(1e-9));
+            }
         }
 
         [Test]
@@ -50,12 +49,12 @@ namespace SpiceSharpBehavioralTest.Components
 
             var refExport = new ComplexPropertyExport(ac, "C1", "i");
             var actExport = new ComplexPropertyExport(ac, "C2", "i");
-            ac.ExportSimulationData += (sender, args) =>
+
+            foreach (int _ in ac.Run(ckt, AC.ExportSmallSignal))
             {
-                Assert.AreEqual(refExport.Value.Real, actExport.Value.Real, 1e-9);
-                Assert.AreEqual(refExport.Value.Imaginary, actExport.Value.Imaginary, 1e-9);
-            };
-            ac.Run(ckt);
+                Assert.That(actExport.Value.Real, Is.EqualTo(refExport.Value.Real).Within(1e-9));
+                Assert.That(actExport.Value.Imaginary, Is.EqualTo(refExport.Value.Imaginary).Within(1e-9));
+            }
         }
 
         [Test]
@@ -84,14 +83,13 @@ namespace SpiceSharpBehavioralTest.Components
             Func<double, double> reference = t => dcVoltage * (1.0 - Math.Exp(-t / tau));
 
             // Run
-            tran.ExportSimulationData += (sender, args) =>
+            foreach (int _ in tran.Run(ckt, Transient.ExportTransient))
             {
-                double v_actual = args.GetVoltage("OUT");
-                double v_reference = reference(args.Time);
+                double v_actual = tran.GetVoltage("OUT");
+                double v_reference = reference(tran.Time);
                 double tol = Math.Max(Math.Abs(v_actual), Math.Abs(v_reference)) * 1e-3 + 1e-12;
-                Assert.AreEqual(v_reference, v_actual, tol);
-            };
-            tran.Run(ckt);
+                Assert.That(v_actual, Is.EqualTo(v_reference).Within(tol));
+            }
         }
     }
 }
